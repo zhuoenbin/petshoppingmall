@@ -1,4 +1,4 @@
-package com.ispan.dogland.entity.product;
+package com.ispan.dogland.model.entity.product;
 
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;

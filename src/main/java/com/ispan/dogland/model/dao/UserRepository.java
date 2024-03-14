@@ -6,6 +6,10 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface UserRepository extends JpaRepository<Users, Integer> {
     Users findByUserId(Integer userId);
+
+    Users findByUserEmail(String userEmail);
     @Query("select u from Users u join fetch u.dogs where u.userId = ?1")
     Users findUserAndDogsByUserId(Integer userId);
+
+
 }

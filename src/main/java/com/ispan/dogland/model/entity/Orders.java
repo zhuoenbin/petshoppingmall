@@ -70,7 +70,8 @@ public class Orders {
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private Date orderCancelDate;
 
-    @Column(name="shipping_company_id")
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumn(name="shipping_company_id")
     private ShippingCompany shippingCompany;
 
     private String city;
@@ -345,6 +346,5 @@ public class Orders {
         sb.append('}');
         return sb.toString();
     }
-
 
 }

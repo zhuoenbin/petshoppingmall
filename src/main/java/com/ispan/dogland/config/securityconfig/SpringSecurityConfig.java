@@ -13,6 +13,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -35,9 +36,10 @@ public class SpringSecurityConfig {
 
                 .authorizeHttpRequests(request -> request
 
-                                .requestMatchers("/loginPage","/mainPage","/registerPage","/register/**","/forgetPassword/**","/clearSessionAndCookies","/test").permitAll()
-                                .requestMatchers("/userLogin").hasAnyRole("HR1", "M1", "USER")
-                                .anyRequest().authenticated()
+                        .requestMatchers("/loginPage","/mainPage","/registerPage","/register/**","/forgetPassword/**","/clearSessionAndCookies").permitAll()
+                        .requestMatchers("/userLogin").hasAnyRole("HR1", "M1", "USER")
+                        .requestMatchers("/test").hasRole("USER")
+                        .anyRequest().authenticated()
                 )
 
 //                .oauth2Login(oauth2 -> oauth2
@@ -58,9 +60,9 @@ public class SpringSecurityConfig {
                         .logoutSuccessUrl("/mainPage")
                 )
 
-                .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .accessDeniedPage("/access-denied")
-                )
+//                .exceptionHandling(exceptionHandling -> exceptionHandling
+//                        .accessDeniedPage("/access-denied")
+//                )
 
 
                 //設定session創建機制

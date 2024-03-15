@@ -1,8 +1,10 @@
 package com.ispan.dogland;
 
 import com.ispan.dogland.model.dao.DogRepository;
+import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.entity.Dog;
+import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -23,8 +25,10 @@ public class DoglandApplication {
 	//測試方法
 	@Bean
 	public CommandLineRunner commandLineRunner(UserRepository userRepository,
-											   DogRepository dogRepository) {
+											   DogRepository dogRepository,
+											   EmployeeRepository employeeRepository) {
 		return runner -> {
+
 
 		};
 	}

@@ -8,7 +8,7 @@ public class EmployeePermissions {
     @Id
     private String dbAuthority;
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Integer permissionId;
 
     private String department;

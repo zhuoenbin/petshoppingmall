@@ -1,7 +1,9 @@
 package com.ispan.dogland.service;
 
+import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dto.Passport;
+import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.service.interfaceFile.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +17,16 @@ import java.util.*;
 public class AccountServiceImpl implements AccountService {
     private final Map<String,String> emailVerificationCodes = new HashMap<>();
     private UserRepository usersRepository;
+    private EmployeeRepository employeeRepository;
     private PasswordEncoder passwordEncoder;
     private MailService mailService;
 
     @Autowired
-    public AccountServiceImpl(UserRepository usersRepository, PasswordEncoder passwordEncoder,MailService mailService) {
+    public AccountServiceImpl(UserRepository usersRepository,EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder,MailService mailService) {
         this.usersRepository = usersRepository;
         this.passwordEncoder = passwordEncoder;
         this.mailService = mailService;
+        this.employeeRepository = employeeRepository;
     }
 
     @Override
@@ -50,7 +54,9 @@ public class AccountServiceImpl implements AccountService {
             passportDTO = new Passport(user.getLastName(),user.getUserEmail(), user.getUserId(), null);
             return passportDTO;
         }else {
-           return null;
+            Employee emp = employeeRepository.findByEmail(username);
+            passportDTO = new Passport(emp.getLastName(),emp.getEmail(), emp.getEmployeeId(), null);
+            return passportDTO;
         }
     }
 

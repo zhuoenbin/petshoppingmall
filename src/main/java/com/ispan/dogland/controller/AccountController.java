@@ -18,7 +18,7 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
-    @GetMapping("test")
+    @GetMapping("/test")
     public String test() {
         return "test";
     }
@@ -28,6 +28,7 @@ public class AccountController {
 
         // 取得使用者的帳號(email)
         String username = authentication.getName();
+
         // 取得使用者的權限
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         String authority = authorities.iterator().next().getAuthority();

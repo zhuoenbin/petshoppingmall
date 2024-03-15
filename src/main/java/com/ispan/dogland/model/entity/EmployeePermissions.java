@@ -8,6 +8,7 @@ public class EmployeePermissions {
     @Id
     private String dbAuthority;
 
+
     private Integer permissionId;
 
     private String department;

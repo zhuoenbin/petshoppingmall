@@ -70,7 +70,8 @@ public class Orders {
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private Date orderCancelDate;
 
-    @Column(name="shipping_company_id")
+    @ManyToOne
+    @JoinColumn(name = "shipping_company_id")
     private ShippingCompany shippingCompany;
 
     private String city;

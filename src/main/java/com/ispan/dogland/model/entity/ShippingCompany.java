@@ -8,6 +8,7 @@ public class ShippingCompany {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "shipping_company_id")
     private Integer shippingCompanyId;
 
     private String shippingCompanyName;

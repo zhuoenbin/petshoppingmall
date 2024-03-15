@@ -1,9 +1,8 @@
-package com.ispan.dogland.entity;
+package com.ispan.dogland.model.entity;
 
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

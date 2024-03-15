@@ -1,4 +1,4 @@
-package com.ispan.dogland.entity;
+package com.ispan.dogland.model.entity;
 import jakarta.persistence.*;
 
 import java.util.Date;

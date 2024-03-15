@@ -1,9 +1,7 @@
 package com.ispan.dogland;
 
-import com.ispan.dogland.dao.OrderDetailRepository;
-import com.ispan.dogland.dao.OrdersRepository;
-import com.ispan.dogland.entity.OrderDetail;
-import com.ispan.dogland.entity.Orders;
+import com.ispan.dogland.model.dao.OrderDetailRepository;
+import com.ispan.dogland.model.entity.OrderDetail;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

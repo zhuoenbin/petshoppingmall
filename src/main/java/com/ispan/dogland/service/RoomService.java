@@ -1,7 +1,9 @@
 package com.ispan.dogland.service;
 
+import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.RoomRepository;
 import com.ispan.dogland.model.dao.RoomReservationRepository;
+import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Orders;
 import com.ispan.dogland.model.entity.Room;
 import com.ispan.dogland.model.entity.RoomReservation;
@@ -24,6 +26,9 @@ public class RoomService {
     @Autowired
     private RoomReservationRepository roomReservation;
 
+    @Autowired
+    private DogRepository dog;
+
 //    訂單時間
 //    public List<List<String>> room() {
 //        List<List<String>> roomList = new ArrayList<>();
@@ -43,9 +48,7 @@ public class RoomService {
 //            // 加入當天日期
 //            roomTime.add(receiveDate.toString());
 //
-//            // 顯示範圍內的日期
 //            for (int i = 0; i < daysBetween; i++) {
-//                // 加入前一天日期
 //                roomTime.add(currentDay.plusDays(i).toString());
 //            }
 //
@@ -57,10 +60,13 @@ public class RoomService {
 
 
     public List<Room> room() {
-
         List<Room> rooms = room.findAll();
-
         return rooms;
+    }
+
+    public List<Dog> dogs() {
+        List<Dog> dogs = dog.findAll();
+        return dogs;
     }
 
 }

@@ -17,6 +17,14 @@
 <!--</div>-->
 
 <div id="app">
+
+    <select>
+        <option >請選擇要住宿的寵物</option>
+        <option v-for="(dog, dogId) in dogs" :key="dogId">
+            {{ dog.dogName }}
+        </option>
+    </select>
+
     <div v-for="(room, roomId) in rooms" :key="roomId">
         <span>
             <div>
@@ -42,30 +50,30 @@
         el: '#app',
         data() {
             return {
-                rooms: [] // 用於存儲從Spring Boot應用程序返回的訂單數據
+                rooms: [],
+                dogs: []
             };
         },
         created() {
-            // 在組件創建時發送HTTP GET請求以獲取訂單數據
             axios.get('/room')
                 .then(response => {
-                    // 從HTTP響應中獲取訂單數據
                     this.rooms = response.data;
-                    console.log(this.rooms); // 將數據輸出到控制台
-                })
-                .catch(error => {
-                    // 處理錯誤
-                    console.error('獲取訂單時出錯:', error);
+                    console.log(this.rooms);
                 });
+            axios.get('/dog')
+                .then(response => {
+                    this.dogs = response.data;
+                    console.log(this.dogs);
+                })
         },
         methods: {
-            // 方法用於檢查日期是否在指定範圍內
 <!--            isIncludedDate(date) {-->
 <!--                return date >= '2024-03-17' && date <= '2024-03-19';-->
 <!--            }-->
         }
     });
 </script>
+
 
 </body>
 </html>

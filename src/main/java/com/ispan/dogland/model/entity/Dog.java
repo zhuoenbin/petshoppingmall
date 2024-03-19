@@ -1,4 +1,6 @@
 package com.ispan.dogland.model.entity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -6,25 +8,41 @@ import java.util.Date;
 @Entity
 @Table(name = "dog")
 public class Dog {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer dogId;
+
     private String dogName;
+
     private String dogImgPathLocal;
+
     private String dogImgPathCloud;
+
     private String dogImgPublicId;
+
     private String dogGender;
+
     private String dogIntroduce;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "dog_birth_date")
     private Date dogBirthDate;
+
     private Double dogWeight;
+
     private String dogBreed;
-    private Integer userId;
+
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private Users user;
 
     public Dog() {
     }
 
-    public Dog(Integer dogId, String dogName, String dogImgPathLocal, String dogImgPathCloud, String dogImgPublicId, String dogGender, String dogIntroduce, Date dogBirthDate, Double dogWeight, String dogBreed, Integer userId) {
-        this.dogId = dogId;
+    public Dog(String dogName, String dogImgPathLocal, String dogImgPathCloud, String dogImgPublicId, String dogGender, String dogIntroduce, Date dogBirthDate, Double dogWeight, String dogBreed, Users user) {
         this.dogName = dogName;
         this.dogImgPathLocal = dogImgPathLocal;
         this.dogImgPathCloud = dogImgPathCloud;
@@ -34,7 +52,7 @@ public class Dog {
         this.dogBirthDate = dogBirthDate;
         this.dogWeight = dogWeight;
         this.dogBreed = dogBreed;
-        this.userId = userId;
+        this.user = user;
     }
 
     public Integer getDogId() {
@@ -117,12 +135,12 @@ public class Dog {
         this.dogBreed = dogBreed;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public Users getUser() {
+        return user;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setUser(Users user) {
+        this.user = user;
     }
 
     @Override
@@ -138,7 +156,7 @@ public class Dog {
         sb.append(", dogBirthDate=").append(dogBirthDate);
         sb.append(", dogWeight=").append(dogWeight);
         sb.append(", dogBreed='").append(dogBreed).append('\'');
-        sb.append(", userId=").append(userId);
+        sb.append(", user=").append(user);
         sb.append('}');
         return sb.toString();
     }

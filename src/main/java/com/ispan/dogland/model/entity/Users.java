@@ -1,6 +1,7 @@
 package com.ispan.dogland.model.entity;
 
 
+import com.ispan.dogland.model.entity.tweet.Tweet;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -37,6 +38,10 @@ public class Users {
     @OneToMany(mappedBy = "user",
             cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Dog> dogs;
+
+    @OneToMany(mappedBy = "user",
+            cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Tweet> tweets;
 
     @PrePersist //在物件轉換到persistent狀態以前，做這個function
     public void onCreate() {

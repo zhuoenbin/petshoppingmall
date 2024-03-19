@@ -1,5 +1,6 @@
 package com.ispan.dogland.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -85,6 +86,8 @@ public class Orders {
     @OneToMany(mappedBy = "order",
             fetch = FetchType.LAZY ,
             cascade = {CascadeType.ALL})
+    // 序列化時省略掉這個物件
+    @JsonIgnore
     private List<OrderDetail> orderDetail;
 
     public List<OrderDetail> getOrderDetail() {

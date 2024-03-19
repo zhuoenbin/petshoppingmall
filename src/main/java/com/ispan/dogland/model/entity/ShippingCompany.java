@@ -2,6 +2,9 @@ package com.ispan.dogland.model.entity;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "shipping_company")
 public class ShippingCompany {
@@ -14,6 +17,28 @@ public class ShippingCompany {
     private String shippingCompanyName;
 
     private Integer shippingCompanyFreight;
+
+    @OneToMany(mappedBy = "shippingCompany",
+            fetch = FetchType.LAZY ,
+            cascade = {CascadeType.ALL})
+    private List<Orders> order;
+
+    public List<Orders> getOrders() {
+        return order;
+    }
+
+    public void setOrders(List<Orders> shippingCompany) {
+        this.order = order;
+    }
+
+    public void addOrders(Orders tmpOrders){
+        if(order==null){
+            order = new ArrayList<>();
+        }
+        order.add(tmpOrders);
+
+        tmpOrders.setShippingCompany(this);
+    }
 
     public ShippingCompany() {
     }
@@ -57,4 +82,6 @@ public class ShippingCompany {
         sb.append('}');
         return sb.toString();
     }
+
+
 }

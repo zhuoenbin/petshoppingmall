@@ -1,5 +1,6 @@
 package com.ispan.dogland.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -70,8 +71,8 @@ public class Orders {
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private Date orderCancelDate;
 
-    @ManyToOne
-    @JoinColumn(name = "shipping_company_id")
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumn(name="shipping_company_id")
     private ShippingCompany shippingCompany;
 
     private String city;
@@ -85,6 +86,8 @@ public class Orders {
     @OneToMany(mappedBy = "order",
             fetch = FetchType.LAZY ,
             cascade = {CascadeType.ALL})
+    // 序列化時省略掉這個物件
+    @JsonIgnore
     private List<OrderDetail> orderDetail;
 
     public List<OrderDetail> getOrderDetail() {

@@ -1,8 +1,8 @@
 package com.ispan.dogland.service;
 
-import com.ispan.dogland.model.dao.ActivityTypeRepository;
-import com.ispan.dogland.model.dao.VenueRentalRepository;
-import com.ispan.dogland.model.dao.VenueRepository;
+import com.ispan.dogland.model.dao.activity.ActivityTypeRepository;
+import com.ispan.dogland.model.dao.activity.VenueRentalRepository;
+import com.ispan.dogland.model.dao.activity.VenueRepository;
 import com.ispan.dogland.model.entity.activity.Venue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -43,6 +43,21 @@ public class VenueRental {
 
     //////////////////////////////////////
 
+    @PrePersist //在物件轉換到persistent狀態以前，做這個function
+    public void onCreate() {
+        if(rentalOrderDate==null && rentalUpdateDate==null) {
+            rentalOrderDate=new Date();
+            rentalUpdateDate=new Date();
+        }
+    }
+
+    @PreUpdate
+    public void onUpdate(){
+        rentalUpdateDate = new Date();
+    }
+
+    /////////////////////////////////////
+
     public VenueRental() {
     }
 

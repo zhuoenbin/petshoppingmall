@@ -55,7 +55,7 @@ public class DoglandApplication {
 		dog1.setDogGender("Male");
 		dog1.setDogIntroduce("Friendly and playful dog");
 		dog1.setDogBirthDate(new Date()); // Set birth date to current date
-		dog1.setDogSize(3); // Assuming 3 represents medium size
+		dog1.setDogWeight(10.6); // Assuming 3 represents medium size
 		dog1.setDogBreed("Labrador Retriever");
 
 		Dog dog2 = new Dog();
@@ -67,7 +67,7 @@ public class DoglandApplication {
 		dog2.setDogGender("Female");
 		dog2.setDogIntroduce("Calm and affectionate dog");
 		dog2.setDogBirthDate(new Date()); // Set birth date to current date
-		dog2.setDogSize(2); // Assuming 2 represents small size
+		dog2.setDogWeight(22.0); // Assuming 2 represents small size
 		dog2.setDogBreed("Golden Retriever");
 
 		dog1.setUser(u1);

@@ -2,6 +2,8 @@ package com.ispan.dogland.model.entity.activity;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Table
 @Entity
 public class Venue {
@@ -16,6 +18,12 @@ public class Venue {
     private Integer venueRent;
 
     //////////////////////////////////////
+    @OneToMany(mappedBy = "venue", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<VenueActivity> venueActivityList;
+
+
+
+    /////////////////////////////////////
     public Venue() {
     }
 
@@ -66,5 +74,13 @@ public class Venue {
 
     public void setVenueRent(Integer venueRent) {
         this.venueRent = venueRent;
+    }
+
+    public List<VenueActivity> getVenueActivityList() {
+        return venueActivityList;
+    }
+
+    public void setVenueActivityList(List<VenueActivity> venueActivityList) {
+        this.venueActivityList = venueActivityList;
     }
 }

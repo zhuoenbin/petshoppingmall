@@ -1,4 +1,4 @@
-package com.ispan.dogland.model.dao;
+package com.ispan.dogland.model.dao.activity;
 
 import com.ispan.dogland.model.entity.activity.ActivityType;
 import org.springframework.data.jpa.repository.JpaRepository;

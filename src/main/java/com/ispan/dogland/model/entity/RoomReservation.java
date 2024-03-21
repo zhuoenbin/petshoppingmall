@@ -1,5 +1,6 @@
 package com.ispan.dogland.model.entity;
 
+import com.ispan.dogland.model.entity.Room;
 import jakarta.persistence.*;
 import java.util.Date;
 

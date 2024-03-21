@@ -32,6 +32,10 @@ public class Users {
 
     private Date lastLoginTime;
 
+    private String userImgPath;
+
+    private String imgPublicId;
+
     private String userStatus;
 
     @OneToMany(mappedBy = "user",
@@ -132,6 +136,22 @@ public class Users {
         this.lastLoginTime = lastLoginTime;
     }
 
+    public String getUserImgPath() {
+        return userImgPath;
+    }
+
+    public void setUserImgPath(String userImgPath) {
+        this.userImgPath = userImgPath;
+    }
+
+    public String getImgPublicId() {
+        return imgPublicId;
+    }
+
+    public void setImgPublicId(String imgPublicId) {
+        this.imgPublicId = imgPublicId;
+    }
+
     public String getUserStatus() {
         return userStatus;
     }
@@ -167,7 +187,10 @@ public class Users {
         sb.append(", birthDate=").append(birthDate);
         sb.append(", userViolationCount=").append(userViolationCount);
         sb.append(", lastLoginTime=").append(lastLoginTime);
+        sb.append(", userImgPath='").append(userImgPath).append('\'');
+        sb.append(", imgPublicId='").append(imgPublicId).append('\'');
         sb.append(", userStatus='").append(userStatus).append('\'');
+        sb.append(", dogs=").append(dogs);
         sb.append('}');
         return sb.toString();
     }

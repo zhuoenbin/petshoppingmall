@@ -1,45 +1,29 @@
-package com.ispan.dogland.model.entity.activity;
+package com.ispan.dogland.model.dto;
 
 import com.ispan.dogland.model.entity.Users;
-import jakarta.persistence.*;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-@Table
-@Entity
-public class VenueRental {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class RentalData {
     private Integer rentalId;
-
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name="venue_id")
-    private Venue venue;
-
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name="user_id")
-    private Users user;
+    private Integer venueId;
+    private Integer userId;
     private Integer participantsNumber;
     private Integer dogNumber;
-
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy/MM/dd")
     private Date rentalDate;
-
     @Temporal(TemporalType.TIME)
     @DateTimeFormat(pattern = "hh:mm")
     private Date rentalStart;
-
     @Temporal(TemporalType.TIME)
     @DateTimeFormat(pattern = "hh:mm")
     private Date rentalEnd;
-    private Integer rentalTotal;
-    @Column(columnDefinition = "VARCHAR(20) DEFAULT '已訂'")
     private String rentalOrderStatus;
-    @Column(columnDefinition = "INT DEFAULT 1")
-    private Integer paymentStatus; //0 未付/1 已付 /2 官方
-
+    private Integer paymentStatus;
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private Date rentalOrderDate;
@@ -47,35 +31,16 @@ public class VenueRental {
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private Date rentalUpdateDate;
 
-    //////////////////////////////////////
+    //////////////
 
-    @PrePersist //在物件轉換到persistent狀態以前，做這個function
-    public void onCreate() {
-        if(rentalOrderDate==null && rentalUpdateDate==null) {
-            rentalOrderDate=new Date();
-            rentalUpdateDate=new Date();
-            if(rentalOrderStatus==null && paymentStatus==null) {
-                rentalOrderStatus="已訂";
-                paymentStatus=1;
-            }
-        }
+
+    public RentalData() {
     }
 
 
-
-
-
-    @PreUpdate
-    public void onUpdate(){
-        rentalUpdateDate = new Date();
+    public RentalData(Integer userId) {
+        this.userId = userId;
     }
-
-    /////////////////////////////////////
-
-    public VenueRental() {
-    }
-
-    /////////////////////////////////////
 
     public Integer getRentalId() {
         return rentalId;
@@ -85,12 +50,12 @@ public class VenueRental {
         this.rentalId = rentalId;
     }
 
-    public Users getUser() {
-        return user;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setUser(Users user) {
-        this.user = user;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public Integer getParticipantsNumber() {
@@ -133,14 +98,6 @@ public class VenueRental {
         this.rentalEnd = rentalEnd;
     }
 
-    public Integer getRentalTotal() {
-        return rentalTotal;
-    }
-
-    public void setRentalTotal(Integer rentalTotal) {
-        this.rentalTotal = rentalTotal;
-    }
-
     public String getRentalOrderStatus() {
         return rentalOrderStatus;
     }
@@ -173,11 +130,11 @@ public class VenueRental {
         this.rentalUpdateDate = rentalUpdateDate;
     }
 
-    public Venue getVenue() {
-        return venue;
+    public Integer getVenueId() {
+        return venueId;
     }
 
-    public void setVenue(Venue venue) {
-        this.venue = venue;
+    public void setVenueId(Integer venueId) {
+        this.venueId = venueId;
     }
 }

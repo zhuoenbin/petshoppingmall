@@ -1,5 +1,6 @@
 package com.ispan.dogland.model.entity.activity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -13,6 +14,7 @@ public class ActivityType {
     private String activityTypeName;
 
     @OneToMany(mappedBy = "activityType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<VenueActivity> venueActivityList;
 
     public Integer getActivityTypeId() {

@@ -30,4 +30,9 @@ public class TweetServiceImpl implements TweetService {
         }
         return null;
     }
+
+    @Override
+    public List<Tweet> getAllTweet() {
+        return tweetRepository.findAll();
+    }
 }

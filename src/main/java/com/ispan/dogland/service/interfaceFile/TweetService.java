@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface TweetService {
     public List<Tweet> findTweetsByUserId(Integer userId);
+
+    public List<Tweet> getAllTweet();
 }

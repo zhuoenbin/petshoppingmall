@@ -42,19 +42,6 @@ public class Dog {
     public Dog() {
     }
 
-    public Dog(String dogName, String dogImgPathLocal, String dogImgPathCloud, String dogImgPublicId, String dogGender, String dogIntroduce, Date dogBirthDate, Double dogWeight, String dogBreed, Users user) {
-        this.dogName = dogName;
-        this.dogImgPathLocal = dogImgPathLocal;
-        this.dogImgPathCloud = dogImgPathCloud;
-        this.dogImgPublicId = dogImgPublicId;
-        this.dogGender = dogGender;
-        this.dogIntroduce = dogIntroduce;
-        this.dogBirthDate = dogBirthDate;
-        this.dogWeight = dogWeight;
-        this.dogBreed = dogBreed;
-        this.user = user;
-    }
-
     public Integer getDogId() {
         return dogId;
     }
@@ -141,23 +128,5 @@ public class Dog {
 
     public void setUser(Users user) {
         this.user = user;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("Dog{");
-        sb.append("dogId=").append(dogId);
-        sb.append(", dogName='").append(dogName).append('\'');
-        sb.append(", dogImgPathLocal='").append(dogImgPathLocal).append('\'');
-        sb.append(", dogImgPathCloud='").append(dogImgPathCloud).append('\'');
-        sb.append(", dogImgPublicId='").append(dogImgPublicId).append('\'');
-        sb.append(", dogGender='").append(dogGender).append('\'');
-        sb.append(", dogIntroduce='").append(dogIntroduce).append('\'');
-        sb.append(", dogBirthDate=").append(dogBirthDate);
-        sb.append(", dogWeight=").append(dogWeight);
-        sb.append(", dogBreed='").append(dogBreed).append('\'');
-        sb.append(", user=").append(user);
-        sb.append('}');
-        return sb.toString();
     }
 }

@@ -1,11 +1,8 @@
 package com.ispan.dogland.model.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,9 +36,25 @@ public class Users {
 
     private String userStatus;
 
-//    @OneToMany(mappedBy = "user",
-//            cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<Dog> dogs;
+    @OneToMany(mappedBy = "user",
+            cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Dog> dogs;
+
+//    @OneToMany(fetch = FetchType.LAZY,
+//            cascade = CascadeType.ALL,
+//            mappedBy = "user")
+//    private List<Friends> friends;
+
+
+//    @OneToMany(fetch = FetchType.LAZY,
+//            cascade = CascadeType.ALL,
+//            mappedBy = "articles")
+//    private List<Articles> articles;
+//
+//    @OneToMany(fetch = FetchType.LAZY,
+//            cascade = CascadeType.ALL,
+//            mappedBy = "article_comment")
+//    private List<ArticleComments> articleComments;
 
     @PrePersist //在物件轉換到persistent狀態以前，做這個function
     public void onCreate() {
@@ -51,18 +64,6 @@ public class Users {
     }
 
     public Users() {
-    }
-
-    public Users(String lastName, String firstName, String userEmail, String userPassword, String userGender, Date birthDate, Integer userViolationCount, Date lastLoginTime, String userStatus) {
-        this.lastName = lastName;
-        this.firstName = firstName;
-        this.userEmail = userEmail;
-        this.userPassword = userPassword;
-        this.userGender = userGender;
-        this.birthDate = birthDate;
-        this.userViolationCount = userViolationCount;
-        this.lastLoginTime = lastLoginTime;
-        this.userStatus = userStatus;
     }
 
     public Integer getUserId() {
@@ -161,38 +162,11 @@ public class Users {
         this.userStatus = userStatus;
     }
 
-//    public List<Dog> getDogs() {
-//        return dogs;
-//    }
-//
-//    public void setDogs(List<Dog> dogs) {
-//        this.dogs = dogs;
-//    }
-//
-//    public void addDog(Dog dog) {
-//        if(this.dogs == null) {
-//            this.dogs = new ArrayList<>();
-//        }
-//        this.dogs.add(dog);
-//    }
+    public List<Dog> getDogs() {
+        return dogs;
+    }
 
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("Users{");
-        sb.append("userId=").append(userId);
-        sb.append(", lastName='").append(lastName).append('\'');
-        sb.append(", firstName='").append(firstName).append('\'');
-        sb.append(", userEmail='").append(userEmail).append('\'');
-        sb.append(", userPassword='").append(userPassword).append('\'');
-        sb.append(", userGender='").append(userGender).append('\'');
-        sb.append(", birthDate=").append(birthDate);
-        sb.append(", userViolationCount=").append(userViolationCount);
-        sb.append(", lastLoginTime=").append(lastLoginTime);
-        sb.append(", userImgPath='").append(userImgPath).append('\'');
-        sb.append(", imgPublicId='").append(imgPublicId).append('\'');
-        sb.append(", userStatus='").append(userStatus).append('\'');
-//        sb.append(", dogs=").append(dogs);
-        sb.append('}');
-        return sb.toString();
+    public void setDogs(List<Dog> dogs) {
+        this.dogs = dogs;
     }
 }

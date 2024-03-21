@@ -12,10 +12,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class AccountController {
@@ -23,49 +20,33 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
-    @GetMapping("/test")
-    public String test(HttpSession httpSession){
-        Passport loginUser = (Passport) httpSession.getAttribute("loginUser");
-        System.out.println("test = " + loginUser);
-        return "test";
-    }
-    @GetMapping("/test1")
-    public String test1(){
-
-        return "test";
-    }
 
     @GetMapping("/api/users/map")
-    public ResponseEntity<?> testSessionValue(HttpSession httpSession){
-
+    public ResponseEntity<?> testSessionValue(HttpSession httpSession) {
         System.out.println("檢查登入 controller");
 
         Passport loginUser = (Passport) httpSession.getAttribute("loginUser");
         System.out.println("/api/users/map:loginUser = " + loginUser);
-        if(loginUser == null){
+        if (loginUser == null) {
             System.out.println("session attribute 空的");
             return new ResponseEntity<String>("session attribute null", HttpStatus.UNAUTHORIZED); // 401
         }
 
-        Map<String,String> responseMap =  new HashMap<>();
-        responseMap.put("userId",loginUser.getUserId().toString());
-        responseMap.put("userName",loginUser.getUsername());
-
-        return new ResponseEntity<Map<String,String>>(responseMap, HttpStatus.OK);
+        return new ResponseEntity<Passport>(loginUser, HttpStatus.OK);
     }
 
-    @PostMapping("/formLogin")
-    public ResponseEntity<?> formLogin(@RequestBody Map<String,String> data, HttpSession httpSession){
-        String useremail = data.get("useremail");
-        String password = data.get("password");
 
-        Passport loginUser = accountService.loginCheck(useremail, password);
-        if(loginUser == null){
-            return new ResponseEntity<String>("登入失敗", HttpStatus.UNAUTHORIZED); // 401
-        }else{
-            httpSession.setAttribute("loginUser",loginUser);
-            httpSession.setAttribute("loginUser",loginUser);
-            return new ResponseEntity<String>("登入成功", HttpStatusCode.valueOf(200));
+    @PostMapping("/formLogin")
+    public ResponseEntity<Object> formLogin(@RequestParam String email, @RequestParam String password, HttpSession session) {
+
+        Passport loginUser = accountService.loginCheck(email, password);
+        if (loginUser == null) {
+            // 返回 401 未授權狀態碼
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("登入失敗");
+        } else {
+            session.setAttribute("loginUser", loginUser);
+            System.out.println("登入成功");
+            return ResponseEntity.ok(loginUser);
         }
     }
     @PostMapping("/register")
@@ -88,6 +69,19 @@ public class AccountController {
         return new ResponseEntity<String>("註冊失敗", HttpStatus.BAD_REQUEST);
     }
 
+    @RequestMapping("/check")
+    public boolean checkLogin(HttpSession session) {
+        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+        System.out.println("check = " + loggedInMember);
+        return !Objects.isNull(loggedInMember);
+    }
+
+    @RequestMapping("/logout")
+    public boolean logout(HttpSession session) {
+        session.invalidate();
+        System.out.println("logout");
+        return true;
+    }
 
     @PostMapping("/api/auth/logout")
     public ResponseEntity<?> usersLogout(HttpSession httpSession){

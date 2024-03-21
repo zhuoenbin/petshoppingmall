@@ -3,16 +3,9 @@ package com.ispan.dogland;
 import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
-import com.ispan.dogland.model.dao.tweet.TweetRepository;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
-import com.ispan.dogland.model.dao.OrderDetailRepository;
-import com.ispan.dogland.model.dao.OrdersRepository;
-import com.ispan.dogland.model.entity.OrderDetail;
-import com.ispan.dogland.model.entity.Orders;
-import com.ispan.dogland.model.entity.Users;
-import com.ispan.dogland.model.entity.tweet.Tweet;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -33,15 +26,10 @@ public class DoglandApplication {
 	@Bean
 	public CommandLineRunner commandLineRunner(UserRepository userRepository,
 											   DogRepository dogRepository,
-											   EmployeeRepository employeeRepository,
-											   TweetRepository tweetRepository) {
+											   EmployeeRepository employeeRepository) {
 		return runner -> {
-			Users u1=userRepository.findByUserId(1);
-			Tweet tweet = new Tweet(null, u1.getLastName(), "This is a tweet", 0, new Date(), 1, 0);
 
-			Tweet tweet1 = tweetRepository.save(tweet);
-			tweet1.setUser(u1);
-			tweetRepository.save(tweet1);
+
 		};
 	}
 
@@ -62,7 +50,7 @@ public class DoglandApplication {
 		dog1.setDogGender("Male");
 		dog1.setDogIntroduce("Friendly and playful dog");
 		dog1.setDogBirthDate(new Date()); // Set birth date to current date
-		dog1.setDogWeight(3.0); // Assuming 3 represents medium size
+		dog1.setDogSize(3); // Assuming 3 represents medium size
 		dog1.setDogBreed("Labrador Retriever");
 
 		Dog dog2 = new Dog();
@@ -74,7 +62,7 @@ public class DoglandApplication {
 		dog2.setDogGender("Female");
 		dog2.setDogIntroduce("Calm and affectionate dog");
 		dog2.setDogBirthDate(new Date()); // Set birth date to current date
-		dog2.setDogWeight(3.0); // Assuming 2 represents small size
+		dog2.setDogSize(2); // Assuming 2 represents small size
 		dog2.setDogBreed("Golden Retriever");
 
 		dog1.setUser(u1);

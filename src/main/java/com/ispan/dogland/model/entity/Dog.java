@@ -29,7 +29,7 @@ public class Dog {
     @Column(name = "dog_birth_date")
     private Date dogBirthDate;
 
-    private Double dogWeight;
+    private Integer dogSize;
 
     private String dogBreed;
 
@@ -42,7 +42,7 @@ public class Dog {
     public Dog() {
     }
 
-    public Dog(String dogName, String dogImgPathLocal, String dogImgPathCloud, String dogImgPublicId, String dogGender, String dogIntroduce, Date dogBirthDate, Double dogWeight, String dogBreed, Users user) {
+    public Dog(String dogName, String dogImgPathLocal, String dogImgPathCloud, String dogImgPublicId, String dogGender, String dogIntroduce, Date dogBirthDate, int dogSize, String dogBreed, Users user) {
         this.dogName = dogName;
         this.dogImgPathLocal = dogImgPathLocal;
         this.dogImgPathCloud = dogImgPathCloud;
@@ -50,7 +50,7 @@ public class Dog {
         this.dogGender = dogGender;
         this.dogIntroduce = dogIntroduce;
         this.dogBirthDate = dogBirthDate;
-        this.dogWeight = dogWeight;
+        this.dogSize = dogSize;
         this.dogBreed = dogBreed;
         this.user = user;
     }
@@ -119,12 +119,12 @@ public class Dog {
         this.dogBirthDate = dogBirthDate;
     }
 
-    public Double getDogWeight() {
-        return dogWeight;
+    public Integer getDogSize() {
+        return dogSize;
     }
 
-    public void setDogWeight(Double dogWeight) {
-        this.dogWeight = dogWeight;
+    public void setDogSize(Integer dogSize) {
+        this.dogSize = dogSize;
     }
 
     public String getDogBreed() {
@@ -154,8 +154,7 @@ public class Dog {
         sb.append(", dogGender='").append(dogGender).append('\'');
         sb.append(", dogIntroduce='").append(dogIntroduce).append('\'');
         sb.append(", dogBirthDate=").append(dogBirthDate);
-        sb.append(", dogWeight=").append(dogWeight);
-        sb.append(", dogBreed='").append(dogBreed).append('\'');
+        sb.append(", dogSize=").append(dogSize);
         sb.append(", dogBreed='").append(dogBreed).append('\'');
         sb.append(", user=").append(user);
         sb.append('}');

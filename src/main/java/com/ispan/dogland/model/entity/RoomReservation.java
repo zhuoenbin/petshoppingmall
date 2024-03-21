@@ -10,7 +10,7 @@ public class RoomReservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long reservationId;
+    private Integer reservationId;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name="room_id")
@@ -37,7 +37,7 @@ public class RoomReservation {
     public RoomReservation() {
     }
 
-    public RoomReservation(Long reservationId, Room room, Integer dogId, Date startTime, Date endTime, Integer totalPrice, Date reservationTime, Date cancelTime, String cancelDirection, String paymentMethod, String paymentStatus) {
+    public RoomReservation(Integer reservationId, Room room, Integer dogId, Date startTime, Date endTime, Integer totalPrice, Date reservationTime, Date cancelTime, String cancelDirection, String paymentMethod, String paymentStatus) {
         this.reservationId = reservationId;
         this.room = room;
         this.dogId = dogId;
@@ -51,11 +51,11 @@ public class RoomReservation {
         this.paymentStatus = paymentStatus;
     }
 
-    public Long getReservationId() {
+    public Integer getReservationId() {
         return reservationId;
     }
 
-    public void setReservationId(Long reservationId) {
+    public void setReservationId(Integer reservationId) {
         this.reservationId = reservationId;
     }
 

@@ -137,22 +137,6 @@ public class Users {
         this.lastLoginTime = lastLoginTime;
     }
 
-    public String getUserImgPath() {
-        return userImgPath;
-    }
-
-    public void setUserImgPath(String userImgPath) {
-        this.userImgPath = userImgPath;
-    }
-
-    public String getImgPublicId() {
-        return imgPublicId;
-    }
-
-    public void setImgPublicId(String imgPublicId) {
-        this.imgPublicId = imgPublicId;
-    }
-
     public String getUserStatus() {
         return userStatus;
     }
@@ -161,14 +145,19 @@ public class Users {
         this.userStatus = userStatus;
     }
 
+    public List<Dog> getDogs() {
+        return dogs;
+    }
 
     public void setDogs(List<Dog> dogs) {
         this.dogs = dogs;
     }
 
-
-    public List<Dog> getDogs() {
-        return dogs;
+    public void addDog(Dog dog) {
+        if(this.dogs == null) {
+            this.dogs = new ArrayList<>();
+        }
+        this.dogs.add(dog);
     }
 
     @Override

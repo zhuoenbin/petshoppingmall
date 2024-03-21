@@ -3,14 +3,9 @@ package com.ispan.dogland;
 import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
-import com.ispan.dogland.model.dao.product.ProductRepository;
 import com.ispan.dogland.model.dao.tweet.TweetRepository;
 import com.ispan.dogland.model.entity.Dog;
-import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
-import com.ispan.dogland.model.entity.product.Product;
-import com.ispan.dogland.model.entity.product.ProductGallery;
-import com.ispan.dogland.model.entity.tweet.Tweet;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -32,12 +27,8 @@ public class DoglandApplication {
 	public CommandLineRunner commandLineRunner(UserRepository userRepository,
 											   DogRepository dogRepository,
 											   EmployeeRepository employeeRepository,
-											   TweetRepository tweetRepository,
-											   ProductRepository productRepository) {
+											   TweetRepository tweetRepository) {
 		return runner -> {
-
-
-
 
 		};
 	}

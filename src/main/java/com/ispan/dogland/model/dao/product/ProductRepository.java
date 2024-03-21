@@ -17,9 +17,4 @@ public interface ProductRepository extends JpaRepository<Product,Integer> {
     List<Product> findByCategory(ProductCategory category);
 
 
-    @Query("FROM Product p JOIN FETCH p.productGalleries WHERE p.productId = ?1")
-    Product findByProductIdWithGallery(Integer productId);
-
-
-
 }

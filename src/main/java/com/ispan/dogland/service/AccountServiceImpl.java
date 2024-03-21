@@ -65,14 +65,7 @@ public class AccountServiceImpl implements AccountService {
             user.setUserPassword(encodePassword);
         }
         user.setLastLoginTime(new Date());
-        user.setUserViolationCount(0);
-        user.setUserStatus("ACTIVE");
         return usersRepository.save(user);
-    }
-
-    @Override
-    public Users getUserDetail(String email) {
-        return usersRepository.findByUserEmail(email);
     }
 
 

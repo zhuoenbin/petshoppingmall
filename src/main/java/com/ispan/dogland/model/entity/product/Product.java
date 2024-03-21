@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import com.ispan.dogland.model.entity.Employee;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -19,7 +20,7 @@ public class Product {
     @Column(name = "product_id")
     private Integer productId;
 
-
+    @NotBlank
     @Column(name = "product_name", nullable = false)
     private String productName;
 
@@ -213,23 +214,4 @@ public class Product {
     }
 //////////////////////////////////
 
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("Product{");
-        sb.append("productId=").append(productId);
-        sb.append(", productName='").append(productName).append('\'');
-        sb.append(", employee=").append(employee);
-        sb.append(", category=").append(category);
-        sb.append(", unitPrice=").append(unitPrice);
-        sb.append(", productDescription='").append(productDescription).append('\'');
-        sb.append(", stock=").append(stock);
-        sb.append(", reservedQuantity=").append(reservedQuantity);
-        sb.append(", listingDate=").append(listingDate);
-        sb.append(", modifiedDate=").append(modifiedDate);
-        sb.append(", discountId=").append(discountId);
-        sb.append(", productGalleries=").append(productGalleries);
-        sb.append(", productGalleryClouds=").append(productGalleryClouds);
-        sb.append('}');
-        return sb.toString();
-    }
 }

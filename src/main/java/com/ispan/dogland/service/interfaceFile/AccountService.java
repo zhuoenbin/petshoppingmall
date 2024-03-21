@@ -11,7 +11,8 @@ public interface AccountService {
 
     public Users register(Users user);
 
-    public Users getUserDetail(String email);
+
+
 
     public Passport getPassportFromFormLogin(String username);
 

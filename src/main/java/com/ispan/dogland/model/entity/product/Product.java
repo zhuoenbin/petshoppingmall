@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import com.ispan.dogland.model.entity.Employee;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -20,7 +19,7 @@ public class Product {
     @Column(name = "product_id")
     private Integer productId;
 
-    @NotBlank
+
     @Column(name = "product_name", nullable = false)
     private String productName;
 

@@ -1,7 +1,7 @@
-package com.ispan.dogland.dao;
+package com.ispan.dogland.model.dao;
 
-import com.ispan.dogland.model.Blockeds;
-import com.ispan.dogland.model.Users;
+import com.ispan.dogland.model.entity.Blockeds;
+import com.ispan.dogland.model.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BlockedDao extends JpaRepository<Blockeds, Users> {

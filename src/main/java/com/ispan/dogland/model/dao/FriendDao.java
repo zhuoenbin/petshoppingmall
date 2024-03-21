@@ -1,7 +1,7 @@
-package com.ispan.dogland.dao;
+package com.ispan.dogland.model.dao;
 
-import com.ispan.dogland.model.Friends;
-import com.ispan.dogland.model.Users;
+import com.ispan.dogland.model.entity.Friends;
+import com.ispan.dogland.model.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface FriendDao extends JpaRepository<Friends, Users> {

@@ -1,4 +1,4 @@
-package com.ispan.dogland.model;
+package com.ispan.dogland.model.entity.forum;
 
 import jakarta.persistence.*;
 

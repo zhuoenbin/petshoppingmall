@@ -1,4 +1,4 @@
-package com.ispan.dogland.model;
+package com.ispan.dogland.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -10,29 +10,29 @@ public class Blockeds {
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    private Users user;
+    private com.ispan.dogland.model.Users user;
 
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "block_id", referencedColumnName = "user_id")
-    private Users blocked;
+    private com.ispan.dogland.model.Users blocked;
 
     public Blockeds(){}
 
-    public Blockeds(Users user, Users blocked) {
+    public Blockeds(com.ispan.dogland.model.Users user, com.ispan.dogland.model.Users blocked) {
         this.user = user;
         this.blocked = blocked;
     }
 
-    public Users getUser() {
+    public com.ispan.dogland.model.Users getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(com.ispan.dogland.model.Users user) {
         this.user = user;
     }
 
-    public Users getBlocked() {
+    public com.ispan.dogland.model.Users getBlocked() {
         return blocked;
     }
 

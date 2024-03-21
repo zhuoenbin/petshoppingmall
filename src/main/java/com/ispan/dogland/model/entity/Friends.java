@@ -1,4 +1,4 @@
-package com.ispan.dogland.model;
+package com.ispan.dogland.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -12,31 +12,31 @@ public class Friends {
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    private Users user;
+    private com.ispan.dogland.model.Users user;
 
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "friend_id", referencedColumnName = "user_id")
-    private Users friend;
+    private com.ispan.dogland.model.Users friend;
 
     @Column(name = "become_friend_time")
     private Date becomeFriendTime;
 
-    public Friends(Users user, Users friend, Date becomeFriendTime) {
+    public Friends(com.ispan.dogland.model.Users user, com.ispan.dogland.model.Users friend, Date becomeFriendTime) {
         this.user = user;
         this.friend = friend;
         this.becomeFriendTime = becomeFriendTime;
     }
 
-    public Users getUser() {
+    public com.ispan.dogland.model.Users getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(com.ispan.dogland.model.Users user) {
         this.user = user;
     }
 
-    public Users getFriend() {
+    public com.ispan.dogland.model.Users getFriend() {
         return friend;
     }
 

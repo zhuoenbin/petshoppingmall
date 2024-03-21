@@ -1,8 +1,9 @@
 package com.ispan.dogland.model.entity;
 
 
+import com.ispan.dogland.model.entity.forum.ArticleComments;
+import com.ispan.dogland.model.entity.forum.Articles;
 import jakarta.persistence.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,6 +42,26 @@ public class Users {
     @OneToMany(mappedBy = "user",
             cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Dog> dogs;
+
+    @OneToMany(fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            mappedBy = "user")
+    private List<Friends> friends;
+
+    @OneToMany(fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            mappedBy = "user")
+    private List<Blockeds> blockeds;
+
+    @OneToMany(fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            mappedBy = "articles")
+    private List<Articles> articles;
+
+    @OneToMany(fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            mappedBy = "article_comment")
+    private List<ArticleComments> articleComments;
 
     @PrePersist //在物件轉換到persistent狀態以前，做這個function
     public void onCreate() {

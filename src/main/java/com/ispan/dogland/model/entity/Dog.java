@@ -42,6 +42,19 @@ public class Dog {
     public Dog() {
     }
 
+    public Dog(String dogName, String dogImgPathLocal, String dogImgPathCloud, String dogImgPublicId, String dogGender, String dogIntroduce, Date dogBirthDate, Double dogWeight, String dogBreed, Users user) {
+        this.dogName = dogName;
+        this.dogImgPathLocal = dogImgPathLocal;
+        this.dogImgPathCloud = dogImgPathCloud;
+        this.dogImgPublicId = dogImgPublicId;
+        this.dogGender = dogGender;
+        this.dogIntroduce = dogIntroduce;
+        this.dogBirthDate = dogBirthDate;
+        this.dogWeight = dogWeight;
+        this.dogBreed = dogBreed;
+        this.user = user;
+    }
+
     public Integer getDogId() {
         return dogId;
     }

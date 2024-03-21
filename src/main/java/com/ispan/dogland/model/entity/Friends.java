@@ -12,31 +12,31 @@ public class Friends {
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    private com.ispan.dogland.model.Users user;
+    private Users user;
 
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "friend_id", referencedColumnName = "user_id")
-    private com.ispan.dogland.model.Users friend;
+    private Users friend;
 
     @Column(name = "become_friend_time")
     private Date becomeFriendTime;
 
-    public Friends(com.ispan.dogland.model.Users user, com.ispan.dogland.model.Users friend, Date becomeFriendTime) {
+    public Friends(Users user, Users friend, Date becomeFriendTime) {
         this.user = user;
         this.friend = friend;
         this.becomeFriendTime = becomeFriendTime;
     }
 
-    public com.ispan.dogland.model.Users getUser() {
+    public Users getUser() {
         return user;
     }
 
-    public void setUser(com.ispan.dogland.model.Users user) {
+    public void setUser(Users user) {
         this.user = user;
     }
 
-    public com.ispan.dogland.model.Users getFriend() {
+    public Users getFriend() {
         return friend;
     }
 

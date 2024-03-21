@@ -1,6 +1,7 @@
 package com.ispan.dogland.model.entity.forum;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.ispan.dogland.model.entity.Users;
 import jakarta.persistence.*;
 
 import java.sql.Date;
@@ -13,6 +14,9 @@ public class ArticleComments {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
     private Integer commentId;
+
+    @Column(name="comment_content")
+    private String commentContent;
 
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,8 +33,9 @@ public class ArticleComments {
 
     public ArticleComments(){}
 
-    public ArticleComments(Integer commentId, Articles article, Users user, Date commentCreateTime) {
+    public ArticleComments(Integer commentId, String commentContent, Articles article, Users user, Date commentCreateTime) {
         this.commentId = commentId;
+        this.commentContent = commentContent;
         this.article = article;
         this.user = user;
         this.commentCreateTime = commentCreateTime;
@@ -66,5 +71,13 @@ public class ArticleComments {
 
     public void setCommentCreateTime(Date commentCreateTime) {
         this.commentCreateTime = commentCreateTime;
+    }
+
+    public String getCommentContent() {
+        return commentContent;
+    }
+
+    public void setCommentContent(String commentContent) {
+        this.commentContent = commentContent;
     }
 }

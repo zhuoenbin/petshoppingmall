@@ -1,5 +1,6 @@
 package com.ispan.dogland.model.entity.forum;
 
+import com.ispan.dogland.model.entity.Users;
 import jakarta.persistence.*;
 
 import java.sql.Date;

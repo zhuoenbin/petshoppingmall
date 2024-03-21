@@ -113,7 +113,7 @@ public class GoogleOAuth2NativeHttpController {
                 tmpUser.setFirstName(payloadName);
                 tmpUser.setLastName(payloadName);
                 tmpUser.setUserEmail(payloadEmail);
-                tmpUser.setUserStatus("ACTIVE");
+                tmpUser.setUserImgPath(payloadPicture);
                 accountService.register(tmpUser);
                 loginUser = accountService.getPassportFromFormLogin(payloadEmail);
             }

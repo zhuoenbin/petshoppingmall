@@ -49,6 +49,23 @@ public class AccountController {
             return ResponseEntity.ok(loginUser);
         }
     }
+
+    @GetMapping ("/getUserDetail")
+    public ResponseEntity<?> getUserDetail(HttpSession httpSession){
+        System.out.println("/getUserDetail 檢查登入 controller");
+
+        Passport loginUser = (Passport) httpSession.getAttribute("loginUser");
+        if (loginUser == null) {
+            System.out.println("session attribute 空的");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("session attribute null"); // 401
+        }
+        Users userDetail = accountService.getUserDetail(loginUser.getEmail());
+        if (userDetail == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User detail not found"); // 404
+        }
+        return ResponseEntity.ok(userDetail);
+    }
+
     @PostMapping("/register")
     public ResponseEntity<?>   registerUser(@RequestBody Users userData,HttpSession httpSession){
         String useremail = userData.getUserEmail();

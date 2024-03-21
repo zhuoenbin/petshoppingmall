@@ -1,5 +1,6 @@
 package com.ispan.dogland.model.entity.activity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -18,9 +19,13 @@ public class Venue {
     private Integer venueRent;
 
     //////////////////////////////////////
+    @JsonIgnore
     @OneToMany(mappedBy = "venue", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<VenueActivity> venueActivityList;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "venue", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<VenueRental> venueRentalList;
 
 
     /////////////////////////////////////

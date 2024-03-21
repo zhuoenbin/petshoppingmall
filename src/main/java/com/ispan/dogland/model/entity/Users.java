@@ -1,6 +1,7 @@
 package com.ispan.dogland.model.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -38,9 +39,9 @@ public class Users {
 
     private String userStatus;
 
-    @OneToMany(mappedBy = "user",
-            cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Dog> dogs;
+//    @OneToMany(mappedBy = "user",
+//            cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private List<Dog> dogs;
 
     @PrePersist //在物件轉換到persistent狀態以前，做這個function
     public void onCreate() {
@@ -160,20 +161,20 @@ public class Users {
         this.userStatus = userStatus;
     }
 
-    public List<Dog> getDogs() {
-        return dogs;
-    }
-
-    public void setDogs(List<Dog> dogs) {
-        this.dogs = dogs;
-    }
-
-    public void addDog(Dog dog) {
-        if(this.dogs == null) {
-            this.dogs = new ArrayList<>();
-        }
-        this.dogs.add(dog);
-    }
+//    public List<Dog> getDogs() {
+//        return dogs;
+//    }
+//
+//    public void setDogs(List<Dog> dogs) {
+//        this.dogs = dogs;
+//    }
+//
+//    public void addDog(Dog dog) {
+//        if(this.dogs == null) {
+//            this.dogs = new ArrayList<>();
+//        }
+//        this.dogs.add(dog);
+//    }
 
     @Override
     public String toString() {
@@ -190,7 +191,7 @@ public class Users {
         sb.append(", userImgPath='").append(userImgPath).append('\'');
         sb.append(", imgPublicId='").append(imgPublicId).append('\'');
         sb.append(", userStatus='").append(userStatus).append('\'');
-        sb.append(", dogs=").append(dogs);
+//        sb.append(", dogs=").append(dogs);
         sb.append('}');
         return sb.toString();
     }

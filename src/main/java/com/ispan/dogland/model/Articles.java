@@ -27,14 +27,19 @@ public class Articles {
     @Column(name="article_create_time")
     private Date articleCreateTime;
 
-    @OneToMany(fetch = FetchType.LAZY,
+    @OneToMany(fetch = FetchType.EAGER,
             cascade = CascadeType.ALL,
             mappedBy = "user")
-    private List<AritcleComments> comments;
+    private List<ArticleComments> comments;
+
+    @OneToOne(fetch = FetchType.EAGER,
+             cascade = CascadeType.ALL)
+    @JoinColumn(name="category_id")
+    private ArticleCategory category;
 
     public Articles(){}
 
-    public Articles(Integer articleId, Users user, String articleTitle, String articleContent, Date articleCreateTime, List<AritcleComments> comments) {
+    public Articles(Integer articleId, Users user, String articleTitle, String articleContent, Date articleCreateTime, List<ArticleComments> comments) {
         this.articleId = articleId;
         this.user = user;
         this.articleTitle = articleTitle;
@@ -83,11 +88,11 @@ public class Articles {
         this.articleCreateTime = articleCreateTime;
     }
 
-    public List<AritcleComments> getComments() {
+    public List<ArticleComments> getComments() {
         return comments;
     }
 
-    public void setComments(List<AritcleComments> comments) {
+    public void setComments(List<ArticleComments> comments) {
         this.comments = comments;
     }
 }

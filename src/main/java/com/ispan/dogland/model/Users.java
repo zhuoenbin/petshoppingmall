@@ -51,6 +51,16 @@ public class Users {
             mappedBy = "user")
     private List<Blockeds> blockeds;
 
+    @OneToMany(fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            mappedBy = "articles")
+    private List<Articles> articles;
+
+    @OneToMany(fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            mappedBy = "article_comment")
+    private List<ArticleComments> articleCommments;
+
     public Users(){}
 
     public Users(Integer userId, String lastName, String firstName, String userEmail, String userPassword, String userGender, Date birthDate, Integer userViolationCount, Date lastLoginTime, String userStatus) {

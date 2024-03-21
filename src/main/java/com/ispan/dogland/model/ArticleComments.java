@@ -1,22 +1,25 @@
 package com.ispan.dogland.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.sql.Date;
 
 @Entity
 @Table(name="article_comment")
-public class AritcleComments {
+public class ArticleComments {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
     private Integer commentId;
 
+    @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id", referencedColumnName = "article_id")
     private Articles article;
 
+    @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private Users user;
@@ -24,9 +27,9 @@ public class AritcleComments {
     @Column(name="comment_create_time")
     private Date commentCreateTime;
 
-    public AritcleComments(){}
+    public ArticleComments(){}
 
-    public AritcleComments(Integer commentId, Articles article, Users user, Date commentCreateTime) {
+    public ArticleComments(Integer commentId, Articles article, Users user, Date commentCreateTime) {
         this.commentId = commentId;
         this.article = article;
         this.user = user;

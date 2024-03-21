@@ -34,7 +34,7 @@ public class Dog {
     private String dogBreed;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
+                          CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private Users user;
@@ -123,7 +123,7 @@ public class Dog {
         return dogWeight;
     }
 
-    public void setDogWeight(Double dogWeight) {
+    public void setDogWeight(Double dogSize) {
         this.dogWeight = dogWeight;
     }
 
@@ -154,7 +154,7 @@ public class Dog {
         sb.append(", dogGender='").append(dogGender).append('\'');
         sb.append(", dogIntroduce='").append(dogIntroduce).append('\'');
         sb.append(", dogBirthDate=").append(dogBirthDate);
-        sb.append(", dogWeight=").append(dogWeight);
+        sb.append(", dogSize=").append(dogWeight);
         sb.append(", dogBreed='").append(dogBreed).append('\'');
         sb.append(", user=").append(user);
         sb.append('}');

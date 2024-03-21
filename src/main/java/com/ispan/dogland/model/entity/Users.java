@@ -1,6 +1,7 @@
 package com.ispan.dogland.model.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -136,22 +137,6 @@ public class Users {
         this.lastLoginTime = lastLoginTime;
     }
 
-    public String getUserImgPath() {
-        return userImgPath;
-    }
-
-    public void setUserImgPath(String userImgPath) {
-        this.userImgPath = userImgPath;
-    }
-
-    public String getImgPublicId() {
-        return imgPublicId;
-    }
-
-    public void setImgPublicId(String imgPublicId) {
-        this.imgPublicId = imgPublicId;
-    }
-
     public String getUserStatus() {
         return userStatus;
     }
@@ -190,7 +175,7 @@ public class Users {
         sb.append(", userImgPath='").append(userImgPath).append('\'');
         sb.append(", imgPublicId='").append(imgPublicId).append('\'');
         sb.append(", userStatus='").append(userStatus).append('\'');
-        sb.append(", dogs=").append(dogs);
+//        sb.append(", dogs=").append(dogs);
         sb.append('}');
         return sb.toString();
     }

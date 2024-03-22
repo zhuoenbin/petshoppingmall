@@ -11,6 +11,7 @@ import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductGallery;
 import com.ispan.dogland.model.entity.tweet.Tweet;
+import com.ispan.dogland.model.entity.tweet.TweetGallery;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -37,23 +38,18 @@ public class DoglandApplication {
 											   ProductRepository productRepository,
 											   TweetService tweetService) {
 		return runner -> {
+			List<Tweet> tweets = tweetService.findTweetsByUserId(2);
+//			for(Tweet tweet : tweets){
+//				System.out.println("111111111111111");
+//				List<TweetGallery> img = tweet.getTweetGalleries();
+//				if(img != null){
+//					for(TweetGallery i : img){
+//						System.out.println("2222222222222222");
+//						System.out.println(i.getImgPath());
+//					}
+//				}
+//			}
 
-			Tweet t2 = new Tweet();
-			t2.setTweetContent("Watching my favorite movie tonight!");
-			t2.setPreNode(0); // 代表自己发的文
-			t2.setPostDate(new Date());
-			t2.setTweetStatus(1); // 一般状态
-			t2.setNumReport(0);
-			boolean b =tweetService.postNewTweet(t2, 1);
-			System.out.println(b);
-//
-//			Tweet t3 = new Tweet();
-//			t3.setUserName("user3");
-//			t3.setTweetContent("Just finished reading an amazing book!");
-//			t3.setPreNode(0); // 代表自己发的文
-//			t3.setPostDate(new Date());
-//			t3.setTweetStatus(1); // 一般状态
-//			t3.setNumReport(0);
 
 
 

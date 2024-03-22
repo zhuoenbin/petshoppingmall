@@ -160,12 +160,7 @@ public class Users {
         this.dogs = dogs;
     }
 
-    public void addDog(Dog dog) {
-        if(this.dogs == null) {
-            this.dogs = new ArrayList<>();
-        }
-        this.dogs.add(dog);
-    }
+
 
     public List<Tweet> getTweets() {
         return tweets;
@@ -173,6 +168,22 @@ public class Users {
 
     public void setTweets(List<Tweet> tweets) {
         this.tweets = tweets;
+    }
+
+    public String getUserImgPath() {
+        return userImgPath;
+    }
+
+    public void setUserImgPath(String userImgPath) {
+        this.userImgPath = userImgPath;
+    }
+
+    public String getImgPublicId() {
+        return imgPublicId;
+    }
+
+    public void setImgPublicId(String imgPublicId) {
+        this.imgPublicId = imgPublicId;
     }
 
     @Override

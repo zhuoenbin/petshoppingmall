@@ -145,6 +145,22 @@ public class Users {
         this.userStatus = userStatus;
     }
 
+    public String getUserImgPath() {
+        return userImgPath;
+    }
+
+    public void setUserImgPath(String userImgPath) {
+        this.userImgPath = userImgPath;
+    }
+
+    public String getImgPublicId() {
+        return imgPublicId;
+    }
+
+    public void setImgPublicId(String imgPublicId) {
+        this.imgPublicId = imgPublicId;
+    }
+
     public List<Dog> getDogs() {
         return dogs;
     }

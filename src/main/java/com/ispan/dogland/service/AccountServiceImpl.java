@@ -63,13 +63,17 @@ public class AccountServiceImpl implements AccountService {
         if(user.getUserPassword() !=null){
             String encodePassword = encodePassword(user.getUserPassword());
             user.setUserPassword(encodePassword);
+            user.setUserViolationCount(0);
+            user.setUserStatus("ACTIVE");
         }
         user.setLastLoginTime(new Date());
         return usersRepository.save(user);
     }
 
-
-    ;
+    @Override
+    public Users getUserDetail(String email) {
+        return usersRepository.findByUserEmail(email);
+    }
 
 
     @Override

@@ -8,4 +8,6 @@ public interface TweetService {
     public List<Tweet> findTweetsByUserId(Integer userId);
 
     public List<Tweet> getAllTweet();
+
+    public boolean postTweet(Tweet tweet, Integer userId);
 }

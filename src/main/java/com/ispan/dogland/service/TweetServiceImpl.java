@@ -35,4 +35,15 @@ public class TweetServiceImpl implements TweetService {
     public List<Tweet> getAllTweet() {
         return tweetRepository.findAll();
     }
+
+    @Override
+    public boolean postTweet(Tweet tweet, Integer userId) {
+        Users tmp = userRepository.findByUserId(userId);
+        if (tmp != null) {
+            tweetRepository.save(tweet);
+
+            return true;
+        }
+        return false;
+    }
 }

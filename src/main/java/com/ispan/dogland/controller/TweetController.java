@@ -27,6 +27,6 @@ public class TweetController {
         return tweetService.getAllTweet();
     }
 
-    @PostMapping("/postTweet")
-    public
+//    @PostMapping("/postTweet")
+//    public
 }

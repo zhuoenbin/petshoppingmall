@@ -79,7 +79,7 @@ public class AccountServiceImpl implements AccountService {
         if(user != null){
             user.setLastLoginTime(new Date());
             usersRepository.save(user);
-            passportDTO = new Passport(user.getLastName(),user.getUserEmail(), user.getUserId(), user.getUserStatus());
+            passportDTO = new Passport(user.getLastName(),user.getUserEmail(), user.getUserId(), user.getUserStatus(),user.getUserImgPath());
             return passportDTO;
         }else {
             Employee emp = employeeRepository.findByEmail(username);

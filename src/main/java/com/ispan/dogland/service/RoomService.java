@@ -24,39 +24,48 @@ public class RoomService {
     private RoomRepository room;
 
     @Autowired
-    private RoomReservationRepository roomReservation;
+    private RoomReservationRepository rRepository;
 
     @Autowired
     private DogRepository dog;
 
-//    訂單時間
-//    public List<List<String>> room() {
-//        List<List<String>> roomList = new ArrayList<>();
-//
-//        for (RoomReservation roomReservations : roomReservation.findAll()) {
-//            LocalDate receiveDate = roomReservations.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-//            LocalDate confirmDate = roomReservations.getEndTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-//
-//            // 計算日期範圍
-//            long daysBetween = ChronoUnit.DAYS.between(receiveDate, confirmDate);
-//
-//            // 創建一個新的 LocalDate 對象，表示 receiveDate 後的第一天
-//            LocalDate currentDay = receiveDate.plusDays(1);
-//            List<String> roomTime = new ArrayList<>();
-//            // 加入訂房id
-//            roomTime.add(roomReservations.getReservationId().toString());
-//            // 加入當天日期
-//            roomTime.add(receiveDate.toString());
-//
-//            for (int i = 0; i < daysBetween; i++) {
-//                roomTime.add(currentDay.plusDays(i).toString());
-//            }
-//
-//            roomList.add(roomTime);
-//        }
-//
-//        return roomList;
-//    }
+    public void addRoomReservation(RoomReservation roomReservation) {
+        rRepository.save(roomReservation);
+    }
+
+//    全部訂單時間
+    public List<List<String>> roomReservation() {
+        List<List<String>> roomList = new ArrayList<>();
+
+        for (RoomReservation roomReservations : rRepository.findAll()) {
+            LocalDate receiveDate = roomReservations.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate confirmDate = roomReservations.getEndTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+            // 計算日期範圍
+            long daysBetween = ChronoUnit.DAYS.between(receiveDate, confirmDate);
+
+            // 創建一個新的 LocalDate 對象，表示 receiveDate 後的第一天
+            LocalDate currentDay = receiveDate.plusDays(1);
+            List<String> roomTime = new ArrayList<>();
+            // 加入訂房id
+            roomTime.add(roomReservations.getRoom().getRoomId().toString());
+            // 加入當天日期
+            roomTime.add(receiveDate.toString());
+
+            for (int i = 0; i < daysBetween - 1; i++) {
+                roomTime.add(currentDay.plusDays(i).toString());
+            }
+
+            roomList.add(roomTime);
+        }
+//        System.out.println(roomList);
+
+        return roomList;
+    }
+
+    public Room findByRoomId(Integer roomId) {
+        return room.findByRoomId(roomId);
+    }
 
 
     public List<Room> room() {

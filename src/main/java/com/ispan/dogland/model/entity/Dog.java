@@ -34,7 +34,7 @@ public class Dog {
     private String dogBreed;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
+                          CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private Users user;
@@ -123,7 +123,7 @@ public class Dog {
         return dogWeight;
     }
 
-    public void setDogWeight(Double dogWeight) {
+    public void setDogWeight(Double dogSize) {
         this.dogWeight = dogWeight;
     }
 
@@ -141,5 +141,23 @@ public class Dog {
 
     public void setUser(Users user) {
         this.user = user;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Dog{");
+        sb.append("dogId=").append(dogId);
+        sb.append(", dogName='").append(dogName).append('\'');
+        sb.append(", dogImgPathLocal='").append(dogImgPathLocal).append('\'');
+        sb.append(", dogImgPathCloud='").append(dogImgPathCloud).append('\'');
+        sb.append(", dogImgPublicId='").append(dogImgPublicId).append('\'');
+        sb.append(", dogGender='").append(dogGender).append('\'');
+        sb.append(", dogIntroduce='").append(dogIntroduce).append('\'');
+        sb.append(", dogBirthDate=").append(dogBirthDate);
+        sb.append(", dogSize=").append(dogWeight);
+        sb.append(", dogBreed='").append(dogBreed).append('\'');
+        sb.append(", user=").append(user);
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -21,12 +21,12 @@ public class RoomController {
     private RoomService rService;
 
 
-
     @PostMapping("/roomReservation")
     public void addRoom(@RequestBody RoomReservation roomReservation, @RequestParam Integer roomId) {
         System.out.println(roomId);
         System.out.println(roomReservation.getDogId());
         roomReservation.setRoom(rService.findByRoomId(roomId));
+        roomReservation.setReservationTime(new Date());
         rService.addRoomReservation(roomReservation);
     }
 

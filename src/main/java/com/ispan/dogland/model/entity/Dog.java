@@ -29,30 +29,17 @@ public class Dog {
     @Column(name = "dog_birth_date")
     private Date dogBirthDate;
 
-    private Integer dogSize;
+    private Double dogWeight;
 
     private String dogBreed;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-                          CascadeType.DETACH, CascadeType.REFRESH})
+            CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private Users user;
 
     public Dog() {
-    }
-
-    public Dog(String dogName, String dogImgPathLocal, String dogImgPathCloud, String dogImgPublicId, String dogGender, String dogIntroduce, Date dogBirthDate, int dogSize, String dogBreed, Users user) {
-        this.dogName = dogName;
-        this.dogImgPathLocal = dogImgPathLocal;
-        this.dogImgPathCloud = dogImgPathCloud;
-        this.dogImgPublicId = dogImgPublicId;
-        this.dogGender = dogGender;
-        this.dogIntroduce = dogIntroduce;
-        this.dogBirthDate = dogBirthDate;
-        this.dogSize = dogSize;
-        this.dogBreed = dogBreed;
-        this.user = user;
     }
 
     public Integer getDogId() {
@@ -119,12 +106,12 @@ public class Dog {
         this.dogBirthDate = dogBirthDate;
     }
 
-    public Integer getDogSize() {
-        return dogSize;
+    public Double getDogWeight() {
+        return dogWeight;
     }
 
-    public void setDogSize(Integer dogSize) {
-        this.dogSize = dogSize;
+    public void setDogWeight(Double dogWeight) {
+        this.dogWeight = dogWeight;
     }
 
     public String getDogBreed() {
@@ -141,23 +128,5 @@ public class Dog {
 
     public void setUser(Users user) {
         this.user = user;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("Dog{");
-        sb.append("dogId=").append(dogId);
-        sb.append(", dogName='").append(dogName).append('\'');
-        sb.append(", dogImgPathLocal='").append(dogImgPathLocal).append('\'');
-        sb.append(", dogImgPathCloud='").append(dogImgPathCloud).append('\'');
-        sb.append(", dogImgPublicId='").append(dogImgPublicId).append('\'');
-        sb.append(", dogGender='").append(dogGender).append('\'');
-        sb.append(", dogIntroduce='").append(dogIntroduce).append('\'');
-        sb.append(", dogBirthDate=").append(dogBirthDate);
-        sb.append(", dogSize=").append(dogSize);
-        sb.append(", dogBreed='").append(dogBreed).append('\'');
-        sb.append(", user=").append(user);
-        sb.append('}');
-        return sb.toString();
     }
 }

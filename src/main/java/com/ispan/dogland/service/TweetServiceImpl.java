@@ -37,11 +37,13 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
-    public boolean postTweet(Tweet tweet, Integer userId) {
-        Users tmp = userRepository.findByUserId(userId);
-        if (tmp != null) {
-            tweetRepository.save(tweet);
-
+    public boolean postNewTweet(Tweet tweet, Integer userId) {
+        Users user = userRepository.findByUserId(userId);
+        if (user != null) {
+            tweet.setUserName(user.getLastName());
+            Tweet t = tweetRepository.save(tweet);
+            t.setUser(user);
+            tweetRepository.save(t);
             return true;
         }
         return false;

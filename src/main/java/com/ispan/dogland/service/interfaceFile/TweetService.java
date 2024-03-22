@@ -9,5 +9,5 @@ public interface TweetService {
 
     public List<Tweet> getAllTweet();
 
-    public boolean postTweet(Tweet tweet, Integer userId);
+    public boolean postNewTweet(Tweet tweet, Integer userId);
 }

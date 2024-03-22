@@ -44,7 +44,8 @@ public class VenueActivity {
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private Date activityUpdateDate;
-    private Integer activityStatus;
+    @Column(columnDefinition = "VARCHAR(20) DEFAULT '活動中'")
+    private String activityStatus;
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private Date activityClosingDate;
@@ -75,6 +76,9 @@ public class VenueActivity {
         if (activityListedDate == null && activityUpdateDate == null) {
             activityListedDate = new Date();
             activityUpdateDate = new Date();
+            if(activityStatus==null){
+                activityStatus="活動中";
+            }
         }
     }
 
@@ -217,11 +221,11 @@ public class VenueActivity {
         this.activityUpdateDate = activityUpdateDate;
     }
 
-    public Integer getActivityStatus() {
+    public String getActivityStatus() {
         return activityStatus;
     }
 
-    public void setActivityStatus(Integer activityStatus) {
+    public void setActivityStatus(String activityStatus) {
         this.activityStatus = activityStatus;
     }
 

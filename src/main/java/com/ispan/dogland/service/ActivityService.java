@@ -1,31 +1,49 @@
 package com.ispan.dogland.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.ispan.dogland.model.dao.DogRepository;
+import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dao.activity.*;
+import com.ispan.dogland.model.dto.ActivityData;
 import com.ispan.dogland.model.dto.RentalData;
+import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.activity.ActivityType;
 import com.ispan.dogland.model.entity.activity.Venue;
+import com.ispan.dogland.model.entity.activity.VenueActivity;
 import com.ispan.dogland.model.entity.activity.VenueRental;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
+@Transactional
 public class ActivityService {
+    @Autowired
+    private Cloudinary cloudinary;
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private DogRepository dogRepository;
+    @Autowired
+    private EmployeeRepository employeeRepository;
     @Autowired
     private VenueRepository venueRepository;
     @Autowired
@@ -150,8 +168,46 @@ public class ActivityService {
             return rentalData;
         });
         return rentalDataList;
-        
     }
+
+    ///////////////////////場地活動/////////////////////////
+    //===============新增場地活動===================
+    public ActivityData createNewActivity(VenueActivity venueActivity,
+                                          Integer activityTypeId,
+                                          Integer venueId,
+                                          Integer employeeId,
+                                          MultipartFile file){
+        ActivityData activityData = new ActivityData();
+        try {
+        //上傳到activityFolder裡
+            Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "activityFolder"));
+            //找到實體放進去
+            Employee employee = employeeRepository.findByEmployeeId(employeeId);
+            ActivityType type = typeRepository.findByActivityTypeId(activityTypeId);
+            Venue venue = venueRepository.findByVenueId(venueId);
+
+            venueActivity.setEmployee(employee);
+            venueActivity.setVenue(venue);
+            venueActivity.setActivityType(type);
+
+            //放圖片資料
+            venueActivity.setMainImageUrl((String) data.get("url"));
+            venueActivity.setMainImagePublicId((String) data.get("public_id"));
+
+
+            VenueActivity activity = activityRepository.save(venueActivity);
+
+            BeanUtils.copyProperties(activity, activityData);
+            activityData.setEmployeeId(activity.getEmployee().getEmployeeId());
+            activityData.setVenueId(activity.getVenue().getVenueId());
+            activityData.setActivityTypeId(activity.getActivityType().getActivityTypeId());
+            return activityData;
+        } catch (IOException e) {
+            throw new RuntimeException("Image uploading fail !!");
+        }
+
+    }
+
 
 
 

@@ -22,9 +22,6 @@ public class Articles {
     @Column(name="article_title")
     private String articleTitle;
 
-    @Column(name="article_content")
-    private String articleContent;
-
     @Column(name="article_create_time")
     private Date articleCreateTime;
 
@@ -40,11 +37,10 @@ public class Articles {
 
     public Articles(){}
 
-    public Articles(Integer articleId, Users user, String articleTitle, String articleContent, Date articleCreateTime, List<ArticleComments> comments) {
+    public Articles(Integer articleId, Users user, String articleTitle, Date articleCreateTime, List<ArticleComments> comments) {
         this.articleId = articleId;
         this.user = user;
         this.articleTitle = articleTitle;
-        this.articleContent = articleContent;
         this.articleCreateTime = articleCreateTime;
         this.comments = comments;
     }
@@ -71,14 +67,6 @@ public class Articles {
 
     public void setArticleTitle(String articleTitle) {
         this.articleTitle = articleTitle;
-    }
-
-    public String getArticleContent() {
-        return articleContent;
-    }
-
-    public void setArticleContent(String articleContent) {
-        this.articleContent = articleContent;
     }
 
     public Date getArticleCreateTime() {

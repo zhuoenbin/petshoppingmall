@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ArticleDao extends JpaRepository<Articles, Integer>{
+public interface ArticleRepository extends JpaRepository<Articles, Integer>{
 
     @Query("SELECT a FROM Articles a ORDER BY a.articleCreateTime ASC")
     List<Articles> findAllOrderByTime();

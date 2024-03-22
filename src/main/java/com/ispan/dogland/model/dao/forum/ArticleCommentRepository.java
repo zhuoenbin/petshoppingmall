@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ArticleCommentDao extends JpaRepository<ArticleComments,Integer> {
+public interface ArticleCommentRepository extends JpaRepository<ArticleComments,Integer> {
 
     @Query("SELECT c FROM ArticleComments c JOIN c.article a ON a.articleId = :articleId")
     List<ArticleComments> findAllByArticleId(@Param("articleId") Integer articleId);

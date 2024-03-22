@@ -3,9 +3,15 @@ package com.ispan.dogland;
 import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
+import com.ispan.dogland.model.dao.product.ProductRepository;
 import com.ispan.dogland.model.dao.tweet.TweetRepository;
 import com.ispan.dogland.model.entity.Dog;
+import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
+import com.ispan.dogland.model.entity.product.Product;
+import com.ispan.dogland.model.entity.product.ProductGallery;
+import com.ispan.dogland.model.entity.tweet.Tweet;
+import com.ispan.dogland.service.interfaceFile.TweetService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -27,8 +33,31 @@ public class DoglandApplication {
 	public CommandLineRunner commandLineRunner(UserRepository userRepository,
 											   DogRepository dogRepository,
 											   EmployeeRepository employeeRepository,
-											   TweetRepository tweetRepository) {
+											   TweetRepository tweetRepository,
+											   ProductRepository productRepository,
+											   TweetService tweetService) {
 		return runner -> {
+
+			Tweet t2 = new Tweet();
+			t2.setTweetContent("Watching my favorite movie tonight!");
+			t2.setPreNode(0); // 代表自己发的文
+			t2.setPostDate(new Date());
+			t2.setTweetStatus(1); // 一般状态
+			t2.setNumReport(0);
+			boolean b =tweetService.postNewTweet(t2, 1);
+			System.out.println(b);
+//
+//			Tweet t3 = new Tweet();
+//			t3.setUserName("user3");
+//			t3.setTweetContent("Just finished reading an amazing book!");
+//			t3.setPreNode(0); // 代表自己发的文
+//			t3.setPostDate(new Date());
+//			t3.setTweetStatus(1); // 一般状态
+//			t3.setNumReport(0);
+
+
+
+
 
 		};
 	}

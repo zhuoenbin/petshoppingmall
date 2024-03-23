@@ -1,5 +1,6 @@
 package com.ispan.dogland.model.entity.activity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ispan.dogland.model.entity.Employee;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -35,9 +36,6 @@ public class VenueActivity {
     private String activityDescription;
     private String activityProcess;
     private String activityNotice;
-    private String mainImageUrl;
-    private String mainImagePublicId;
-    private String mainImageData;
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private Date activityListedDate;
@@ -57,15 +55,20 @@ public class VenueActivity {
     private String contactMail;
     private String contactPhone;
     ///////////////////////////////////
+    @JsonIgnore
     @OneToMany(mappedBy = "venueActivity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ActivityGallery> galleryList;
 
+
+    @JsonIgnore
     @OneToMany(mappedBy = "venueActivity", fetch = FetchType.LAZY)
     private List<LikedActivity>likedActivityList;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "venueActivity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ActivityUserJoined> activityUserJoinedList;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "venueActivity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ActivityDogJoined> activityDogJoinedList;
 
@@ -78,6 +81,9 @@ public class VenueActivity {
             activityUpdateDate = new Date();
             if(activityStatus==null){
                 activityStatus="活動中";
+                if(currentDogNumber==null){
+                    currentDogNumber=0;
+                }
             }
         }
     }
@@ -179,30 +185,6 @@ public class VenueActivity {
 
     public void setActivityNotice(String activityNotice) {
         this.activityNotice = activityNotice;
-    }
-
-    public String getMainImageUrl() {
-        return mainImageUrl;
-    }
-
-    public void setMainImageUrl(String mainImageUrl) {
-        this.mainImageUrl = mainImageUrl;
-    }
-
-    public String getMainImagePublicId() {
-        return mainImagePublicId;
-    }
-
-    public void setMainImagePublicId(String mainImagePublicId) {
-        this.mainImagePublicId = mainImagePublicId;
-    }
-
-    public String getMainImageData() {
-        return mainImageData;
-    }
-
-    public void setMainImageData(String mainImageData) {
-        this.mainImageData = mainImageData;
     }
 
     public Date getActivityListedDate() {

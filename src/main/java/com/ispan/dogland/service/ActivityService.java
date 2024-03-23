@@ -175,13 +175,9 @@ public class ActivityService {
     public ActivityData createNewActivity(VenueActivity venueActivity,
                                           Integer activityTypeId,
                                           Integer venueId,
-                                          Integer employeeId,
-                                          MultipartFile file){
+                                          Integer employeeId){
         ActivityData activityData = new ActivityData();
-        try {
-        //上傳到activityFolder裡
-            Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "activityFolder"));
-            //找到實體放進去
+
             Employee employee = employeeRepository.findByEmployeeId(employeeId);
             ActivityType type = typeRepository.findByActivityTypeId(activityTypeId);
             Venue venue = venueRepository.findByVenueId(venueId);
@@ -190,11 +186,6 @@ public class ActivityService {
             venueActivity.setVenue(venue);
             venueActivity.setActivityType(type);
 
-            //放圖片資料
-            venueActivity.setMainImageUrl((String) data.get("url"));
-            venueActivity.setMainImagePublicId((String) data.get("public_id"));
-
-
             VenueActivity activity = activityRepository.save(venueActivity);
 
             BeanUtils.copyProperties(activity, activityData);
@@ -202,11 +193,10 @@ public class ActivityService {
             activityData.setVenueId(activity.getVenue().getVenueId());
             activityData.setActivityTypeId(activity.getActivityType().getActivityTypeId());
             return activityData;
-        } catch (IOException e) {
-            throw new RuntimeException("Image uploading fail !!");
-        }
-
     }
+
+
+
 
 
 

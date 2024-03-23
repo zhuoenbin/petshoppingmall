@@ -22,9 +22,6 @@ public class ActivityData {
     @DateTimeFormat(pattern = "hh:mm")
     private Date activityEnd;
 
-    private String mainImageUrl;
-    private String mainImagePublicId;
-    private String mainImageData;
     private String activityStatus;
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
@@ -94,30 +91,6 @@ public class ActivityData {
 
     public void setActivityEnd(Date activityEnd) {
         this.activityEnd = activityEnd;
-    }
-
-    public String getMainImageUrl() {
-        return mainImageUrl;
-    }
-
-    public void setMainImageUrl(String mainImageUrl) {
-        this.mainImageUrl = mainImageUrl;
-    }
-
-    public String getMainImagePublicId() {
-        return mainImagePublicId;
-    }
-
-    public void setMainImagePublicId(String mainImagePublicId) {
-        this.mainImagePublicId = mainImagePublicId;
-    }
-
-    public String getMainImageData() {
-        return mainImageData;
-    }
-
-    public void setMainImageData(String mainImageData) {
-        this.mainImageData = mainImageData;
     }
 
     public String getActivityStatus() {

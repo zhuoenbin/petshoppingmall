@@ -11,6 +11,8 @@ import com.ispan.dogland.service.ActivityService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -73,15 +75,13 @@ public class ActivityController {
     }
     //===============官方新增活動===================
     @PostMapping("/official/add")
-    public ActivityData createNewActivity(@RequestPart VenueActivity venueActivity,
+    public ActivityData createNewActivity(@RequestBody VenueActivity venueActivity,
                                           @RequestParam Integer activityTypeId,
                                           @RequestParam Integer venueId,
                                           @RequestParam Integer employeeId,
-                                          @RequestPart("mainImg") MultipartFile image,
                                           HttpSession httpSession){
         //**再去session撈資料
-
-        return activityService.createNewActivity(venueActivity,activityTypeId,venueId,employeeId,image);
+        return activityService.createNewActivity(venueActivity,activityTypeId,venueId,employeeId);
     }
 
 

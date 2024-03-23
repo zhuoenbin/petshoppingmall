@@ -152,21 +152,6 @@ public class Users {
         this.userStatus = userStatus;
     }
 
-    public String getUserImgPath() {
-        return userImgPath;
-    }
-
-    public void setUserImgPath(String userImgPath) {
-        this.userImgPath = userImgPath;
-    }
-
-    public String getImgPublicId() {
-        return imgPublicId;
-    }
-
-    public void setImgPublicId(String imgPublicId) {
-        this.imgPublicId = imgPublicId;
-    }
 
     public List<Dog> getDogs() {
         return dogs;
@@ -175,9 +160,7 @@ public class Users {
     public void setDogs(List<Dog> dogs) {
         this.dogs = dogs;
     }
-
-
-
+    
     public List<Tweet> getTweets() {
         return tweets;
     }

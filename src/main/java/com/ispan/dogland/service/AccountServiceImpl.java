@@ -63,8 +63,6 @@ public class AccountServiceImpl implements AccountService {
         if(user.getUserPassword() !=null){
             String encodePassword = encodePassword(user.getUserPassword());
             user.setUserPassword(encodePassword);
-            user.setUserViolationCount(0);
-            user.setUserStatus("ACTIVE");
         }
         user.setLastLoginTime(new Date());
         return usersRepository.save(user);
@@ -75,6 +73,11 @@ public class AccountServiceImpl implements AccountService {
         return usersRepository.findByUserEmail(email);
     }
 
+    @Override
+    public Users getUserDetailById(Integer userId) {
+        return usersRepository.findByUserId(userId);
+    }
+
 
     @Override
     public Passport getPassportFromFormLogin(String username) {
@@ -83,7 +86,7 @@ public class AccountServiceImpl implements AccountService {
         if(user != null){
             user.setLastLoginTime(new Date());
             usersRepository.save(user);
-            passportDTO = new Passport(user.getLastName(),user.getUserEmail(), user.getUserId(), user.getUserStatus());
+            passportDTO = new Passport(user.getLastName(),user.getUserEmail(), user.getUserId(), user.getUserStatus(),user.getUserImgPath());
             return passportDTO;
         }else {
             Employee emp = employeeRepository.findByEmail(username);
@@ -91,7 +94,6 @@ public class AccountServiceImpl implements AccountService {
             return passportDTO;
         }
     }
-
 
 
     @Override
@@ -133,5 +135,10 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void clearVerificationCode(String email) {
         emailVerificationCodes.remove(email);
+    }
+
+    @Override
+    public void updateUser(Users user) {
+        usersRepository.save(user);
     }
 }

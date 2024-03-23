@@ -2,6 +2,7 @@ package com.ispan.dogland.model.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ispan.dogland.model.entity.tweet.Tweet;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -42,6 +43,12 @@ public class Users {
     @OneToMany(mappedBy = "user",
             cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Dog> dogs;
+
+
+    @OneToMany(mappedBy = "user",
+            cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Tweet> tweets;
+
 
     @PrePersist //在物件轉換到persistent狀態以前，做這個function
     public void onCreate() {
@@ -169,11 +176,30 @@ public class Users {
         this.dogs = dogs;
     }
 
-    public void addDog(Dog dog) {
-        if(this.dogs == null) {
-            this.dogs = new ArrayList<>();
-        }
-        this.dogs.add(dog);
+
+
+    public List<Tweet> getTweets() {
+        return tweets;
+    }
+
+    public void setTweets(List<Tweet> tweets) {
+        this.tweets = tweets;
+    }
+
+    public String getUserImgPath() {
+        return userImgPath;
+    }
+
+    public void setUserImgPath(String userImgPath) {
+        this.userImgPath = userImgPath;
+    }
+
+    public String getImgPublicId() {
+        return imgPublicId;
+    }
+
+    public void setImgPublicId(String imgPublicId) {
+        this.imgPublicId = imgPublicId;
     }
 
     @Override

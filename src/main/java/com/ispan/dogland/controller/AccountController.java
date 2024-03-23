@@ -21,6 +21,21 @@ public class AccountController {
     private AccountService accountService;
 
 
+    @GetMapping ("/getUserDetail")
+    public ResponseEntity<?> getUserDetail(HttpSession httpSession){
+        System.out.println("/getUserDetail 檢查登入 controller");
+
+        Passport loginUser = (Passport) httpSession.getAttribute("loginUser");
+        if (loginUser == null) {
+            System.out.println("session attribute 空的");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("session attribute null"); // 401
+        }
+        Users userDetail = accountService.getUserDetail(loginUser.getEmail());
+        if (userDetail == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User detail not found"); // 404
+        }
+        return ResponseEntity.ok(userDetail);
+    }
     @GetMapping("/api/users/map")
     public ResponseEntity<?> testSessionValue(HttpSession httpSession) {
         System.out.println("檢查登入 controller");
@@ -31,6 +46,10 @@ public class AccountController {
             System.out.println("session attribute 空的");
             return new ResponseEntity<String>("session attribute null", HttpStatus.UNAUTHORIZED); // 401
         }
+        //更新登入時間
+        Users userDetail = accountService.getUserDetailById(loginUser.getUserId());
+        userDetail.setLastLoginTime(new Date());
+        accountService.updateUser(userDetail);
 
         return new ResponseEntity<Passport>(loginUser, HttpStatus.OK);
     }

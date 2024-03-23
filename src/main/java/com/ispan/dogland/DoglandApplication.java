@@ -38,17 +38,8 @@ public class DoglandApplication {
 											   ProductRepository productRepository,
 											   TweetService tweetService) {
 		return runner -> {
-			List<Tweet> tweets = tweetService.findTweetsByUserId(2);
-//			for(Tweet tweet : tweets){
-//				System.out.println("111111111111111");
-//				List<TweetGallery> img = tweet.getTweetGalleries();
-//				if(img != null){
-//					for(TweetGallery i : img){
-//						System.out.println("2222222222222222");
-//						System.out.println(i.getImgPath());
-//					}
-//				}
-//			}
+
+
 
 
 

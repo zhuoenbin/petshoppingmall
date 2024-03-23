@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -48,8 +49,20 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
+    public Users findUserByTweetId(Integer tweetId) {
+        return userRepository.findByTweetId(tweetId);
+    }
+
+    @Override
     public List<Tweet> getAllTweet() {
-        return tweetRepository.findAllTweetsWithGallery();
+        List<Tweet> tweets = tweetRepository.findAllTweetsWithGallery();
+        List<Tweet> ret = new ArrayList<>();
+        for (Tweet tweet : tweets) {
+            if(tweet.getPreNode()==0){
+                ret.add(tweet);
+            }
+        }
+        return ret;
     }
 
     @Override
@@ -82,5 +95,10 @@ public class TweetServiceImpl implements TweetService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public List<Tweet> getNumOfComment(Integer tweetId) {
+        return tweetRepository.findCommentByPreNodeId(tweetId);
     }
 }

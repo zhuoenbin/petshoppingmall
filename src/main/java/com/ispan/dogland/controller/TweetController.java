@@ -114,4 +114,29 @@ public class TweetController {
         }
     }
 
+
+    //取得回文的數量
+    @GetMapping("/getNumOfComment/{tweetId}")
+    public Integer getNumOfComment(@PathVariable Integer tweetId) {
+        return tweetService.getNumOfComment(tweetId).size(); // Assuming tweetService has a method to get the number of comments for a tweet
+    }
+
+    ////取得回文的內容
+    @GetMapping("/getComments/{tweetId}")
+    public List<Tweet> getComments(@PathVariable Integer tweetId) {
+        return tweetService.getNumOfComment(tweetId); // Assuming tweetService has a method to get the number of comments for a tweet
+    }
+
+    //取得userId發的所有tweets
+    @GetMapping("/getTweetsByUserId/{userId}")
+    public List<Tweet> getTweetsByUserId(@PathVariable Integer userId) {
+        return tweetService.findTweetsByUserId(userId);
+    }
+
+    @GetMapping("/getUserTweetsByTweetId/{tweetId}")
+    public List<Tweet> getUserTweetsByTweetId(@PathVariable Integer tweetId) {
+        Users user = tweetService.findUserByTweetId(tweetId);
+        return tweetService.findTweetsByUserId(user.getUserId());
+    }
+
 }

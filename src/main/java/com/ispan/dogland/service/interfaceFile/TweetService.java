@@ -19,5 +19,7 @@ public interface TweetService {
 
     public List<Tweet> getNumOfComment(Integer tweetId);
 
+    public List<Tweet> getAllTweetForPage(int page, int limit);
+
 
 }

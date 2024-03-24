@@ -8,6 +8,8 @@ import com.ispan.dogland.model.entity.tweet.Tweet;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -100,5 +102,11 @@ public class TweetServiceImpl implements TweetService {
     @Override
     public List<Tweet> getNumOfComment(Integer tweetId) {
         return tweetRepository.findCommentByPreNodeId(tweetId);
+    }
+
+    @Override
+    public List<Tweet> getAllTweetForPage(int page, int limit) {
+        Page<Tweet> tweetPage = tweetRepository.findAllTweetsWithGallery(PageRequest.of(page - 1, limit));
+        return tweetPage.getContent();
     }
 }

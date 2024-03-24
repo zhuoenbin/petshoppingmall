@@ -33,6 +33,7 @@ public class GoogleOAuth2NativeHttpController {
 
     private final String scope = "https://www.googleapis.com/auth/userinfo.email";
 
+
     @GetMapping("/google-login")
     public String googleLogin(HttpServletResponse response) {
 

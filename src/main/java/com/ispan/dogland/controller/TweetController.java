@@ -42,13 +42,15 @@ public class TweetController {
         this.accountService = accountService;
     }
 
-    public TweetController(TweetService tweetService){
-        this.tweetService = tweetService;
-    }
+
+//    @GetMapping("/getAllTweet")
+//    public List<Tweet> allTweet(){
+//        return tweetService.getAllTweet();
+//    }
 
     @GetMapping("/getAllTweet")
-    public List<Tweet> allTweet(){
-        return tweetService.getAllTweet();
+    public List<Tweet> allTweet(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "6") int limit){
+        return tweetService.getAllTweetForPage(page, limit);
     }
 
     @PostMapping("/postTweetWithPhoto")

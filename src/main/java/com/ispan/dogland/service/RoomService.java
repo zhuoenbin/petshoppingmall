@@ -58,9 +58,12 @@ public class RoomService {
 
             roomList.add(roomTime);
         }
-//        System.out.println(roomList);
 
         return roomList;
+    }
+
+    public List<RoomReservation> findAllRoomReservation() {
+        return rRepository.findAll();
     }
 
     public Room findByRoomId(Integer roomId) {

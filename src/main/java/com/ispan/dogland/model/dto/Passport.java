@@ -7,12 +7,25 @@ public class Passport implements Serializable {
     private String email;
     private Integer userId;
     private String role;
+    private String photoUrl;
+
+    // Constructors
+    public Passport() {
+    }
 
     public Passport(String username, String email, Integer userId, String role) {
         this.username = username;
         this.email = email;
         this.userId = userId;
         this.role = role;
+    }
+
+    public Passport(String username, String email, Integer userId, String role, String photoUrl) {
+        this.username = username;
+        this.email = email;
+        this.userId = userId;
+        this.role = role;
+        this.photoUrl = photoUrl;
     }
 
     // Getters and Setters
@@ -48,13 +61,22 @@ public class Passport implements Serializable {
         this.role = role;
     }
 
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        photoUrl = photoUrl;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("Passport{");
         sb.append("username='").append(username).append('\'');
         sb.append(", email='").append(email).append('\'');
-        sb.append(", userId='").append(userId).append('\'');
+        sb.append(", userId=").append(userId);
         sb.append(", role='").append(role).append('\'');
+        sb.append(", PhotoUrl='").append(photoUrl).append('\'');
         sb.append('}');
         return sb.toString();
     }

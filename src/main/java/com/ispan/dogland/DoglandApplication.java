@@ -44,7 +44,7 @@ public class DoglandApplication {
 											   TweetService tweetService,
 											   TweetLikeRepository tweetLikeRepository) {
 		return runner -> {
-			
+
 
 		};
 

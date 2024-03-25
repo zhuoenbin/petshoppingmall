@@ -191,4 +191,19 @@ public class TweetController {
         return "removeLikeTweet successfully!";
     }
 
+    //回覆貼文(純文字)
+    @PostMapping("/replyTweet")
+    public String replyTweet(@RequestParam Integer tweetId, @RequestParam Integer memberId, @RequestParam String tweetContent) {
+            System.out.println("tweetId: " + tweetId + " memberId: " + memberId + " tweetContent: " + tweetContent);
+        Tweet tweet = new Tweet();
+        tweet.setPreNode(tweetId);
+        tweet.setPostDate(new Date());
+        tweet.setTweetStatus(1);
+        tweet.setNumReport(0);
+        tweet.setTweetContent(tweetContent);
+
+        tweetService.postNewTweet(tweet, memberId);
+        return "replyTweet successfully!";
+    }
+
 }

@@ -28,7 +28,9 @@ public interface TweetRepository extends JpaRepository<Tweet, Integer> {
     List<Tweet> findCommentByPreNodeId(Integer preNodeId);
 
     //找出所有貼文與圖片(不包括留言)，且分頁
-    @Query("SELECT t FROM Tweet t LEFT JOIN FETCH t.tweetGalleries WHERE t.preNode = 0")
+//    @Query("SELECT t FROM Tweet t LEFT JOIN FETCH t.tweetGalleries WHERE t.preNode = 0")
+//    Page<Tweet> findAllTweetsWithGallery(Pageable pageable);
+    @Query("SELECT t FROM Tweet t LEFT JOIN FETCH t.tweetGalleries WHERE t.preNode = 0 ORDER BY t.postDate DESC")
     Page<Tweet> findAllTweetsWithGallery(Pageable pageable);
 
 

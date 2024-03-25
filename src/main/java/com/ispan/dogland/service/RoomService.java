@@ -81,4 +81,8 @@ public class RoomService {
         return dogs;
     }
 
+    public RoomReservation findByRoomReservationId(Integer roomReservationId) {
+        return rRepository.findByReservationId(roomReservationId);
+    }
+
 }

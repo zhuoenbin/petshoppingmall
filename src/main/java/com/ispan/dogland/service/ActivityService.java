@@ -194,6 +194,25 @@ public class ActivityService {
             activityData.setActivityTypeId(activity.getActivityType().getActivityTypeId());
             return activityData;
     }
+    //===============所有活動===============
+    public Page<ActivityData> findActivityByPage(Integer pageNumber){
+        Page<VenueActivity> activities = activityRepository.findAll(PageRequest.of(pageNumber, 9));
+        System.out.println(activities.getTotalElements());
+        Page<ActivityData> activityDataList = activities.map(a -> {
+            ActivityData activityData = new ActivityData();
+            BeanUtils.copyProperties(a, activityData);
+            activityData.setVenueId(a.getVenue().getVenueId());
+            if (a.getEmployee() != null && a.getVenue()!=null &&a.getActivityType()!=null) {
+                activityData.setEmployeeId(a.getEmployee().getEmployeeId());
+                activityData.setVenueId(a.getVenue().getVenueId());
+                activityData.setActivityTypeId(a.getActivityType().getActivityTypeId());
+            }
+            return activityData;
+        });
+        return activityDataList;
+    }
+
+    //依類別找活動
 
 
 

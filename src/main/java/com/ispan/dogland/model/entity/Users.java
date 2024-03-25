@@ -160,7 +160,7 @@ public class Users {
     public void setDogs(List<Dog> dogs) {
         this.dogs = dogs;
     }
-    
+
     public List<Tweet> getTweets() {
         return tweets;
     }

@@ -1,14 +1,10 @@
 package com.ispan.dogland.controller;
 
-import com.ispan.dogland.model.dto.ArticleDto;
-import com.ispan.dogland.model.entity.forum.Articles;
+import com.ispan.dogland.model.dto.ForumDto;
 import com.ispan.dogland.service.ForumService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/forum")
@@ -19,10 +15,13 @@ public class ForumController {
     private ForumService fs;
 
     @GetMapping("/{pageNumber}")
-    Page<ArticleDto> forumLobby(@PathVariable Integer pageNumber){
+    Page<ForumDto> forumLobby(@PathVariable Integer pageNumber){
         return fs.showArticlesByPages(pageNumber);
     }
 
-//    @GetMapping("/{articleId}")
+    @GetMapping("/{articleId}/{pageNumber}")
+    Page<ForumDto> commentsOfArticle(@PathVariable Integer articleId,@PathVariable Integer pageNumber){
+        return fs.showCommentsOfArticle(articleId,pageNumber);
+    }
 
 }

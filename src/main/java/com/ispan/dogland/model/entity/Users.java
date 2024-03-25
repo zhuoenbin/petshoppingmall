@@ -49,6 +49,12 @@ public class Users {
             cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Tweet> tweets;
 
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                                                    CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinTable(name="tweet_like", joinColumns = @JoinColumn(name="user_id"),
+            inverseJoinColumns = @JoinColumn(name="tweet_id"))
+    private List<Tweet> tweetLikes;
+
 
     @PrePersist //在物件轉換到persistent狀態以前，做這個function
     public void onCreate() {
@@ -161,7 +167,6 @@ public class Users {
     }
 
 
-
     public List<Tweet> getTweets() {
         return tweets;
     }
@@ -185,6 +190,22 @@ public class Users {
     public void setImgPublicId(String imgPublicId) {
         this.imgPublicId = imgPublicId;
     }
+
+    public List<Tweet> getTweetLikes() {
+        return tweetLikes;
+    }
+
+    public void setTweetLikes(List<Tweet> tweetLikes) {
+        this.tweetLikes = tweetLikes;
+    }
+
+    public void addTweetLike(Tweet tweet) {
+        if(tweetLikes == null) {
+            tweetLikes = new ArrayList<>();
+        }
+        tweetLikes.add(tweet);
+    }
+
 
     @Override
     public String toString() {

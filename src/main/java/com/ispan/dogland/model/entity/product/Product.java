@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import com.ispan.dogland.model.entity.Employee;
+import com.ispan.dogland.model.entity.ShoppingCart;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -20,7 +21,7 @@ public class Product {
     private Integer productId;
 
 
-    @Column(name = "product_name", nullable = false)
+    @Column(name = "product_name")
     private String productName;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
@@ -58,23 +59,20 @@ public class Product {
     @Column(name = "discount_id")
     private Integer discountId;
 
-
-
     /////////////////////////////////////////
 
-    @PrePersist //在物件轉換到persistent狀態以前，做這個function
-    public void onCreate() {
-        if(listingDate==null && modifiedDate==null) {
-            listingDate=new Date();
-            modifiedDate=new Date();
-        }
-    }
-
-    @PreUpdate
-    public void onUpdate(){
-        modifiedDate = new Date();
-    }
-
+//    @PrePersist //在物件轉換到persistent狀態以前，做這個function
+//    public void onCreate() {
+//        if(listingDate==null && modifiedDate==null) {
+//            listingDate=new Date();
+//            modifiedDate=new Date();
+//        }
+//    }
+//
+//    @PreUpdate
+//    public void onUpdate(){
+//        modifiedDate = new Date();
+//    }
     /////////////////////////////////////////
 
     @OneToMany(mappedBy = "product",
@@ -89,22 +87,30 @@ public class Product {
                     CascadeType.DETACH, CascadeType.REFRESH})
     private List<ProductGalleryCloud>productGalleryClouds;
 
+    @OneToMany(mappedBy = "product")
+    private List<ShoppingCart> shoppingCarts;
+
     ///////////////////////////////////
     public Product() {
     }
-
-    public Product(Integer productId, String productName, Employee employee, ProductCategory category, Integer unitPrice, String productDescription, Integer stock, Integer reservedQuantity, Date listingDate, Date modifiedDate) {
+    //要有這個
+    public Product(Integer productId){
         this.productId = productId;
-        this.productName = productName;
-        this.employee = employee;
-        this.category = category;
-        this.unitPrice = unitPrice;
-        this.productDescription = productDescription;
-        this.stock = stock;
-        this.reservedQuantity = reservedQuantity;
-        this.listingDate = listingDate;
-        this.modifiedDate = modifiedDate;
     }
+
+//    public Product(Integer productId, String productName, Employee employee, ProductCategory category, Integer unitPrice, String productDescription, Integer stock, Integer reservedQuantity, Date listingDate, Date modifiedDate) {
+//        this.productId = productId;
+//        this.productName = productName;
+//        this.employee = employee;
+//        this.category = category;
+//        this.unitPrice = unitPrice;
+//        this.productDescription = productDescription;
+//        this.stock = stock;
+//        this.reservedQuantity = reservedQuantity;
+//        this.listingDate = listingDate;
+//        this.modifiedDate = modifiedDate;
+//    }
+
 
     ///////////////////////////////////
 
@@ -211,7 +217,17 @@ public class Product {
     public void setProductDescription(String productDescription) {
         this.productDescription = productDescription;
     }
-//////////////////////////////////
+
+    public List<ShoppingCart> getShoppingCarts() {
+        return shoppingCarts;
+    }
+
+    public void setShoppingCarts(List<ShoppingCart> shoppingCarts) {
+        this.shoppingCarts = shoppingCarts;
+    }
+
+    //////////////////////////////////
+
 
     @Override
     public String toString() {
@@ -229,6 +245,7 @@ public class Product {
         sb.append(", discountId=").append(discountId);
         sb.append(", productGalleries=").append(productGalleries);
         sb.append(", productGalleryClouds=").append(productGalleryClouds);
+        sb.append(", shoppingCarts=").append(shoppingCarts);
         sb.append('}');
         return sb.toString();
     }

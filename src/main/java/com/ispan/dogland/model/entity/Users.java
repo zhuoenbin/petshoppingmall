@@ -40,6 +40,9 @@ public class Users {
             cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Dog> dogs;
 
+    @OneToMany(mappedBy = "users")
+    private List<ShoppingCart> shoppingCarts;
+
 //    @OneToMany(fetch = FetchType.LAZY,
 //            cascade = CascadeType.ALL,
 //            mappedBy = "user")
@@ -64,6 +67,10 @@ public class Users {
     }
 
     public Users() {
+    }
+    //加了這個
+    public Users(Integer userId){
+        this.userId = userId;
     }
 
     public Integer getUserId() {
@@ -168,5 +175,13 @@ public class Users {
 
     public void setDogs(List<Dog> dogs) {
         this.dogs = dogs;
+    }
+
+    public List<ShoppingCart> getShoppingCarts() {
+        return shoppingCarts;
+    }
+
+    public void setShoppingCarts(List<ShoppingCart> shoppingCarts) {
+        this.shoppingCarts = shoppingCarts;
     }
 }

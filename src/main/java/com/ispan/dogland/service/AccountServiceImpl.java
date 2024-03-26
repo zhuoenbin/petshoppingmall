@@ -141,4 +141,9 @@ public class AccountServiceImpl implements AccountService {
     public void updateUser(Users user) {
         usersRepository.save(user);
     }
+
+    @Override
+    public Users findUsersByLastName(String lastName) {
+        return usersRepository.findByLastName(lastName);
+    }
 }

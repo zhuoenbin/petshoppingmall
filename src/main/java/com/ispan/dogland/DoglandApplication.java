@@ -4,6 +4,7 @@ import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dao.product.ProductRepository;
+import com.ispan.dogland.model.dao.tweet.TweetFollowListRepository;
 import com.ispan.dogland.model.dao.tweet.TweetLikeRepository;
 import com.ispan.dogland.model.dao.tweet.TweetRepository;
 import com.ispan.dogland.model.entity.Dog;
@@ -12,6 +13,7 @@ import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductGallery;
 import com.ispan.dogland.model.entity.tweet.Tweet;
+import com.ispan.dogland.model.entity.tweet.TweetFollowList;
 import com.ispan.dogland.model.entity.tweet.TweetGallery;
 import com.ispan.dogland.model.entity.tweet.TweetLike;
 import com.ispan.dogland.service.interfaceFile.TweetService;
@@ -42,9 +44,9 @@ public class DoglandApplication {
 											   TweetRepository tweetRepository,
 											   ProductRepository productRepository,
 											   TweetService tweetService,
-											   TweetLikeRepository tweetLikeRepository) {
+											   TweetLikeRepository tweetLikeRepository,
+											   TweetFollowListRepository tweetFollowListRepository) {
 		return runner -> {
-
 
 		};
 

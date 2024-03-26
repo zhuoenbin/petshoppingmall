@@ -15,12 +15,8 @@ public interface TweetRepository extends JpaRepository<Tweet, Integer> {
     List<Tweet> findByUserId(Integer userId);
 
 
-    //使用tweetId找找推特與圖
-    @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries WHERE t.tweetId = ?1")
-    Tweet findByTweetId(Integer tweetId);
-
     //找所有推文與圖片
-    @Query("SELECT t FROM Tweet t LEFT JOIN FETCH t.tweetGalleries")
+    @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries")
     List<Tweet> findAllTweetsWithGallery();
 
 
@@ -33,11 +29,20 @@ public interface TweetRepository extends JpaRepository<Tweet, Integer> {
     @Query("SELECT t FROM Tweet t LEFT JOIN FETCH t.tweetGalleries WHERE t.preNode = 0 ORDER BY t.postDate DESC")
     Page<Tweet> findAllTweetsWithGallery(Pageable pageable);
 
+    @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries WHERE t.user.userId = ?1 AND t.preNode = 0 ")
+    List<Tweet> findTweetsWithGalleryWithNoComment(Integer userId);
+
+    @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries WHERE t.user.lastName = ?1 AND t.preNode = 0")
+    List<Tweet> findTweetsByUserName(String userName);
+    @Query("SELECT t FROM Tweet t LEFT JOIN  t.tweetGalleries WHERE t.tweetId = ?1")
+    Tweet findTweetByTweetId(Integer tweetId);
 
     @Query("SELECT u FROM Users u JOIN FETCH u.tweetLikes t WHERE t.tweetId = ?1")
     List<Users> findUserLikesByTweetId(Integer tweetId);
 
     @Query("SELECT t FROM Tweet t LEFT JOIN  t.userLikes WHERE t.tweetId = ?1")
     Tweet findTweetUserLikesByTweetId(Integer tweetId);
+
+
 
 }

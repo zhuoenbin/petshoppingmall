@@ -1,16 +1,19 @@
 package com.ispan.dogland.service;
 
 import com.ispan.dogland.model.dao.UserRepository;
+import com.ispan.dogland.model.dao.tweet.TweetFollowListRepository;
 import com.ispan.dogland.model.dao.tweet.TweetGalleryRepository;
 import com.ispan.dogland.model.dao.tweet.TweetLikeRepository;
 import com.ispan.dogland.model.dao.tweet.TweetRepository;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.tweet.Tweet;
+import com.ispan.dogland.model.entity.tweet.TweetFollowList;
 import com.ispan.dogland.model.entity.tweet.TweetLike;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -36,13 +39,15 @@ public class TweetServiceImpl implements TweetService {
     private UserRepository userRepository;
     private TweetGalleryRepository tweetGalleryRepository;
     private TweetLikeRepository tweetLikeRepository;
+    private TweetFollowListRepository tweetFollowListRepository;
 
     @Autowired
-    public TweetServiceImpl(TweetRepository tweetRepository, UserRepository userRepository, TweetGalleryRepository tweetGalleryRepository, TweetLikeRepository tweetLikeRepository) {
+    public TweetServiceImpl(TweetRepository tweetRepository, UserRepository userRepository, TweetGalleryRepository tweetGalleryRepository, TweetLikeRepository tweetLikeRepository,TweetFollowListRepository tweetFollowListRepository) {
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
         this.tweetGalleryRepository = tweetGalleryRepository;
         this.tweetLikeRepository = tweetLikeRepository;
+        this.tweetFollowListRepository = tweetFollowListRepository;
     }
 
     @Override
@@ -57,6 +62,11 @@ public class TweetServiceImpl implements TweetService {
     @Override
     public Users findUserByTweetId(Integer tweetId) {
         return userRepository.findByTweetId(tweetId);
+    }
+
+    @Override
+    public List<Tweet> findTweetsByUserName(String userName) {
+        return tweetRepository.findTweetsByUserName(userName);
     }
 
     @Override
@@ -134,5 +144,55 @@ public class TweetServiceImpl implements TweetService {
         if (ll != null) {
             tweetLikeRepository.delete(ll);
         }
+    }
+
+    @Override
+    public Tweet findTweetByTweetId(Integer tweetId) {
+        return tweetRepository.findTweetByTweetId(tweetId);
+    }
+
+    @Override
+    public boolean checkIsFollow(Integer myUserId, Integer otherUserId) {
+        TweetFollowList tmp = tweetFollowListRepository.findByMyUserIdAndOtherUserId(myUserId, otherUserId);
+        return tmp != null;
+    }
+    @Override
+    public boolean followTweetUser(Integer myUserId, Integer otherUserId) {
+        Users myUser = userRepository.findByUserId(myUserId);
+        Users otherUser = userRepository.findByUserId(otherUserId);
+        if (myUser != null && otherUser != null) {
+            TweetFollowList tmp = new TweetFollowList(myUserId, otherUserId);
+            tweetFollowListRepository.save(tmp);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void deleteFollowTweetUser(Integer myUserId, Integer otherUserId) {
+        tweetFollowListRepository.deleteByUserIdAndFollwerId(myUserId, otherUserId);
+    }
+
+    @Override
+    public List<Tweet> findAllFollowTweetsByUserId(Integer userId) {
+        //該user所有追蹤的人
+        List<TweetFollowList> followList = tweetFollowListRepository.findByUserId(userId);
+        List<Tweet> totalTweet = new ArrayList<>();
+        //把每一個追蹤的人的tweets找出來
+        for (TweetFollowList tmp : followList) {
+            totalTweet.addAll(tweetRepository.findTweetsWithGalleryWithNoComment(tmp.getFollwerId()));
+        }
+        return totalTweet;
+    }
+
+    @Override
+    public List<Users> findAllFollowUsersByUserId(Integer userId) {
+        //該user所有追蹤的人
+        List<TweetFollowList> followList = tweetFollowListRepository.findByUserId(userId);
+        List<Users> totalUsers = new ArrayList<>();
+        for (TweetFollowList tmp : followList) {
+            totalUsers.add(userRepository.findByUserId(tmp.getFollwerId()));
+        }
+        return totalUsers;
     }
 }

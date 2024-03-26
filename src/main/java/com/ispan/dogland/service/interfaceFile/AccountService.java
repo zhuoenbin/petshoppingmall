@@ -30,5 +30,6 @@ public interface AccountService {
 
     public void updateUser(Users user);
 
+    public Users findUsersByLastName(String lastName);
 
 }

@@ -201,7 +201,6 @@ public class TweetController {
         tweet.setTweetStatus(1);
         tweet.setNumReport(0);
         tweet.setTweetContent(tweetContent);
-
         tweetService.postNewTweet(tweet, memberId);
         return "replyTweet successfully!";
     }

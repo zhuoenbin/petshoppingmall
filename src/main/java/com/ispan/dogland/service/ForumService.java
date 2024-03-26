@@ -6,6 +6,7 @@ import com.ispan.dogland.model.dao.forum.ArticleCommentRepository;
 import com.ispan.dogland.model.dao.forum.ArticleRepository;
 import com.ispan.dogland.model.dto.ForumDto;
 import com.ispan.dogland.model.entity.Users;
+import com.ispan.dogland.model.entity.forum.ArticleCategory;
 import com.ispan.dogland.model.entity.forum.ArticleComments;
 import com.ispan.dogland.model.entity.forum.Articles;
 import org.springframework.beans.BeanUtils;
@@ -35,7 +36,7 @@ public class ForumService {
     public Page<ForumDto> showArticlesByPages(Integer pageNumber){
         Sort sortByTime = Sort.by(Sort.Direction.ASC,"articleCreateTime");
 
-        Page<Articles> articles = articleRepository.findAll(PageRequest.of(pageNumber, 5,sortByTime));
+        Page<Articles> articles = articleRepository.findAll(PageRequest.of(pageNumber, 3,sortByTime));
 
         Page<ForumDto> forumDtos = articles.map(a -> {
             ForumDto aDto = new ForumDto();
@@ -52,7 +53,7 @@ public class ForumService {
     public boolean addNewArticle(Articles articles,Integer userId){
         Users user = userRepository.findByUserId(userId);
         if(user!=null) {
-            articles.setAuthor(user.getFirstName() + user.getLastName());
+            articles.setUserName(user.getFirstName() + user.getLastName());
             Articles a = articleRepository.save(articles);
             articles.setUser(user);
             articleRepository.save(articles);
@@ -76,6 +77,10 @@ public class ForumService {
             return aDto;
         });
         return forumDtos;
+    }
+
+    public List<ArticleCategory> showCategories(){
+        return articleCategoryRepository.findAll();
     }
 
 }

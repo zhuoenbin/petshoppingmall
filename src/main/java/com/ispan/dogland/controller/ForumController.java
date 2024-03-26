@@ -1,10 +1,13 @@
 package com.ispan.dogland.controller;
 
 import com.ispan.dogland.model.dto.ForumDto;
+import com.ispan.dogland.model.entity.forum.ArticleCategory;
 import com.ispan.dogland.service.ForumService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/forum")
@@ -24,4 +27,8 @@ public class ForumController {
         return fs.showCommentsOfArticle(articleId,pageNumber);
     }
 
+    @GetMapping("/category")
+    List<ArticleCategory> getArticleCategory(){
+        return fs.showCategories();
+    }
 }

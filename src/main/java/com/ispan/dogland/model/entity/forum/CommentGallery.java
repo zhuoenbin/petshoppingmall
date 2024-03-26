@@ -1,6 +1,7 @@
 package com.ispan.dogland.model.entity.forum;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,7 +18,6 @@ public class CommentGallery {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
                 CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "comment_id")
-    @JsonIgnore
     private ArticleComments comment;
 
     public CommentGallery() {

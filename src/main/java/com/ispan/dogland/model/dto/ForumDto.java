@@ -8,7 +8,6 @@ import java.sql.Date;
 public class ForumDto {
 
     private Integer articleId;
-    private Users user;
     private String articleTitle;
     private Date articleCreateTime;
     private ArticleCategory category;
@@ -17,34 +16,12 @@ public class ForumDto {
 
     public ForumDto(){}
 
-    public ForumDto(Integer articleId, Users user, String articleTitle, Date articleCreateTime, ArticleCategory category) {
-        this.articleId = articleId;
-        this.user = user;
-        this.articleTitle = articleTitle;
-        this.articleCreateTime = articleCreateTime;
-        this.category = category;
-    }
-
-    public ForumDto(Users user, String commentContent, Date commentCreateTime) {
-        this.user = user;
-        this.commentContent = commentContent;
-        this.commentCreateTime = commentCreateTime;
-    }
-
     public Integer getArticleId() {
         return articleId;
     }
 
     public void setArticleId(Integer articleId) {
         this.articleId = articleId;
-    }
-
-    public Users getUser() {
-        return user;
-    }
-
-    public void setUser(Users user) {
-        this.user = user;
     }
 
     public String getArticleTitle() {

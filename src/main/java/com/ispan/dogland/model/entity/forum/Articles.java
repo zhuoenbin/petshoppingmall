@@ -1,6 +1,7 @@
 package com.ispan.dogland.model.entity.forum;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.ispan.dogland.model.entity.Users;
 import jakarta.persistence.*;
 
@@ -18,11 +19,10 @@ public class Articles {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @JsonIgnore
     private Users user;
 
-    @JoinColumn(name="author")
-    private String author;
+    @JoinColumn(name="user_name")
+    private String userName;
 
     @Column(name="article_title")
     private String articleTitle;
@@ -33,6 +33,7 @@ public class Articles {
     @OneToMany(fetch = FetchType.EAGER,
             cascade = CascadeType.ALL,
             mappedBy = "commentId")
+    @JsonIgnore
     private List<ArticleComments> comments;
 
     @ManyToOne(fetch = FetchType.EAGER,
@@ -42,10 +43,10 @@ public class Articles {
 
     public Articles(){}
 
-    public Articles(Integer articleId, Users user, String author, String articleTitle, Date articleCreateTime, List<ArticleComments> comments, ArticleCategory articleCategory) {
+    public Articles(Integer articleId, Users user, String userName, String articleTitle, Date articleCreateTime, List<ArticleComments> comments, ArticleCategory articleCategory) {
         this.articleId = articleId;
         this.user = user;
-        this.author = author;
+        this.userName = userName;
         this.articleTitle = articleTitle;
         this.articleCreateTime = articleCreateTime;
         this.comments = comments;
@@ -68,12 +69,12 @@ public class Articles {
         this.user = user;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getArticleTitle() {

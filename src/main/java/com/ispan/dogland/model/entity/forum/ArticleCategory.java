@@ -1,5 +1,6 @@
 package com.ispan.dogland.model.entity.forum;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class ArticleCategory {
     @OneToMany(fetch = FetchType.EAGER,
             cascade = CascadeType.ALL,
             mappedBy = "articleId")
+    @JsonIgnore
     private List<Articles> categories;
 
     public ArticleCategory(){}

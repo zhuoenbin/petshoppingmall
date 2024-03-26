@@ -2,12 +2,16 @@ package com.ispan.dogland.service;
 
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dao.tweet.TweetGalleryRepository;
+import com.ispan.dogland.model.dao.tweet.TweetLikeRepository;
 import com.ispan.dogland.model.dao.tweet.TweetRepository;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.tweet.Tweet;
+import com.ispan.dogland.model.entity.tweet.TweetLike;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,12 +35,14 @@ public class TweetServiceImpl implements TweetService {
     private TweetRepository tweetRepository;
     private UserRepository userRepository;
     private TweetGalleryRepository tweetGalleryRepository;
+    private TweetLikeRepository tweetLikeRepository;
 
     @Autowired
-    public TweetServiceImpl(TweetRepository tweetRepository, UserRepository userRepository,TweetGalleryRepository tweetGalleryRepository) {
+    public TweetServiceImpl(TweetRepository tweetRepository, UserRepository userRepository, TweetGalleryRepository tweetGalleryRepository, TweetLikeRepository tweetLikeRepository) {
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
         this.tweetGalleryRepository = tweetGalleryRepository;
+        this.tweetLikeRepository = tweetLikeRepository;
     }
 
     @Override
@@ -58,7 +64,7 @@ public class TweetServiceImpl implements TweetService {
         List<Tweet> tweets = tweetRepository.findAllTweetsWithGallery();
         List<Tweet> ret = new ArrayList<>();
         for (Tweet tweet : tweets) {
-            if(tweet.getPreNode()==0){
+            if (tweet.getPreNode() == 0) {
                 ret.add(tweet);
             }
         }
@@ -100,5 +106,33 @@ public class TweetServiceImpl implements TweetService {
     @Override
     public List<Tweet> getNumOfComment(Integer tweetId) {
         return tweetRepository.findCommentByPreNodeId(tweetId);
+    }
+
+    @Override
+    public List<Tweet> getAllTweetForPage(int page, int limit) {
+        Page<Tweet> tweetPage = tweetRepository.findAllTweetsWithGallery(PageRequest.of(page - 1, limit));
+        return tweetPage.getContent();
+    }
+
+    @Override
+    public List<Users> findUserLikesByTweetId(Integer tweetId) {
+        return tweetRepository.findUserLikesByTweetId(tweetId);
+    }
+
+
+    @Override
+    public void createLinkWithTweetAndLike(Integer tweetId, Integer userId) {
+        Users user = userRepository.findByUserId(userId);
+        Tweet tweet = tweetRepository.findTweetUserLikesByTweetId(tweetId);
+        tweet.addUserLike(user);
+        tweetRepository.save(tweet);
+    }
+
+    @Override
+    public void removeLinkWithTweetAndLike(Integer tweetId, Integer userId) {
+        TweetLike ll = tweetLikeRepository.findByTweetIdAndUserId(tweetId, userId);
+        if (ll != null) {
+            tweetLikeRepository.delete(ll);
+        }
     }
 }

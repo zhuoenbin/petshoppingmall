@@ -52,6 +52,12 @@ public class Users {
             cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Tweet> tweets;
 
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                                                    CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinTable(name="tweet_like", joinColumns = @JoinColumn(name="user_id"),
+            inverseJoinColumns = @JoinColumn(name="tweet_id"))
+    private List<Tweet> tweetLikes;
+
 
     @OneToMany(fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
@@ -167,22 +173,6 @@ public class Users {
         this.lastLoginTime = lastLoginTime;
     }
 
-    public String getUserImgPath() {
-        return userImgPath;
-    }
-
-    public void setUserImgPath(String userImgPath) {
-        this.userImgPath = userImgPath;
-    }
-
-    public String getImgPublicId() {
-        return imgPublicId;
-    }
-
-    public void setImgPublicId(String imgPublicId) {
-        this.imgPublicId = imgPublicId;
-    }
-
     public String getUserStatus() {
         return userStatus;
     }
@@ -199,12 +189,48 @@ public class Users {
         this.dogs = dogs;
     }
 
-    public void addDog(Dog dog) {
-        if(this.dogs == null) {
-            this.dogs = new ArrayList<>();
-        }
-        this.dogs.add(dog);
+
+
+    public List<Tweet> getTweets() {
+        return tweets;
     }
+
+    public void setTweets(List<Tweet> tweets) {
+        this.tweets = tweets;
+    }
+
+    public String getUserImgPath() {
+        return userImgPath;
+    }
+
+    public void setUserImgPath(String userImgPath) {
+        this.userImgPath = userImgPath;
+    }
+
+    public String getImgPublicId() {
+        return imgPublicId;
+    }
+
+    public void setImgPublicId(String imgPublicId) {
+        this.imgPublicId = imgPublicId;
+    }
+
+
+    public List<Tweet> getTweetLikes() {
+        return tweetLikes;
+    }
+
+    public void setTweetLikes(List<Tweet> tweetLikes) {
+        this.tweetLikes = tweetLikes;
+    }
+
+    public void addTweetLike(Tweet tweet) {
+        if(tweetLikes == null) {
+            tweetLikes = new ArrayList<>();
+        }
+        tweetLikes.add(tweet);
+    }
+
 
     @Override
     public String toString() {
@@ -221,7 +247,7 @@ public class Users {
         sb.append(", userImgPath='").append(userImgPath).append('\'');
         sb.append(", imgPublicId='").append(imgPublicId).append('\'');
         sb.append(", userStatus='").append(userStatus).append('\'');
-        sb.append(", dogs=").append(dogs);
+//        sb.append(", dogs=").append(dogs);
         sb.append('}');
         return sb.toString();
     }

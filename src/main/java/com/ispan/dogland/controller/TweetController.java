@@ -2,6 +2,7 @@ package com.ispan.dogland.controller;
 
 
 import com.ispan.dogland.model.dto.TweetDto;
+import com.ispan.dogland.model.dto.TweetLikesCheckResponse;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import com.ispan.dogland.model.entity.tweet.TweetGallery;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/tweet")
@@ -42,13 +44,15 @@ public class TweetController {
         this.accountService = accountService;
     }
 
-    public TweetController(TweetService tweetService){
-        this.tweetService = tweetService;
-    }
+
+//    @GetMapping("/getAllTweet")
+//    public List<Tweet> allTweet(){
+//        return tweetService.getAllTweet();
+//    }
 
     @GetMapping("/getAllTweet")
-    public List<Tweet> allTweet(){
-        return tweetService.getAllTweet();
+    public List<Tweet> allTweet(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "6") int limit){
+        return tweetService.getAllTweetForPage(page, limit);
     }
 
     @PostMapping("/postTweetWithPhoto")
@@ -137,6 +141,68 @@ public class TweetController {
     public List<Tweet> getUserTweetsByTweetId(@PathVariable Integer tweetId) {
         Users user = tweetService.findUserByTweetId(tweetId);
         return tweetService.findTweetsByUserId(user.getUserId());
+    }
+
+
+    //找到該則tweet的所有按讚數量
+    @GetMapping("/getTweetLikesNum")
+    public ResponseEntity<TweetLikesCheckResponse> getTweetLikesNum(@RequestParam Integer tweetId , @RequestParam Integer userId) {
+        List<Users> users = tweetService.findUserLikesByTweetId(tweetId);
+        Users user = accountService.getUserDetailById(userId);
+        TweetLikesCheckResponse tweetLikesCheckResponse = new TweetLikesCheckResponse();
+
+        tweetLikesCheckResponse.setTweetLikesNum(tweetService.findUserLikesByTweetId(tweetId).size());
+
+        if (users.contains(user)) {
+            // user 在 users 列表中
+            tweetLikesCheckResponse.setIsUserLiked(1);
+        } else {
+            // user 不在 users 列表中
+            tweetLikesCheckResponse.setIsUserLiked(0);
+        }
+
+
+        return ResponseEntity.ok(tweetLikesCheckResponse);
+    }
+
+    //取得該貼文所有按讚的用戶
+    @GetMapping("/getTweetLikesUser")
+    public ResponseEntity<List<Users>> getTweetLikesUser(@RequestParam Integer tweetId) {
+        List<Users> users = tweetService.findUserLikesByTweetId(tweetId);
+        return ResponseEntity.ok(users);
+    }
+
+
+    //使用者按讚，使用者與like建立連結
+    @PostMapping("/getLikeLink")
+    public String likeTweet(@RequestParam Integer userId,@RequestParam Integer tweetId) {
+        System.out.println("userId: " + userId + " tweetId: " + tweetId);
+
+        tweetService.createLinkWithTweetAndLike(tweetId, userId);
+
+        return "Liked successfully!";
+    }
+
+
+    //取消讚
+    @PostMapping("/removeLikeLink")
+    public String removeLikeTweet(@RequestParam Integer userId,@RequestParam Integer tweetId) {
+        tweetService.removeLinkWithTweetAndLike(tweetId, userId);
+        return "removeLikeTweet successfully!";
+    }
+
+    //回覆貼文(純文字)
+    @PostMapping("/replyTweet")
+    public String replyTweet(@RequestParam Integer tweetId, @RequestParam Integer memberId, @RequestParam String tweetContent) {
+            System.out.println("tweetId: " + tweetId + " memberId: " + memberId + " tweetContent: " + tweetContent);
+        Tweet tweet = new Tweet();
+        tweet.setPreNode(tweetId);
+        tweet.setPostDate(new Date());
+        tweet.setTweetStatus(1);
+        tweet.setNumReport(0);
+        tweet.setTweetContent(tweetContent);
+        tweetService.postNewTweet(tweet, memberId);
+        return "replyTweet successfully!";
     }
 
 }

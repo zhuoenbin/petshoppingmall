@@ -4,6 +4,7 @@ import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dao.product.ProductRepository;
+import com.ispan.dogland.model.dao.tweet.TweetLikeRepository;
 import com.ispan.dogland.model.dao.tweet.TweetRepository;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Employee;
@@ -12,7 +13,10 @@ import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductGallery;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import com.ispan.dogland.model.entity.tweet.TweetGallery;
+import com.ispan.dogland.model.entity.tweet.TweetLike;
 import com.ispan.dogland.service.interfaceFile.TweetService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,6 +24,7 @@ import org.springframework.context.annotation.Bean;
 
 import java.util.Date;
 import java.util.List;
+
 
 @SpringBootApplication
 public class DoglandApplication {
@@ -36,17 +41,13 @@ public class DoglandApplication {
 											   EmployeeRepository employeeRepository,
 											   TweetRepository tweetRepository,
 											   ProductRepository productRepository,
-											   TweetService tweetService) {
+											   TweetService tweetService,
+											   TweetLikeRepository tweetLikeRepository) {
 		return runner -> {
 
 
-
-
-
-
-
-
 		};
+
 	}
 
 	private void findUserAndDogsByUserId(UserRepository userRepository,DogRepository dogRepository){

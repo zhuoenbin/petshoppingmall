@@ -3,19 +3,18 @@ package com.ispan.dogland.controller;
 import com.cloudinary.utils.ObjectUtils;
 import com.ispan.dogland.model.dto.ActivityData;
 import com.ispan.dogland.model.dto.RentalData;
-import com.ispan.dogland.model.entity.activity.ActivityType;
-import com.ispan.dogland.model.entity.activity.Venue;
-import com.ispan.dogland.model.entity.activity.VenueActivity;
-import com.ispan.dogland.model.entity.activity.VenueRental;
+import com.ispan.dogland.model.entity.activity.*;
 import com.ispan.dogland.service.ActivityService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +82,21 @@ public class ActivityController {
     @PostMapping("/official/addActivity")
     public ActivityData addNewActivity(@RequestBody ActivityData activityData){
         return activityService.addNewActivity(activityData);
+    }
+
+    @PostMapping("/official/addMainImg")
+    public ActivityGallery addMainImg(@RequestParam Integer activityId,@RequestParam MultipartFile mainImg){
+        return activityService.addTitleImg(mainImg,activityId);
+    }
+
+    @PostMapping("/official/addNormalImg")
+    public List<ActivityGallery> addNormalImg(@RequestParam Integer activityId,@RequestParam MultipartFile[] normalImages){
+        List<ActivityGallery> uploadedImages=new ArrayList<>();
+        for(MultipartFile img:normalImages){
+            ActivityGallery gallery = activityService.addNormalImg(img, activityId);
+            uploadedImages.add(gallery);
+        }
+        return uploadedImages;
     }
 
     //===============所有活動===================

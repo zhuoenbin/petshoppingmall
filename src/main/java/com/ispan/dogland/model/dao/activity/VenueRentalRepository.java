@@ -14,4 +14,7 @@ public interface VenueRentalRepository extends JpaRepository<VenueRental,Integer
 
     Page<VenueRental> findByUser(Users user, Pageable pageable);
 
+    Page<VenueRental> findByUserNull(Pageable pageable);
+
+
 }

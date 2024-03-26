@@ -10,10 +10,7 @@ import com.ispan.dogland.model.dto.ActivityData;
 import com.ispan.dogland.model.dto.RentalData;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
-import com.ispan.dogland.model.entity.activity.ActivityType;
-import com.ispan.dogland.model.entity.activity.Venue;
-import com.ispan.dogland.model.entity.activity.VenueActivity;
-import com.ispan.dogland.model.entity.activity.VenueRental;
+import com.ispan.dogland.model.entity.activity.*;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
@@ -32,6 +29,8 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -98,44 +97,6 @@ public class ActivityService {
 
     ///////////////////////場地租借/////////////////////////
     //===============新增場地租借訂單===================
-    public RentalData createRentalOrder(VenueRental venueRental, Integer userId,Integer venueId){
-        RentalData rentalData = new RentalData();
-        Venue venue = venueRepository.findByVenueId(venueId);
-        venueRental.setVenue(venue);
-        //使用者訂單
-        if(userId!=null) {
-            Users user = userRepository.findByUserId(userId);
-            venueRental.setUser(user);
-
-            //計算價錢
-            Date rentalEnd = venueRental.getRentalEnd();
-            Date rentalStart = venueRental.getRentalStart();
-            Integer hour= (int)Math.ceil(rentalEnd.getTime() - rentalStart.getTime())/ (1000 * 60 * 60); // 毫秒轉換為小時;
-
-            //取得價目
-            Integer venueRent = venueRental.getVenue().getVenueRent();
-            Integer total=venueRent*hour;
-            venueRental.setRentalTotal(total);
-
-            //存入訂單
-            VenueRental saveCustomer = rentalRepository.save(venueRental);
-
-            //存入要給前端的dto
-            BeanUtils.copyProperties(saveCustomer, rentalData);
-            rentalData.setUserId(saveCustomer.getUser().getUserId());
-            rentalData.setVenueId(saveCustomer.getVenue().getVenueId());
-            return rentalData;
-        }
-
-        //官方訂單
-        venueRental.setPaymentStatus(2);
-        venueRental.setRentalTotal(0);
-        VenueRental saveOfficial = rentalRepository.save(venueRental);
-        BeanUtils.copyProperties(saveOfficial,rentalData);
-        rentalData.setVenueId(saveOfficial.getVenue().getVenueId());
-        return rentalData;
-    }
-
     public RentalData addNewRental(RentalData rentalData){
         Integer venueId = rentalData.getVenueId();
         Integer userId = rentalData.getUserId();
@@ -182,6 +143,8 @@ public class ActivityService {
                 rentalData.setVenueId(r.getVenue().getVenueId());
                 if (r.getUser() != null) {
                     rentalData.setUserId(r.getUser().getUserId());
+                }else{
+                    rentalData.setUserId(0);
                 }
                 return rentalData;
             });
@@ -204,6 +167,20 @@ public class ActivityService {
         });
         return rentalDataList;
     }
+    //===============查詢官方場地租借訂單===================
+    public Page<RentalData> findOfficialRentalByPage(Integer pageNumber){
+        Page<VenueRental> officialRental = rentalRepository.findByUserNull(PageRequest.of(pageNumber, 9));
+        System.out.println(officialRental.getTotalElements());
+        Page<RentalData> rentalDataList=officialRental.map(r->{
+            RentalData rentalData = new RentalData();
+            BeanUtils.copyProperties(r,rentalData);
+            rentalData.setVenueId((r.getVenue().getVenueId()));
+            rentalData.setUserId(0);
+            return rentalData;
+        });
+        return rentalDataList;
+    }
+
 
     ///////////////////////場地活動/////////////////////////
     //===============新增場地活動===================
@@ -219,16 +196,63 @@ public class ActivityService {
         activity.setEmployee(employee);
         activity.setVenue(venue);
         activity.setActivityType(type);
-        activityRepository.save(activity);
+        VenueActivity save = activityRepository.save(activity);
 
         ActivityData newData = new ActivityData();
-        BeanUtils.copyProperties(activity,newData);
-        newData.setActivityId(activity.getActivityId());
-        newData.setEmployeeId(activity.getEmployee().getEmployeeId());
-        newData.setActivityTypeId(activity.getActivityType().getActivityTypeId());
-        newData.setVenueId(activity.getVenue().getVenueId());
+        BeanUtils.copyProperties(save,newData);
+        newData.setActivityId(save.getActivityId());
+        newData.setEmployeeId(save.getEmployee().getEmployeeId());
+        newData.setActivityTypeId(save.getActivityType().getActivityTypeId());
+        newData.setVenueId(save.getVenue().getVenueId());
         return  newData;
     }
+    //===============新增活動照片===================
+    public ActivityGallery addTitleImg(MultipartFile file,Integer activityId){
+        //上傳到producutFolder裡
+        try {
+            Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "activityFolder"));
+            VenueActivity activity = activityRepository.findByActivityId(activityId);
+
+            ActivityGallery gallery = new ActivityGallery();
+            gallery.setVenueActivity(activity);
+            gallery.setGalleryImgUrl((String) data.get("url"));
+            gallery.setGalleryPublicId((String) data.get("public_id"));
+            gallery.setGalleryImgType("main");
+
+            System.out.println("活動id: "+activityId+" 的主題照片上傳成功!");
+
+            activity.setActivityUpdateDate(new Date());
+            activityRepository.save(activity);
+
+            return galleryRepository.save(gallery);
+        } catch (IOException e) {
+            throw new RuntimeException("Image uploading fail !!");
+        }
+    }
+
+    public ActivityGallery addNormalImg(MultipartFile file,Integer activityId){
+        //上傳到producutFolder裡
+        try {
+            Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "activityFolder"));
+            VenueActivity activity = activityRepository.findByActivityId(activityId);
+
+            ActivityGallery gallery = new ActivityGallery();
+            gallery.setVenueActivity(activity);
+            gallery.setGalleryImgUrl((String) data.get("url"));
+            gallery.setGalleryPublicId((String) data.get("public_id"));
+            gallery.setGalleryImgType(null);
+
+            System.out.println("活動id: "+activityId+" 的其他說明照片上傳成功!");
+
+            activity.setActivityUpdateDate(new Date());
+            activityRepository.save(activity);
+
+            return galleryRepository.save(gallery);
+        } catch (IOException e) {
+            throw new RuntimeException("Image uploading fail !!");
+        }
+    }
+
     //===============所有活動===============
     public Page<ActivityData> findActivityByPage(Integer pageNumber){
         Page<VenueActivity> activities = activityRepository.findAll(PageRequest.of(pageNumber, 9));

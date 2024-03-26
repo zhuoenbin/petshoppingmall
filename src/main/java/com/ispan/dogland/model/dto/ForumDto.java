@@ -9,6 +9,7 @@ public class ForumDto {
 
     private Integer articleId;
     private String articleTitle;
+    private String userName;
     private Date articleCreateTime;
     private ArticleCategory category;
     private String commentContent;
@@ -30,6 +31,14 @@ public class ForumDto {
 
     public void setArticleTitle(String articleTitle) {
         this.articleTitle = articleTitle;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public Date getArticleCreateTime() {

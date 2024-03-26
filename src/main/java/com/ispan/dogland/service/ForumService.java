@@ -67,7 +67,7 @@ public class ForumService {
     }
 
     public Page<ForumDto> showCommentsOfArticle(Integer articleId,Integer pageNumber){
-        Sort sortByTime = Sort.by(Sort.Direction.ASC,"articleCreateTime");
+        Sort sortByTime = Sort.by(Sort.Direction.DESC,"commentCreateTime");
 
         Page<ArticleComments> comments = articleCommentRepository.findAllByArticleId(articleId,PageRequest.of(pageNumber, 4,sortByTime));
 

@@ -89,6 +89,7 @@ public class RoomController {
     @GetMapping("/dog")
     public List<Dog> dog() {
         List<Dog> dogList = rService.dogs();
+        System.out.println(dogList);
         return dogList;
     }
 

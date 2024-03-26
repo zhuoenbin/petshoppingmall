@@ -75,45 +75,45 @@ public class ActivityController {
         return activityService.findUserRetalByPage(1,1);
     }
     //===============官方新增活動===================
-//    @PostMapping("/official/add")
-//    public ActivityData createNewActivity(@RequestBody VenueActivity venueActivity,
-//                                          @RequestParam Integer activityTypeId,
-//                                          @RequestParam Integer venueId,
-//                                          @RequestParam Integer employeeId){
-//        //**再去session撈資料
-//        return activityService.createNewActivity(venueActivity,activityTypeId,venueId,employeeId);
-//    }
     @PostMapping("/official/add")
-    public ActivityData createNewActivity(
-                                          @RequestParam Integer activityTypeId, @RequestParam Integer venueId,
-                                          @RequestParam Integer employeeId, @RequestParam Date activityDate,
-                                          @RequestParam Date activityStart, @RequestParam Date activityEnd,
-                                          @RequestParam String activityTitle, @RequestParam String activityDescription,
-                                          @RequestParam String activityProcess, @RequestParam String activityNotice,
-                                          @RequestParam Integer activityCost, @RequestParam String activityCostDescription,
-                                          @RequestParam Date activityClosingDate, @RequestParam String contactInfo,
-                                          @RequestParam String contactPhone, @RequestParam String contactMail,
-                                          @RequestParam Integer activityDogNumber
-                                          ){
+    public ActivityData createNewActivity(@RequestBody VenueActivity venueActivity,
+                                          @RequestParam Integer activityTypeId,
+                                          @RequestParam Integer venueId,
+                                          @RequestParam Integer employeeId){
         //**再去session撈資料
-        VenueActivity activity = new VenueActivity();
-        activity.setActivityCost(activityCost);
-        activity.setActivityCostDescription(activityCostDescription);
-        activity.setActivityDate(activityDate);
-        activity.setActivityStart(activityStart);
-        activity.setActivityEnd(activityEnd);
-        activity.setActivityTitle(activityTitle);
-        activity.setActivityDescription(activityDescription);
-        activity.setActivityProcess(activityProcess);
-        activity.setActivityNotice(activityNotice);
-        activity.setActivityClosingDate(activityClosingDate);
-        activity.setContactInfo(contactInfo);
-        activity.setContactMail(contactMail);
-        activity.setContactPhone(contactPhone);
-        activity.setActivityDogNumber(activityDogNumber);
-
-        return activityService.createNewActivity(activity,activityTypeId,venueId,employeeId);
+        return activityService.createNewActivity(venueActivity,activityTypeId,venueId,employeeId);
     }
+//    @PostMapping("/official/add")
+//    public ActivityData createNewActivity(
+//                                          @RequestParam Integer activityTypeId, @RequestParam Integer venueId,
+//                                          @RequestParam Integer employeeId, @RequestParam Date activityDate,
+//                                          @RequestParam Date activityStart, @RequestParam Date activityEnd,
+//                                          @RequestParam String activityTitle, @RequestParam String activityDescription,
+//                                          @RequestParam String activityProcess, @RequestParam String activityNotice,
+//                                          @RequestParam Integer activityCost, @RequestParam String activityCostDescription,
+//                                          @RequestParam Date activityClosingDate, @RequestParam String contactInfo,
+//                                          @RequestParam String contactPhone, @RequestParam String contactMail,
+//                                          @RequestParam Integer activityDogNumber
+//                                          ){
+//        //**再去session撈資料
+//        VenueActivity activity = new VenueActivity();
+//        activity.setActivityCost(activityCost);
+//        activity.setActivityCostDescription(activityCostDescription);
+//        activity.setActivityDate(activityDate);
+//        activity.setActivityStart(activityStart);
+//        activity.setActivityEnd(activityEnd);
+//        activity.setActivityTitle(activityTitle);
+//        activity.setActivityDescription(activityDescription);
+//        activity.setActivityProcess(activityProcess);
+//        activity.setActivityNotice(activityNotice);
+//        activity.setActivityClosingDate(activityClosingDate);
+//        activity.setContactInfo(contactInfo);
+//        activity.setContactMail(contactMail);
+//        activity.setContactPhone(contactPhone);
+//        activity.setActivityDogNumber(activityDogNumber);
+//
+//        return activityService.createNewActivity(activity,activityTypeId,venueId,employeeId);
+//    }
     //===============所有活動===================
 
 

@@ -212,8 +212,23 @@ public class ActivityService {
         return activityDataList;
     }
 
-    //依類別找活動
-
+    //===============依類別找活動===============
+    public Page<ActivityData> findActivityByType(Integer typeId,Integer pageNumber){
+        ActivityType type = typeRepository.findByActivityTypeId(typeId);
+        Page<VenueActivity> activities = activityRepository.findByActivityType(type,PageRequest.of(pageNumber, 9));
+        System.out.println(activities.getTotalElements());
+        Page<ActivityData> activityDataList = activities.map(r -> {
+            ActivityData activityData = new ActivityData();
+            BeanUtils.copyProperties(r, activityData);
+            activityData.setActivityTypeId(r.getActivityType().getActivityTypeId());
+            if (r.getEmployee() != null && r.getVenue()!=null) {
+                activityData.setEmployeeId(r.getEmployee().getEmployeeId());
+                activityData.setVenueId(r.getVenue().getVenueId());
+            }
+            return activityData;
+        });
+        return activityDataList;
+    }
 
 
 

@@ -44,6 +44,13 @@ public class Users {
             cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Dog> dogs;
 
+    @OneToMany(mappedBy = "users")
+    private List<ShoppingCart> shoppingCarts;
+
+//    @OneToMany(fetch = FetchType.LAZY,
+//            cascade = CascadeType.ALL,
+//            mappedBy = "user")
+//    private List<Friends> friends;
 
     @OneToMany(mappedBy = "user",
             cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -64,6 +71,10 @@ public class Users {
     }
 
     public Users() {
+    }
+    //加了這個
+    public Users(Integer userId){
+        this.userId = userId;
     }
 
     public Users(String lastName, String firstName, String userEmail, String userPassword, String userGender, Date birthDate, Integer userViolationCount, Date lastLoginTime, String userStatus) {
@@ -225,5 +236,13 @@ public class Users {
 //        sb.append(", dogs=").append(dogs);
         sb.append('}');
         return sb.toString();
+    }
+
+    public List<ShoppingCart> getShoppingCarts() {
+        return shoppingCarts;
+    }
+
+    public void setShoppingCarts(List<ShoppingCart> shoppingCarts) {
+        this.shoppingCarts = shoppingCarts;
     }
 }

@@ -8,6 +8,9 @@ import com.ispan.dogland.model.entity.ShoppingCart;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductGallery;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.HmacAlgorithms;
+import org.apache.commons.codec.digest.HmacUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,6 +75,17 @@ public class ShopService {
             shoppingCartRepository.delete(shoppingCartItem); // 找到了購物車項目，進行刪除
         }
         return null; // 返回被刪除的購物車項目，或者返回null（視情況而定）
+    }
+
+    //------------LinePay------------
+    //Hmac 簽章
+    public static String encrypt(final String keys, final String data) {
+        return toBase64String(HmacUtils.getInitializedMac(HmacAlgorithms.HMAC_SHA_256, keys.getBytes()).doFinal(data.getBytes()));
+    }
+    //Base64
+    public static String toBase64String(byte[] bytes) {
+        byte[] byteArray = Base64.encodeBase64(bytes);
+        return new String(byteArray);
     }
 
 }

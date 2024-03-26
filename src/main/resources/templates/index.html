@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+</html><!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title>Home 首頁</title>
+</head>
+<body>
+<h1>Home 首頁 666 </h1>
+
+<!--     <form th:action="@{/messages/add}" method="post"> -->
+<form th:action="@{/linepay/submit}" method="post">
+    <label for="uname"><b>訂單</b></label>
+    <input type="text" id="uname" placeholder="Enter Username" name="text">
+    <button type="submit">送出</button>
+</form>
+
+<br/>
+<form th:action="@{/linepay}" method="post">
+    <label for="uname"><b>訂單</b></label>
+    <button type="submit">送出</button>
+</form>
+
+<br/>
+<form th:action="@{/payok}" method="post">
+    <label for="uname"><b>訂單</b></label>
+    <button type="submit">跳轉</button>
+</form>
+
+<br/>
+<form th:action="@{/confirm}" method="post">
+    <label for="uname"><b>賣家</b></label>
+    <button type="submit">請款</button>
+</form>
+
+</body>
+</html>

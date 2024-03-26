@@ -1,16 +1,24 @@
 package com.ispan.dogland.controller;
 
+import com.cloudinary.utils.ObjectUtils;
+import com.ispan.dogland.model.dto.ActivityData;
 import com.ispan.dogland.model.dto.RentalData;
 import com.ispan.dogland.model.entity.activity.ActivityType;
 import com.ispan.dogland.model.entity.activity.Venue;
+import com.ispan.dogland.model.entity.activity.VenueActivity;
 import com.ispan.dogland.model.entity.activity.VenueRental;
 import com.ispan.dogland.service.ActivityService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/activity/api")
@@ -66,6 +74,47 @@ public class ActivityController {
         //**session取得使用者id
         return activityService.findUserRetalByPage(1,1);
     }
+    //===============官方新增活動===================
+    @PostMapping("/official/add")
+    public ActivityData createNewActivity(@RequestBody VenueActivity venueActivity,
+                                          @RequestParam Integer activityTypeId,
+                                          @RequestParam Integer venueId,
+                                          @RequestParam Integer employeeId){
+        //**再去session撈資料
+        return activityService.createNewActivity(venueActivity,activityTypeId,venueId,employeeId);
+    }
+//    @PostMapping("/official/add")
+//    public ActivityData createNewActivity(
+//                                          @RequestParam Integer activityTypeId, @RequestParam Integer venueId,
+//                                          @RequestParam Integer employeeId, @RequestParam Date activityDate,
+//                                          @RequestParam Date activityStart, @RequestParam Date activityEnd,
+//                                          @RequestParam String activityTitle, @RequestParam String activityDescription,
+//                                          @RequestParam String activityProcess, @RequestParam String activityNotice,
+//                                          @RequestParam Integer activityCost, @RequestParam String activityCostDescription,
+//                                          @RequestParam Date activityClosingDate, @RequestParam String contactInfo,
+//                                          @RequestParam String contactPhone, @RequestParam String contactMail,
+//                                          @RequestParam Integer activityDogNumber
+//                                          ){
+//        //**再去session撈資料
+//        VenueActivity activity = new VenueActivity();
+//        activity.setActivityCost(activityCost);
+//        activity.setActivityCostDescription(activityCostDescription);
+//        activity.setActivityDate(activityDate);
+//        activity.setActivityStart(activityStart);
+//        activity.setActivityEnd(activityEnd);
+//        activity.setActivityTitle(activityTitle);
+//        activity.setActivityDescription(activityDescription);
+//        activity.setActivityProcess(activityProcess);
+//        activity.setActivityNotice(activityNotice);
+//        activity.setActivityClosingDate(activityClosingDate);
+//        activity.setContactInfo(contactInfo);
+//        activity.setContactMail(contactMail);
+//        activity.setContactPhone(contactPhone);
+//        activity.setActivityDogNumber(activityDogNumber);
+//
+//        return activityService.createNewActivity(activity,activityTypeId,venueId,employeeId);
+//    }
+    //===============所有活動===================
 
 
 }

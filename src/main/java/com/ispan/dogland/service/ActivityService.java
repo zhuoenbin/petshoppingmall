@@ -1,31 +1,49 @@
 package com.ispan.dogland.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.ispan.dogland.model.dao.DogRepository;
+import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dao.activity.*;
+import com.ispan.dogland.model.dto.ActivityData;
 import com.ispan.dogland.model.dto.RentalData;
+import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.activity.ActivityType;
 import com.ispan.dogland.model.entity.activity.Venue;
+import com.ispan.dogland.model.entity.activity.VenueActivity;
 import com.ispan.dogland.model.entity.activity.VenueRental;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
+@Transactional
 public class ActivityService {
+    @Autowired
+    private Cloudinary cloudinary;
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private DogRepository dogRepository;
+    @Autowired
+    private EmployeeRepository employeeRepository;
     @Autowired
     private VenueRepository venueRepository;
     @Autowired
@@ -150,8 +168,70 @@ public class ActivityService {
             return rentalData;
         });
         return rentalDataList;
-        
     }
+
+    ///////////////////////場地活動/////////////////////////
+    //===============新增場地活動===================
+    public ActivityData createNewActivity(VenueActivity venueActivity,
+                                          Integer activityTypeId,
+                                          Integer venueId,
+                                          Integer employeeId){
+        ActivityData activityData = new ActivityData();
+
+            Employee employee = employeeRepository.findByEmployeeId(employeeId);
+            ActivityType type = typeRepository.findByActivityTypeId(activityTypeId);
+            Venue venue = venueRepository.findByVenueId(venueId);
+
+            venueActivity.setEmployee(employee);
+            venueActivity.setVenue(venue);
+            venueActivity.setActivityType(type);
+
+            VenueActivity activity = activityRepository.save(venueActivity);
+
+            BeanUtils.copyProperties(activity, activityData);
+            activityData.setEmployeeId(activity.getEmployee().getEmployeeId());
+            activityData.setVenueId(activity.getVenue().getVenueId());
+            activityData.setActivityTypeId(activity.getActivityType().getActivityTypeId());
+            return activityData;
+    }
+    //===============所有活動===============
+    public Page<ActivityData> findActivityByPage(Integer pageNumber){
+        Page<VenueActivity> activities = activityRepository.findAll(PageRequest.of(pageNumber, 9));
+        System.out.println(activities.getTotalElements());
+        Page<ActivityData> activityDataList = activities.map(a -> {
+            ActivityData activityData = new ActivityData();
+            BeanUtils.copyProperties(a, activityData);
+            activityData.setVenueId(a.getVenue().getVenueId());
+            if (a.getEmployee() != null && a.getVenue()!=null &&a.getActivityType()!=null) {
+                activityData.setEmployeeId(a.getEmployee().getEmployeeId());
+                activityData.setVenueId(a.getVenue().getVenueId());
+                activityData.setActivityTypeId(a.getActivityType().getActivityTypeId());
+            }
+            return activityData;
+        });
+        return activityDataList;
+    }
+
+    //===============依類別找活動===============
+    public Page<ActivityData> findActivityByType(Integer typeId,Integer pageNumber){
+        ActivityType type = typeRepository.findByActivityTypeId(typeId);
+        Page<VenueActivity> activities = activityRepository.findByActivityType(type,PageRequest.of(pageNumber, 9));
+        System.out.println(activities.getTotalElements());
+        Page<ActivityData> activityDataList = activities.map(r -> {
+            ActivityData activityData = new ActivityData();
+            BeanUtils.copyProperties(r, activityData);
+            activityData.setActivityTypeId(r.getActivityType().getActivityTypeId());
+            if (r.getEmployee() != null && r.getVenue()!=null) {
+                activityData.setEmployeeId(r.getEmployee().getEmployeeId());
+                activityData.setVenueId(r.getVenue().getVenueId());
+            }
+            return activityData;
+        });
+        return activityDataList;
+    }
+
+
+
 
 
 

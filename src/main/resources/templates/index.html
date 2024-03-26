@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<!--<div id="app">-->
+<!--    &lt;!&ndash; 使用外部v-for遍歷外部數組 &ndash;&gt;-->
+<!--    <div v-for="(room, roomId) in rooms" :key="roomId">-->
+<!--        <p>{{ room.roomId }}</p>-->
+<!--        <p>{{ room.roomName }}</p>-->
+<!--        <p>{{ room.roomSize }}</p>-->
+<!--        <p>{{ room.roomPrice }}</p>-->
+<!--    </div>-->
+<!--</div>-->
+
+<div id="app">
+
+    <select>
+        <option >請選擇要住宿的寵物</option>
+        <option v-for="(dog, dogId) in dogs" :key="dogId">
+            {{ dog.dogName }}
+        </option>
+    </select>
+
+    <div v-for="(room, roomId) in rooms" :key="roomId">
+        <span>
+            <div>
+                房間Id <span> {{ room.roomId }} </span>
+                <br>
+                房間名稱 <span> {{ room.roomName }} </span>
+                <br>
+                房間適用於: <span> {{ room.roomSize === 1 ? '小型犬' : (room.roomSize === 2 ? '中型犬' : '大型犬') }} </span>
+                <br>
+                房間價格(一天) <span> {{ room.roomPrice }} </span>
+                <br>
+                <a>訂房</a>
+            </div>
+        </span>
+        <br>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                rooms: [],
+                dogs: []
+            };
+        },
+        created() {
+            axios.get('/room')
+                .then(response => {
+                    this.rooms = response.data;
+                    console.log(this.rooms);
+                });
+            axios.get('/dog')
+                .then(response => {
+                    this.dogs = response.data;
+                    console.log(this.dogs);
+                })
+        },
+        methods: {
+<!--            isIncludedDate(date) {-->
+<!--                return date >= '2024-03-17' && date <= '2024-03-19';-->
+<!--            }-->
+        }
+    });
+</script>
+
+
+</body>
+</html>

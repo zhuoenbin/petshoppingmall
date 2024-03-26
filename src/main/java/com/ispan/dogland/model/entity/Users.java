@@ -1,11 +1,8 @@
 package com.ispan.dogland.model.entity;
 
 
-import com.ispan.dogland.model.entity.forum.ArticleComments;
-import com.ispan.dogland.model.entity.forum.Articles;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ispan.dogland.model.entity.tweet.Tweet;
-import com.ispan.dogland.model.entity.forum.Articles;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -19,6 +16,7 @@ import java.util.List;
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="user_id")
     private Integer userId;
 
     private String lastName;
@@ -47,6 +45,13 @@ public class Users {
             cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Dog> dogs;
 
+    @OneToMany(mappedBy = "users")
+    private List<ShoppingCart> shoppingCarts;
+
+    @OneToMany(fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            mappedBy = "user")
+    private List<Friends> friends;
 
     @OneToMany(mappedBy = "user",
             cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -59,26 +64,6 @@ public class Users {
     private List<Tweet> tweetLikes;
 
 
-    @OneToMany(fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            mappedBy = "user")
-    private List<Friends> friends;
-
-    @OneToMany(fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            mappedBy = "user")
-    private List<Blockeds> blockeds;
-
-    @OneToMany(fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            mappedBy = "articles")
-    private List<Articles> articles;
-
-    @OneToMany(fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            mappedBy = "article_comment")
-    private List<ArticleComments> articleComments;
-
     @PrePersist //在物件轉換到persistent狀態以前，做這個function
     public void onCreate() {
         if(lastLoginTime==null ) {
@@ -87,6 +72,10 @@ public class Users {
     }
 
     public Users() {
+    }
+    //加了這個
+    public Users(Integer userId){
+        this.userId = userId;
     }
 
     public Users(String lastName, String firstName, String userEmail, String userPassword, String userGender, Date birthDate, Integer userViolationCount, Date lastLoginTime, String userStatus) {
@@ -189,7 +178,12 @@ public class Users {
         this.dogs = dogs;
     }
 
-
+    public void addDog(Dog dog) {
+        if(this.dogs == null) {
+            this.dogs = new ArrayList<>();
+        }
+        this.dogs.add(dog);
+    }
 
     public List<Tweet> getTweets() {
         return tweets;
@@ -214,7 +208,6 @@ public class Users {
     public void setImgPublicId(String imgPublicId) {
         this.imgPublicId = imgPublicId;
     }
-
 
     public List<Tweet> getTweetLikes() {
         return tweetLikes;
@@ -250,5 +243,13 @@ public class Users {
 //        sb.append(", dogs=").append(dogs);
         sb.append('}');
         return sb.toString();
+    }
+
+    public List<ShoppingCart> getShoppingCarts() {
+        return shoppingCarts;
+    }
+
+    public void setShoppingCarts(List<ShoppingCart> shoppingCarts) {
+        this.shoppingCarts = shoppingCarts;
     }
 }

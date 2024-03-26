@@ -9,6 +9,11 @@ import java.sql.Date;
 @Table(name="friends")
 public class Friends {
 
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer iId;
+
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")

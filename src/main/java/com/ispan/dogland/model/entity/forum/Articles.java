@@ -1,5 +1,6 @@
 package com.ispan.dogland.model.entity.forum;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ispan.dogland.model.entity.Users;
 import jakarta.persistence.*;
 
@@ -17,7 +18,11 @@ public class Articles {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @JsonIgnore
     private Users user;
+
+    @JoinColumn(name="author")
+    private String author;
 
     @Column(name="article_title")
     private String articleTitle;
@@ -27,7 +32,7 @@ public class Articles {
 
     @OneToMany(fetch = FetchType.EAGER,
             cascade = CascadeType.ALL,
-            mappedBy = "user")
+            mappedBy = "commentId")
     private List<ArticleComments> comments;
 
     @OneToOne(fetch = FetchType.EAGER,
@@ -37,12 +42,14 @@ public class Articles {
 
     public Articles(){}
 
-    public Articles(Integer articleId, Users user, String articleTitle, Date articleCreateTime, List<ArticleComments> comments) {
+    public Articles(Integer articleId, Users user, String author, String articleTitle, Date articleCreateTime, List<ArticleComments> comments, ArticleCategory category) {
         this.articleId = articleId;
         this.user = user;
+        this.author = author;
         this.articleTitle = articleTitle;
         this.articleCreateTime = articleCreateTime;
         this.comments = comments;
+        this.category = category;
     }
 
     public Integer getArticleId() {
@@ -59,6 +66,14 @@ public class Articles {
 
     public void setUser(Users user) {
         this.user = user;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getArticleTitle() {
@@ -83,5 +98,13 @@ public class Articles {
 
     public void setComments(List<ArticleComments> comments) {
         this.comments = comments;
+    }
+
+    public ArticleCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(ArticleCategory category) {
+        this.category = category;
     }
 }

@@ -169,6 +169,7 @@ public class Users {
         this.userStatus = userStatus;
     }
 
+
     public List<Dog> getDogs() {
         return dogs;
     }
@@ -176,7 +177,6 @@ public class Users {
     public void setDogs(List<Dog> dogs) {
         this.dogs = dogs;
     }
-
 
     public List<Tweet> getTweets() {
         return tweets;

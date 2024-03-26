@@ -14,4 +14,5 @@ public class ActivityGallery {
     private String galleryImgUrl;
     private String galleryPublicId;
     private String galleryImgData;
+    private String galleryImgType;
 }

@@ -1,16 +1,23 @@
 package com.ispan.dogland.controller;
 
+import com.cloudinary.utils.ObjectUtils;
+import com.ispan.dogland.model.dto.ActivityData;
 import com.ispan.dogland.model.dto.RentalData;
 import com.ispan.dogland.model.entity.activity.ActivityType;
 import com.ispan.dogland.model.entity.activity.Venue;
+import com.ispan.dogland.model.entity.activity.VenueActivity;
 import com.ispan.dogland.model.entity.activity.VenueRental;
 import com.ispan.dogland.service.ActivityService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/activity/api")
@@ -65,6 +72,16 @@ public class ActivityController {
                                              HttpSession httpSession){
         //**session取得使用者id
         return activityService.findUserRetalByPage(1,1);
+    }
+    //===============官方新增活動===================
+    @PostMapping("/official/add")
+    public ActivityData createNewActivity(@RequestBody VenueActivity venueActivity,
+                                          @RequestParam Integer activityTypeId,
+                                          @RequestParam Integer venueId,
+                                          @RequestParam Integer employeeId,
+                                          HttpSession httpSession){
+        //**再去session撈資料
+        return activityService.createNewActivity(venueActivity,activityTypeId,venueId,employeeId);
     }
 
 

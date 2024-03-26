@@ -3,7 +3,7 @@ package com.ispan.dogland.model.entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
-import java.sql.Date;
+import java.util.Date;
 
 @Entity
 @Table(name="friends")

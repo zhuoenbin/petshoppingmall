@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ispan.dogland.model.entity.Users;
 import jakarta.persistence.*;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -35,21 +35,21 @@ public class Articles {
             mappedBy = "commentId")
     private List<ArticleComments> comments;
 
-    @OneToOne(fetch = FetchType.EAGER,
+    @ManyToOne(fetch = FetchType.EAGER,
              cascade = CascadeType.ALL)
-    @JoinColumn(name="category_id")
-    private ArticleCategory category;
+    @JoinColumn(name = "category_id", referencedColumnName = "category_id")
+    private ArticleCategory articleCategory;
 
     public Articles(){}
 
-    public Articles(Integer articleId, Users user, String author, String articleTitle, Date articleCreateTime, List<ArticleComments> comments, ArticleCategory category) {
+    public Articles(Integer articleId, Users user, String author, String articleTitle, Date articleCreateTime, List<ArticleComments> comments, ArticleCategory articleCategory) {
         this.articleId = articleId;
         this.user = user;
         this.author = author;
         this.articleTitle = articleTitle;
         this.articleCreateTime = articleCreateTime;
         this.comments = comments;
-        this.category = category;
+        this.articleCategory = articleCategory;
     }
 
     public Integer getArticleId() {
@@ -100,11 +100,11 @@ public class Articles {
         this.comments = comments;
     }
 
-    public ArticleCategory getCategory() {
-        return category;
+    public ArticleCategory getArticleCategory() {
+        return articleCategory;
     }
 
-    public void setCategory(ArticleCategory category) {
-        this.category = category;
+    public void setArticleCategory(ArticleCategory articleCategory) {
+        this.articleCategory = articleCategory;
     }
 }

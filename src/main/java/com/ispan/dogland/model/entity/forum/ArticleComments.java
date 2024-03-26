@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.ispan.dogland.model.entity.Users;
 import jakarta.persistence.*;
 
-import java.sql.Date;
+import java.util.Date;
 
 @Entity
 @Table(name="article_comment")

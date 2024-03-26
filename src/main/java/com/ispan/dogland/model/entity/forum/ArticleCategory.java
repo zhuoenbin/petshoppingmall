@@ -2,6 +2,8 @@ package com.ispan.dogland.model.entity.forum;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name="article_category")
 public class ArticleCategory {
@@ -13,6 +15,11 @@ public class ArticleCategory {
 
     @Column(name="category_name")
     private String categoryName;
+
+    @OneToMany(fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL,
+            mappedBy = "articleId")
+    private List<Articles> categories;
 
     public ArticleCategory(){}
 

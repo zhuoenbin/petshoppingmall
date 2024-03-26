@@ -1,8 +1,12 @@
 package com.ispan.dogland.model.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ispan.dogland.model.entity.tweet.Tweet;
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -48,16 +52,16 @@ public class Users {
 //            mappedBy = "user")
 //    private List<Friends> friends;
 
+    @OneToMany(mappedBy = "user",
+            cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Tweet> tweets;
 
-//    @OneToMany(fetch = FetchType.LAZY,
-//            cascade = CascadeType.ALL,
-//            mappedBy = "articles")
-//    private List<Articles> articles;
-//
-//    @OneToMany(fetch = FetchType.LAZY,
-//            cascade = CascadeType.ALL,
-//            mappedBy = "article_comment")
-//    private List<ArticleComments> articleComments;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                                                    CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinTable(name="tweet_like", joinColumns = @JoinColumn(name="user_id"),
+            inverseJoinColumns = @JoinColumn(name="tweet_id"))
+    private List<Tweet> tweetLikes;
+
 
     @PrePersist //在物件轉換到persistent狀態以前，做這個function
     public void onCreate() {
@@ -71,6 +75,18 @@ public class Users {
     //加了這個
     public Users(Integer userId){
         this.userId = userId;
+    }
+
+    public Users(String lastName, String firstName, String userEmail, String userPassword, String userGender, Date birthDate, Integer userViolationCount, Date lastLoginTime, String userStatus) {
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.userEmail = userEmail;
+        this.userPassword = userPassword;
+        this.userGender = userGender;
+        this.birthDate = birthDate;
+        this.userViolationCount = userViolationCount;
+        this.lastLoginTime = lastLoginTime;
+        this.userStatus = userStatus;
     }
 
     public Integer getUserId() {
@@ -145,6 +161,37 @@ public class Users {
         this.lastLoginTime = lastLoginTime;
     }
 
+    public String getUserStatus() {
+        return userStatus;
+    }
+
+    public void setUserStatus(String userStatus) {
+        this.userStatus = userStatus;
+    }
+
+    public List<Dog> getDogs() {
+        return dogs;
+    }
+
+    public void setDogs(List<Dog> dogs) {
+        this.dogs = dogs;
+    }
+
+    public void addDog(Dog dog) {
+        if(this.dogs == null) {
+            this.dogs = new ArrayList<>();
+        }
+        this.dogs.add(dog);
+    }
+
+    public List<Tweet> getTweets() {
+        return tweets;
+    }
+
+    public void setTweets(List<Tweet> tweets) {
+        this.tweets = tweets;
+    }
+
     public String getUserImgPath() {
         return userImgPath;
     }
@@ -161,20 +208,40 @@ public class Users {
         this.imgPublicId = imgPublicId;
     }
 
-    public String getUserStatus() {
-        return userStatus;
+    public List<Tweet> getTweetLikes() {
+        return tweetLikes;
     }
 
-    public void setUserStatus(String userStatus) {
-        this.userStatus = userStatus;
+    public void setTweetLikes(List<Tweet> tweetLikes) {
+        this.tweetLikes = tweetLikes;
     }
 
-    public List<Dog> getDogs() {
-        return dogs;
+    public void addTweetLike(Tweet tweet) {
+        if(tweetLikes == null) {
+            tweetLikes = new ArrayList<>();
+        }
+        tweetLikes.add(tweet);
     }
 
-    public void setDogs(List<Dog> dogs) {
-        this.dogs = dogs;
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Users{");
+        sb.append("userId=").append(userId);
+        sb.append(", lastName='").append(lastName).append('\'');
+        sb.append(", firstName='").append(firstName).append('\'');
+        sb.append(", userEmail='").append(userEmail).append('\'');
+        sb.append(", userPassword='").append(userPassword).append('\'');
+        sb.append(", userGender='").append(userGender).append('\'');
+        sb.append(", birthDate=").append(birthDate);
+        sb.append(", userViolationCount=").append(userViolationCount);
+        sb.append(", lastLoginTime=").append(lastLoginTime);
+        sb.append(", userImgPath='").append(userImgPath).append('\'');
+        sb.append(", imgPublicId='").append(imgPublicId).append('\'');
+        sb.append(", userStatus='").append(userStatus).append('\'');
+//        sb.append(", dogs=").append(dogs);
+        sb.append('}');
+        return sb.toString();
     }
 
     public List<ShoppingCart> getShoppingCarts() {

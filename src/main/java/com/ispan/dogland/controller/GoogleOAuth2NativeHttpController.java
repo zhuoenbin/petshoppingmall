@@ -33,6 +33,7 @@ public class GoogleOAuth2NativeHttpController {
 
     private final String scope = "https://www.googleapis.com/auth/userinfo.email";
 
+
     @GetMapping("/google-login")
     public String googleLogin(HttpServletResponse response) {
 
@@ -113,7 +114,7 @@ public class GoogleOAuth2NativeHttpController {
                 tmpUser.setFirstName(payloadName);
                 tmpUser.setLastName(payloadName);
                 tmpUser.setUserEmail(payloadEmail);
-                tmpUser.setUserStatus("ACTIVE");
+                tmpUser.setUserImgPath(payloadPicture);
                 accountService.register(tmpUser);
                 loginUser = accountService.getPassportFromFormLogin(payloadEmail);
             }

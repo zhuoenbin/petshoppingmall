@@ -11,8 +11,9 @@ public interface AccountService {
 
     public Users register(Users user);
 
+    public Users getUserDetail(String email);
 
-
+    public Users getUserDetailById(Integer userId);
 
     public Passport getPassportFromFormLogin(String username);
 
@@ -26,4 +27,8 @@ public interface AccountService {
     public void resetPassword(String email, String newPassword);
 
     public void clearVerificationCode(String email);
+
+    public void updateUser(Users user);
+
+
 }

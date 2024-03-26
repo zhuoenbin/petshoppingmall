@@ -22,7 +22,6 @@ public class EmployeeController {
 
     @GetMapping("/room")
     public List<RoomReservation> reservation(){
-//        System.out.println(rService.findAllRoomReservation());
         return rService.findAllRoomReservation();
     }
 

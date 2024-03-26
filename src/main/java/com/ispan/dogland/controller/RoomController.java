@@ -28,13 +28,6 @@ public class RoomController {
     @Autowired
     private DogRepository dRepository;
 
-//    // 後臺管理系統
-//    @GetMapping("/employee/room")
-//    public List<RoomReservation> reservation(){
-////        System.out.println(rService.findAllRoomReservation());
-//        return rService.findAllRoomReservation();
-//    }
-
 //    HttpSession session
     @GetMapping("/showUpdateRoom")
     public RoomReservation updateRoom(@RequestParam Integer roomReservationId) {
@@ -44,7 +37,6 @@ public class RoomController {
         return rService.findByRoomReservationId(roomReservationId);
     }
 
-    // totalPrice 還沒改
     @PostMapping("/updateRoom")
     public void updateRoom(@RequestBody RoomReservation roomReservation,
                            @RequestParam Integer roomReservationId) {
@@ -54,7 +46,6 @@ public class RoomController {
         rr.setTotalPrice(roomReservation.getTotalPrice());
         rService.addRoomReservation(rr);
     }
-
 
     @PostMapping("/roomReservation")
     public void addRoom(@RequestBody RoomReservation roomReservation, @RequestParam Integer roomId, @RequestParam Integer dogId) {
@@ -75,7 +66,6 @@ public class RoomController {
     // 顯示出全部的房間
     @GetMapping("")
     public List<Room> room() {
-        System.out.println(rService.room());
         return rService.room();
     }
 
@@ -88,16 +78,13 @@ public class RoomController {
     // 顯示出全部的狗
     @GetMapping("/dog")
     public List<Dog> dog() {
-        List<Dog> dogList = rService.dogs();
-        System.out.println(dogList);
-        return dogList;
+        return rService.dogs();
     }
 
     // 顯示全部的訂單時間
     @GetMapping("/reservation")
     public List<List<String>> reservationTime() {
-        List<List<String>> reservationList = rService.roomReservation();
-        return reservationList;
+        return rService.roomReservation();
     }
 
 

@@ -1,6 +1,7 @@
 package com.ispan.dogland.controller;
 
 import com.cloudinary.utils.ObjectUtils;
+import com.ispan.dogland.model.dto.ActivityBrief;
 import com.ispan.dogland.model.dto.ActivityData;
 import com.ispan.dogland.model.dto.RentalData;
 import com.ispan.dogland.model.entity.activity.*;
@@ -99,7 +100,11 @@ public class ActivityController {
         return uploadedImages;
     }
 
-    //===============所有活動===================
+    //===============查詢所有活動===================
+    @GetMapping("/all/{pageNumber}")
+    public Page<ActivityBrief> showBriefByPage(@PathVariable Integer pageNumber){
+        return activityService.findActivityByPage(pageNumber);
+    }
 
 
 }

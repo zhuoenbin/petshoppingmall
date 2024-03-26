@@ -6,6 +6,7 @@ import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dao.activity.*;
+import com.ispan.dogland.model.dto.ActivityBrief;
 import com.ispan.dogland.model.dto.ActivityData;
 import com.ispan.dogland.model.dto.RentalData;
 import com.ispan.dogland.model.entity.Employee;
@@ -253,38 +254,45 @@ public class ActivityService {
         }
     }
 
-    //===============所有活動===============
-    public Page<ActivityData> findActivityByPage(Integer pageNumber){
+    //===============所有活動簡述===============
+    public Page<ActivityBrief> findActivityByPage(Integer pageNumber){
         Page<VenueActivity> activities = activityRepository.findAll(PageRequest.of(pageNumber, 9));
         System.out.println(activities.getTotalElements());
-        Page<ActivityData> activityDataList = activities.map(a -> {
-            ActivityData activityData = new ActivityData();
-            BeanUtils.copyProperties(a, activityData);
-            activityData.setVenueId(a.getVenue().getVenueId());
-            if (a.getEmployee() != null && a.getVenue()!=null &&a.getActivityType()!=null) {
-                activityData.setEmployeeId(a.getEmployee().getEmployeeId());
-                activityData.setVenueId(a.getVenue().getVenueId());
-                activityData.setActivityTypeId(a.getActivityType().getActivityTypeId());
+        Page<ActivityBrief> activityDataList = activities.map(a -> {
+            ActivityBrief brief = new ActivityBrief();
+            BeanUtils.copyProperties(a, brief);
+            brief.setVenueId(a.getVenue().getVenueId());
+            if (a.getVenue()!=null &&a.getActivityType()!=null) {
+                brief.setVenueId(a.getVenue().getVenueId());
+                brief.setActivityTypeId(a.getActivityType().getActivityTypeId());
+                Integer activityId = a.getActivityId();
+                VenueActivity activity = activityRepository.findByActivityId(activityId);
+                ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
+
+                brief.setGalleryImgUrl(main.getGalleryImgUrl());
             }
-            return activityData;
+            return brief;
         });
         return activityDataList;
     }
 
-    //===============依類別找活動===============
-    public Page<ActivityData> findActivityByType(Integer typeId,Integer pageNumber){
+    //===============依類別找活動簡述===============
+    public Page<ActivityBrief> findActivityByType(Integer typeId, Integer pageNumber){
         ActivityType type = typeRepository.findByActivityTypeId(typeId);
         Page<VenueActivity> activities = activityRepository.findByActivityType(type,PageRequest.of(pageNumber, 9));
         System.out.println(activities.getTotalElements());
-        Page<ActivityData> activityDataList = activities.map(r -> {
-            ActivityData activityData = new ActivityData();
-            BeanUtils.copyProperties(r, activityData);
-            activityData.setActivityTypeId(r.getActivityType().getActivityTypeId());
-            if (r.getEmployee() != null && r.getVenue()!=null) {
-                activityData.setEmployeeId(r.getEmployee().getEmployeeId());
-                activityData.setVenueId(r.getVenue().getVenueId());
-            }
-            return activityData;
+        Page<ActivityBrief> activityDataList = activities.map(r -> {
+            ActivityBrief brief = new ActivityBrief();
+            BeanUtils.copyProperties(r, brief);
+            brief.setActivityTypeId(r.getActivityType().getActivityTypeId());
+            brief.setVenueId(r.getVenue().getVenueId());
+
+            Integer activityId = r.getActivityId();
+            VenueActivity activity = activityRepository.findByActivityId(activityId);
+            ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
+
+            brief.setGalleryImgUrl(main.getGalleryImgUrl());
+            return brief;
         });
         return activityDataList;
     }

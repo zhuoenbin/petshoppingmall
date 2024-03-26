@@ -136,6 +136,41 @@ public class ActivityService {
         return rentalData;
     }
 
+    public RentalData addNewRental(RentalData rentalData){
+        Integer venueId = rentalData.getVenueId();
+        Integer userId = rentalData.getUserId();
+        Users user = userRepository.findByUserId(userId);
+        Venue venue = venueRepository.findByVenueId(venueId);
+        VenueRental rental = new VenueRental();
+        BeanUtils.copyProperties(rentalData,rental);
+        rental.setUser(user);
+        rental.setVenue(venue);
+        VenueRental save = rentalRepository.save(rental);
+
+        RentalData newData = new RentalData();
+        BeanUtils.copyProperties(save,newData);
+        newData.setUserId(save.getUser().getUserId());
+        newData.setVenueId(save.getVenue().getVenueId());
+        return newData;
+    }
+    public RentalData addOfficialRental(RentalData rentalData){
+        Integer venueId = rentalData.getVenueId();
+
+
+        Venue venue = venueRepository.findByVenueId(venueId);
+        VenueRental rental = new VenueRental();
+        BeanUtils.copyProperties(rentalData,rental);
+        rental.setUser(null);
+        rental.setVenue(venue);
+        VenueRental save = rentalRepository.save(rental);
+
+        RentalData newData = new RentalData();
+        BeanUtils.copyProperties(save,newData);
+        newData.setUserId(null);
+        newData.setVenueId(save.getVenue().getVenueId());
+        return newData;
+    }
+
     //===============查詢全部場地租借訂單===================
 
     public Page<RentalData> findRentalByPage(Integer pageNumber){
@@ -172,27 +207,27 @@ public class ActivityService {
 
     ///////////////////////場地活動/////////////////////////
     //===============新增場地活動===================
-    public ActivityData createNewActivity(VenueActivity venueActivity,
-                                          Integer activityTypeId,
-                                          Integer venueId,
-                                          Integer employeeId){
-        ActivityData activityData = new ActivityData();
+    public ActivityData addNewActivity(ActivityData activityData){
+        Integer typeId = activityData.getActivityTypeId();
+        ActivityType type = typeRepository.findByActivityTypeId(typeId);
+        Integer employeeId = activityData.getEmployeeId();
+        Employee employee = employeeRepository.findByEmployeeId(employeeId);
+        Integer venueId = activityData.getVenueId();
+        Venue venue = venueRepository.findByVenueId(venueId);
+        VenueActivity activity = new VenueActivity();
+        BeanUtils.copyProperties(activityData,activity);
+        activity.setEmployee(employee);
+        activity.setVenue(venue);
+        activity.setActivityType(type);
+        activityRepository.save(activity);
 
-            Employee employee = employeeRepository.findByEmployeeId(employeeId);
-            ActivityType type = typeRepository.findByActivityTypeId(activityTypeId);
-            Venue venue = venueRepository.findByVenueId(venueId);
-
-            venueActivity.setEmployee(employee);
-            venueActivity.setVenue(venue);
-            venueActivity.setActivityType(type);
-
-            VenueActivity activity = activityRepository.save(venueActivity);
-
-            BeanUtils.copyProperties(activity, activityData);
-            activityData.setEmployeeId(activity.getEmployee().getEmployeeId());
-            activityData.setVenueId(activity.getVenue().getVenueId());
-            activityData.setActivityTypeId(activity.getActivityType().getActivityTypeId());
-            return activityData;
+        ActivityData newData = new ActivityData();
+        BeanUtils.copyProperties(activity,newData);
+        newData.setActivityId(activity.getActivityId());
+        newData.setEmployeeId(activity.getEmployee().getEmployeeId());
+        newData.setActivityTypeId(activity.getActivityType().getActivityTypeId());
+        newData.setVenueId(activity.getVenue().getVenueId());
+        return  newData;
     }
     //===============所有活動===============
     public Page<ActivityData> findActivityByPage(Integer pageNumber){

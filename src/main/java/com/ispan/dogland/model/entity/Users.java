@@ -44,10 +44,23 @@ public class Users {
             cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Dog> dogs;
 
+    @OneToMany(mappedBy = "users")
+    private List<ShoppingCart> shoppingCarts;
+
+//    @OneToMany(fetch = FetchType.LAZY,
+//            cascade = CascadeType.ALL,
+//            mappedBy = "user")
+//    private List<Friends> friends;
 
     @OneToMany(mappedBy = "user",
             cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Tweet> tweets;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                                                    CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinTable(name="tweet_like", joinColumns = @JoinColumn(name="user_id"),
+            inverseJoinColumns = @JoinColumn(name="tweet_id"))
+    private List<Tweet> tweetLikes;
 
 
     @PrePersist //在物件轉換到persistent狀態以前，做這個function
@@ -58,6 +71,10 @@ public class Users {
     }
 
     public Users() {
+    }
+    //加了這個
+    public Users(Integer userId){
+        this.userId = userId;
     }
 
     public Users(String lastName, String firstName, String userEmail, String userPassword, String userGender, Date birthDate, Integer userViolationCount, Date lastLoginTime, String userStatus) {
@@ -152,22 +169,6 @@ public class Users {
         this.userStatus = userStatus;
     }
 
-    public String getUserImgPath() {
-        return userImgPath;
-    }
-
-    public void setUserImgPath(String userImgPath) {
-        this.userImgPath = userImgPath;
-    }
-
-    public String getImgPublicId() {
-        return imgPublicId;
-    }
-
-    public void setImgPublicId(String imgPublicId) {
-        this.imgPublicId = imgPublicId;
-    }
-
     public List<Dog> getDogs() {
         return dogs;
     }
@@ -191,6 +192,38 @@ public class Users {
         this.tweets = tweets;
     }
 
+    public String getUserImgPath() {
+        return userImgPath;
+    }
+
+    public void setUserImgPath(String userImgPath) {
+        this.userImgPath = userImgPath;
+    }
+
+    public String getImgPublicId() {
+        return imgPublicId;
+    }
+
+    public void setImgPublicId(String imgPublicId) {
+        this.imgPublicId = imgPublicId;
+    }
+
+    public List<Tweet> getTweetLikes() {
+        return tweetLikes;
+    }
+
+    public void setTweetLikes(List<Tweet> tweetLikes) {
+        this.tweetLikes = tweetLikes;
+    }
+
+    public void addTweetLike(Tweet tweet) {
+        if(tweetLikes == null) {
+            tweetLikes = new ArrayList<>();
+        }
+        tweetLikes.add(tweet);
+    }
+
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("Users{");
@@ -209,5 +242,13 @@ public class Users {
 //        sb.append(", dogs=").append(dogs);
         sb.append('}');
         return sb.toString();
+    }
+
+    public List<ShoppingCart> getShoppingCarts() {
+        return shoppingCarts;
+    }
+
+    public void setShoppingCarts(List<ShoppingCart> shoppingCarts) {
+        this.shoppingCarts = shoppingCarts;
     }
 }

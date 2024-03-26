@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ispan.dogland.model.entity.Users;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "tweet")
@@ -24,6 +26,17 @@ public class Tweet {
     private Date postDate;
     private Integer tweetStatus;
     private Integer numReport;
+    @OneToMany(mappedBy = "tweet",cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                                             CascadeType.DETACH, CascadeType.REFRESH})
+    private List<TweetGallery> tweetGalleries;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinTable(name="tweet_like", joinColumns = @JoinColumn(name="tweet_id"),
+            inverseJoinColumns = @JoinColumn(name="user_id"))
+    @JsonIgnore
+    private List<Users> userLikes;
+
     public Tweet() {
     }
     public Tweet(Users user, String userName, String tweetContent, Integer preNode, Date postDate, Integer tweetStatus, Integer numReport) {
@@ -98,6 +111,38 @@ public class Tweet {
 
     public void setNumReport(Integer numReport) {
         this.numReport = numReport;
+    }
+
+    public List<TweetGallery> getTweetGalleries() {
+        return tweetGalleries;
+    }
+
+    public void setTweetGalleries(List<TweetGallery> tweetGalleries) {
+        this.tweetGalleries = tweetGalleries;
+    }
+
+
+    public List<Users> getUserLikes() {
+        return userLikes;
+    }
+
+    public void setUserLikes(List<Users> userLikes) {
+        this.userLikes = userLikes;
+    }
+
+    public void addTweetGallery(TweetGallery tweetGallery) {
+        if(this.tweetGalleries == null) {
+            this.tweetGalleries = new ArrayList<>();
+        }
+        this.tweetGalleries.add(tweetGallery);
+        tweetGallery.setTweet(this);
+    }
+
+    public void addUserLike(Users user) {
+        if(this.userLikes == null) {
+            this.userLikes = new ArrayList<>();
+        }
+        this.userLikes.add(user);
     }
 
     @Override

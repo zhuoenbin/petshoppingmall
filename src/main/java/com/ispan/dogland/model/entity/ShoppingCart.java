@@ -1,6 +1,7 @@
 package com.ispan.dogland.model.entity;
-import jakarta.persistence.*;
 
+import com.ispan.dogland.model.entity.product.Product;
+import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -12,14 +13,6 @@ public class ShoppingCart {
     @Column(name = "shopping_cart_id")
     private Integer shoppingCartId;
 
-    // 對應 user
-    @Column(name = "user_id")
-    private Integer userId;
-
-    // 對應 product
-    @Column(name = "product_id")
-    private Integer productId;
-
     private Integer quantity;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -28,16 +21,18 @@ public class ShoppingCart {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedTime;
 
-    public ShoppingCart() {
-    }
+    // 對應 user
+    @JoinColumn(name = "user_id")
+    @ManyToOne
+    private Users users;
 
-    public ShoppingCart(Integer shoppingCartId, Integer userId, Integer productId, Integer quantity, Date createdTime, Date updatedTime) {
-        this.shoppingCartId = shoppingCartId;
-        this.userId = userId;
-        this.productId = productId;
-        this.quantity = quantity;
-        this.createdTime = createdTime;
-        this.updatedTime = updatedTime;
+    // 對應 product
+    @JoinColumn(name = "product_id")
+    @ManyToOne
+    private Product product;
+
+
+    public ShoppingCart() {
     }
 
     public Integer getShoppingCartId() {
@@ -46,22 +41,6 @@ public class ShoppingCart {
 
     public void setShoppingCartId(Integer shoppingCartId) {
         this.shoppingCartId = shoppingCartId;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Integer getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Integer productId) {
-        this.productId = productId;
     }
 
     public Integer getQuantity() {
@@ -88,15 +67,31 @@ public class ShoppingCart {
         this.updatedTime = updatedTime;
     }
 
+    public Users getUsers() {
+        return users;
+    }
+
+    public void setUsers(Users users) {
+        this.users = users;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("ShoppingCart{");
         sb.append("shoppingCartId=").append(shoppingCartId);
-        sb.append(", userId=").append(userId);
-        sb.append(", productId=").append(productId);
         sb.append(", quantity=").append(quantity);
         sb.append(", createdTime=").append(createdTime);
         sb.append(", updatedTime=").append(updatedTime);
+        sb.append(", users=").append(users);
+        sb.append(", product=").append(product);
         sb.append('}');
         return sb.toString();
     }

@@ -9,5 +9,10 @@ public interface UserRepository extends JpaRepository<Users, Integer> {
 
     Users findByUserEmail(String userEmail);
 
+    @Query("SELECT u FROM Users u LEFT JOIN u.tweets t WHERE t.tweetId = ?1")
+    Users findByTweetId(Integer tweetId);
 
+
+//    @Query("SELECT u FROM Users u  LEFT JOIN u.tweetLikes  WHERE u.userId = ?1")
+//    Users findByUserIdWithTweetLikes(Integer userId);
 }

@@ -1,5 +1,6 @@
 package com.ispan.dogland.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ispan.dogland.model.entity.Room;
 import jakarta.persistence.*;
 import java.util.Date;
@@ -14,9 +15,11 @@ public class RoomReservation {
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name="room_id")
-    private Room room;
 
-    private Integer dogId;
+    private Room room;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumn(name="dog_id")
+    private Dog dog;
 
     private Date startTime;
 
@@ -37,10 +40,10 @@ public class RoomReservation {
     public RoomReservation() {
     }
 
-    public RoomReservation(Integer reservationId, Room room, Integer dogId, Date startTime, Date endTime, Integer totalPrice, Date reservationTime, Date cancelTime, String cancelDirection, String paymentMethod, String paymentStatus) {
+    public RoomReservation(Integer reservationId, Room room, Dog dog, Date startTime, Date endTime, Integer totalPrice, Date reservationTime, Date cancelTime, String cancelDirection, String paymentMethod, String paymentStatus) {
         this.reservationId = reservationId;
         this.room = room;
-        this.dogId = dogId;
+        this.dog = dog;
         this.startTime = startTime;
         this.endTime = endTime;
         this.totalPrice = totalPrice;
@@ -67,12 +70,12 @@ public class RoomReservation {
         this.room = room;
     }
 
-    public Integer getDogId() {
-        return dogId;
+    public Dog getDog() {
+        return dog;
     }
 
-    public void setDogId(Integer dogId) {
-        this.dogId = dogId;
+    public void setDog(Dog dog) {
+        this.dog = dog;
     }
 
     public Date getStartTime() {
@@ -144,7 +147,7 @@ public class RoomReservation {
         final StringBuffer sb = new StringBuffer("RoomReservation{");
         sb.append("reservationId=").append(reservationId);
         sb.append(", room=").append(room);
-        sb.append(", dogId=").append(dogId);
+        sb.append(", dog=").append(dog);
         sb.append(", startTime=").append(startTime);
         sb.append(", endTime=").append(endTime);
         sb.append(", totalPrice=").append(totalPrice);

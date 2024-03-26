@@ -58,9 +58,12 @@ public class RoomService {
 
             roomList.add(roomTime);
         }
-//        System.out.println(roomList);
 
         return roomList;
+    }
+
+    public List<RoomReservation> findAllRoomReservation() {
+        return rRepository.findAll();
     }
 
     public Room findByRoomId(Integer roomId) {
@@ -76,6 +79,10 @@ public class RoomService {
     public List<Dog> dogs() {
         List<Dog> dogs = dog.findAll();
         return dogs;
+    }
+
+    public RoomReservation findByRoomReservationId(Integer roomReservationId) {
+        return rRepository.findByReservationId(roomReservationId);
     }
 
 }

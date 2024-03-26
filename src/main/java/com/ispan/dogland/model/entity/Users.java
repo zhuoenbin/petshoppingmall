@@ -169,13 +169,19 @@ public class Users {
         this.userStatus = userStatus;
     }
 
-
     public List<Dog> getDogs() {
         return dogs;
     }
 
     public void setDogs(List<Dog> dogs) {
         this.dogs = dogs;
+    }
+
+    public void addDog(Dog dog) {
+        if(this.dogs == null) {
+            this.dogs = new ArrayList<>();
+        }
+        this.dogs.add(dog);
     }
 
     public List<Tweet> getTweets() {

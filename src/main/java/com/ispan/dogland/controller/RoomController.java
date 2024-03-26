@@ -35,7 +35,6 @@ public class RoomController {
 
     @GetMapping("/showUpdateRoom")
     public RoomReservation updateRoom(@RequestParam Integer roomReservationId, HttpSession session) {
-//        System.out.println(roomReservationId);
         Passport loginUser = (Passport) session.getAttribute("loginUser");
         loginUser.getUserId();
         return rService.findByRoomReservationId(roomReservationId);

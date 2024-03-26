@@ -17,7 +17,7 @@ public class Articles {
     private Integer articleId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id")
     @JsonIgnore
     private Users user;
 

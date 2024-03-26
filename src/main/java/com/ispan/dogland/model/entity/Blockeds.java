@@ -15,14 +15,14 @@ public class Blockeds {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH}
             ,fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id")
     private Users user;
 
     @JsonManagedReference
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH}
             ,fetch = FetchType.LAZY)
-    @JoinColumn(name = "block_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "block_id")
     private Users blocked;
 
     public Blockeds(){}

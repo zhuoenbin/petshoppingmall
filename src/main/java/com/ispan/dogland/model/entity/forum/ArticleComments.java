@@ -25,7 +25,7 @@ public class ArticleComments {
 
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id")
     private Users user;
 
     @Column(name="comment_create_time")

@@ -16,12 +16,12 @@ public class Friends {
 
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id")
     private Users user;
 
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "friend_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "friend_id")
     private Users friend;
 
     @Column(name = "become_friend_time")

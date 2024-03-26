@@ -1,12 +1,11 @@
 package com.ispan.dogland.model.entity.forum;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ispan.dogland.model.entity.tweet.Tweet;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "article_gallery")
-public class ArticleGallery {
+@Table(name = "comment_gallery")
+public class CommentGallery {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,11 +16,11 @@ public class ArticleGallery {
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
                 CascadeType.DETACH, CascadeType.REFRESH})
-    @JoinColumn(name = "article_id")
+    @JoinColumn(name = "comment_id")
     @JsonIgnore
-    private Articles article;
+    private ArticleComments comment;
 
-    public ArticleGallery() {
+    public CommentGallery() {
     }
 
     public Integer getImgId() {
@@ -40,20 +39,20 @@ public class ArticleGallery {
         this.imgPath = imgPath;
     }
 
-    public Articles getArticle() {
-        return article;
+    public ArticleComments getComment() {
+        return comment;
     }
 
-    public void setArticle(Articles article) {
-        this.article = article;
+    public void setComment(ArticleComments comment) {
+        this.comment = comment;
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("ArticleGallery{");
+        final StringBuilder sb = new StringBuilder("CommentGallery{");
         sb.append("imgId=").append(imgId);
         sb.append(", imgPath='").append(imgPath).append('\'');
-        sb.append(", article=").append(article);
+        sb.append(", comment=").append(comment);
         sb.append('}');
         return sb.toString();
     }

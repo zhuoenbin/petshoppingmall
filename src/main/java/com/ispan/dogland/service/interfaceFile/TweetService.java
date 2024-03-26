@@ -21,5 +21,12 @@ public interface TweetService {
 
     public List<Tweet> getAllTweetForPage(int page, int limit);
 
+    public List<Users> findUserLikesByTweetId(Integer tweetId);
 
+
+    //按讚，建立tweet與user的關聯
+    public void createLinkWithTweetAndLike(Integer tweetId, Integer userId);
+
+
+    public void removeLinkWithTweetAndLike(Integer tweetId, Integer userId);
 }

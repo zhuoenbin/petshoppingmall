@@ -3,7 +3,9 @@ package com.ispan.dogland.model.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "dog")
@@ -34,10 +36,33 @@ public class Dog {
     private String dogBreed;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-                          CascadeType.DETACH, CascadeType.REFRESH})
+            CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private Users user;
+
+    @OneToMany(mappedBy = "dog",
+            fetch = FetchType.LAZY ,
+            cascade = {CascadeType.ALL})
+    @JsonIgnore
+    private List<RoomReservation> roomReservation;
+
+    public List<RoomReservation> getRoomReservation() {
+        return roomReservation;
+    }
+
+    public void setRoomReservation(List<RoomReservation> roomReservation) {
+        this.roomReservation = roomReservation;
+    }
+
+    public void add(RoomReservation tmpRoomReservation){
+        if(roomReservation==null){
+            roomReservation = new ArrayList<>();
+        }
+        roomReservation.add(tmpRoomReservation);
+
+        tmpRoomReservation.setDog(this);
+    }
 
     public Dog() {
     }
@@ -160,4 +185,5 @@ public class Dog {
         sb.append('}');
         return sb.toString();
     }
+
 }

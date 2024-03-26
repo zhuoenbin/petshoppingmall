@@ -30,6 +30,13 @@ public class Tweet {
                                              CascadeType.DETACH, CascadeType.REFRESH})
     private List<TweetGallery> tweetGalleries;
 
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinTable(name="tweet_like", joinColumns = @JoinColumn(name="tweet_id"),
+            inverseJoinColumns = @JoinColumn(name="user_id"))
+    @JsonIgnore
+    private List<Users> userLikes;
+
     public Tweet() {
     }
     public Tweet(Users user, String userName, String tweetContent, Integer preNode, Date postDate, Integer tweetStatus, Integer numReport) {
@@ -114,12 +121,28 @@ public class Tweet {
         this.tweetGalleries = tweetGalleries;
     }
 
+
+    public List<Users> getUserLikes() {
+        return userLikes;
+    }
+
+    public void setUserLikes(List<Users> userLikes) {
+        this.userLikes = userLikes;
+    }
+
     public void addTweetGallery(TweetGallery tweetGallery) {
         if(this.tweetGalleries == null) {
             this.tweetGalleries = new ArrayList<>();
         }
         this.tweetGalleries.add(tweetGallery);
         tweetGallery.setTweet(this);
+    }
+
+    public void addUserLike(Users user) {
+        if(this.userLikes == null) {
+            this.userLikes = new ArrayList<>();
+        }
+        this.userLikes.add(user);
     }
 
     @Override

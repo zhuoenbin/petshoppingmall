@@ -27,7 +27,6 @@ public class Room {
     @OneToMany(mappedBy = "room",
             fetch = FetchType.LAZY ,
             cascade = {CascadeType.ALL})
-    // 序列化時省略掉這個物件
     @JsonIgnore
     private List<RoomReservation> roomReservation;
 

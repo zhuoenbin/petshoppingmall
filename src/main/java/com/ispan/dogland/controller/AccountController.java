@@ -154,5 +154,17 @@ public class AccountController {
         return ResponseEntity.badRequest().body("resetPassword failed");
     }
 
+    @PostMapping("/account/update")
+    public ResponseEntity<String> updateAccount(@RequestBody Users user) {
+
+        System.out.println("back is: "+user.toString());
+        Users realUser = accountService.getUserDetailById(user.getUserId());
+        realUser.setLastName(user.getLastName());
+        realUser.setBirthDate(user.getBirthDate());
+        realUser.setUserGender(user.getUserGender());
+        accountService.updateUser(realUser);
+
+        return ResponseEntity.ok("update success");
+    }
 
 }

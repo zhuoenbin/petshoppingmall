@@ -5,7 +5,10 @@ import java.util.List;
 public class ProductDto {
     private Integer productId;
     private String productName;
+    private Integer employeeId;
     private Integer unitPrice;
+    private Integer categoryId;
+    private Integer stock;
     private List<String> imgPath;
 
     public Integer getProductId() {
@@ -24,12 +27,36 @@ public class ProductDto {
         this.productName = productName;
     }
 
+    public Integer getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(Integer employeeId) {
+        this.employeeId = employeeId;
+    }
+
     public Integer getUnitPrice() {
         return unitPrice;
     }
 
     public void setUnitPrice(Integer unitPrice) {
         this.unitPrice = unitPrice;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
     }
 
     public List<String> getImgPath() {

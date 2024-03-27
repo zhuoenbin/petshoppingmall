@@ -34,9 +34,8 @@ public class ForumService {
     private UserRepository userRepository;
 
     public Page<ForumDto> showArticlesByPages(Integer pageNumber){
-        Sort sortByTime = Sort.by(Sort.Direction.ASC,"articleCreateTime");
 
-        Page<Articles> articles = articleRepository.findAll(PageRequest.of(pageNumber, 3,sortByTime));
+        Page<Articles> articles = articleRepository.findAllOrderByTime(PageRequest.of(pageNumber, 3));
 
         Page<ForumDto> forumDtos = articles.map(a -> {
             ForumDto aDto = new ForumDto();

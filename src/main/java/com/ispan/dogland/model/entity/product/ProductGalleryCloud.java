@@ -28,8 +28,12 @@ public class ProductGalleryCloud {
 
     ///////////////////////////////////
 
-    public ProductGalleryCloud() {
+    public ProductGalleryCloud() {}
+
+    public ProductGalleryCloud(String cloudPath) {
+        this.cloudPath = cloudPath;
     }
+
     ///////////////////////////////////
 
 

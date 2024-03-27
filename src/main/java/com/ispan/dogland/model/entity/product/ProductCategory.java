@@ -33,6 +33,10 @@ public class ProductCategory {
     public ProductCategory() {
     }
 
+    public ProductCategory(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
     public ProductCategory(String categoryName) {
         this.categoryName = categoryName;
     }

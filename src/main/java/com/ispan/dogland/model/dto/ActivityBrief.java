@@ -8,8 +8,8 @@ import java.util.Date;
 
 public class ActivityBrief {
     private Integer activityId;
-    private Integer activityTypeId;
-    private Integer venueId;
+    private String activityTypeName;
+    private String venueName;
     private String activityTitle;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy/MM/dd")
@@ -39,20 +39,20 @@ public class ActivityBrief {
         this.activityId = activityId;
     }
 
-    public Integer getActivityTypeId() {
-        return activityTypeId;
+    public String getActivityTypeName() {
+        return activityTypeName;
     }
 
-    public void setActivityTypeId(Integer activityTypeId) {
-        this.activityTypeId = activityTypeId;
+    public void setActivityTypeName(String activityTypeName) {
+        this.activityTypeName = activityTypeName;
     }
 
-    public Integer getVenueId() {
-        return venueId;
+    public String getVenueName() {
+        return venueName;
     }
 
-    public void setVenueId(Integer venueId) {
-        this.venueId = venueId;
+    public void setVenueName(String venueName) {
+        this.venueName = venueName;
     }
 
     public String getActivityTitle() {

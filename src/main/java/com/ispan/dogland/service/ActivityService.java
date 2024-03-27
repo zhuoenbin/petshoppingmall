@@ -256,36 +256,34 @@ public class ActivityService {
 
     //===============所有活動簡述===============
     public Page<ActivityBrief> findActivityByPage(Integer pageNumber){
-        Page<VenueActivity> activities = activityRepository.findAll(PageRequest.of(pageNumber, 9));
-        System.out.println(activities.getTotalElements());
-        Page<ActivityBrief> activityDataList = activities.map(a -> {
-            ActivityBrief brief = new ActivityBrief();
-            BeanUtils.copyProperties(a, brief);
-            brief.setVenueId(a.getVenue().getVenueId());
-            if (a.getVenue()!=null &&a.getActivityType()!=null) {
-                brief.setVenueId(a.getVenue().getVenueId());
-                brief.setActivityTypeId(a.getActivityType().getActivityTypeId());
-                Integer activityId = a.getActivityId();
-                VenueActivity activity = activityRepository.findByActivityId(activityId);
-                ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
+        Page<VenueActivity> all = activityRepository.findAll(PageRequest.of(pageNumber-1, 4));
 
-                brief.setGalleryImgUrl(main.getGalleryImgUrl());
-            }
-            return brief;
+        Page<ActivityBrief> briefs = all.map(a->{
+            ActivityBrief ab = new ActivityBrief();
+            BeanUtils.copyProperties(a,ab);
+
+            Integer activityId = a.getActivityId();
+            VenueActivity activity = activityRepository.findByActivityId(activityId);
+            ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
+            ab.setGalleryImgUrl(main.getGalleryImgUrl());
+
+            ab.setActivityTypeName(a.getActivityType().getActivityTypeName());
+            ab.setVenueName(a.getVenue().getVenueName());
+            return ab;
         });
-        return activityDataList;
+        return briefs;
     }
 
     //===============依類別找活動簡述===============
     public Page<ActivityBrief> findActivityByType(Integer typeId, Integer pageNumber){
         ActivityType type = typeRepository.findByActivityTypeId(typeId);
-        Page<VenueActivity> activities = activityRepository.findByActivityType(type,PageRequest.of(pageNumber, 9));
+        Page<VenueActivity> activities = activityRepository.findByActivityType(type,PageRequest.of(pageNumber-1, 4));
         System.out.println(activities.getTotalElements());
         Page<ActivityBrief> activityDataList = activities.map(r -> {
             ActivityBrief brief = new ActivityBrief();
             BeanUtils.copyProperties(r, brief);
-            brief.setActivityTypeId(r.getActivityType().getActivityTypeId());
-            brief.setVenueId(r.getVenue().getVenueId());
+            brief.setActivityTypeName(r.getActivityType().getActivityTypeName());
+            brief.setVenueName(r.getVenue().getVenueName());
 
             Integer activityId = r.getActivityId();
             VenueActivity activity = activityRepository.findByActivityId(activityId);

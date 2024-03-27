@@ -197,7 +197,7 @@ public class AccountController {
         Passport loginUser=(Passport)session.getAttribute("loginUser");
         loginUser.setPhotoUrl(imgURL);
         session.setAttribute("loginUser",loginUser);
-        
+
         return imgURL;
     }
 

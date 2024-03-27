@@ -14,6 +14,9 @@ public interface UserRepository extends JpaRepository<Users, Integer> {
 
     Users findByLastName(String lastName);
 
+    @Query("SELECT u FROM Users u JOIN Fetch u.dogs d WHERE u.userId = ?1")
+    Users findUserAndDogsByUserId(Integer userId);
+
 
 //    @Query("SELECT u FROM Users u  LEFT JOIN u.tweetLikes  WHERE u.userId = ?1")
 //    Users findByUserIdWithTweetLikes(Integer userId);

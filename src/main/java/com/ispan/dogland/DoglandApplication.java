@@ -48,6 +48,7 @@ public class DoglandApplication {
 											   TweetFollowListRepository tweetFollowListRepository) {
 		return runner -> {
 
+
 		};
 
 	}

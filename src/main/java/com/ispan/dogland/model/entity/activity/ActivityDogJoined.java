@@ -38,6 +38,9 @@ public class ActivityDogJoined {
         if(joinedTime==null && updateTime==null) {
             joinedTime=new Date();
             updateTime=new Date();
+            if(joinedStatus==null){
+                joinedStatus="參加";
+            }
         }
     }
 

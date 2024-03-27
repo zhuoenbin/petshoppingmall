@@ -3,10 +3,13 @@ package com.ispan.dogland.controller;
 import com.cloudinary.utils.ObjectUtils;
 import com.ispan.dogland.model.dto.ActivityBrief;
 import com.ispan.dogland.model.dto.ActivityData;
+import com.ispan.dogland.model.dto.ApplyData;
 import com.ispan.dogland.model.dto.RentalData;
+import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.activity.*;
 import com.ispan.dogland.service.ActivityService;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -104,6 +107,35 @@ public class ActivityController {
     @GetMapping("/all/{pageNumber}")
     public Page<ActivityBrief> showBriefByPage(@PathVariable Integer pageNumber){
         return activityService.findActivityByPage(pageNumber);
+    }
+
+    //===============查詢使用者的狗===================
+    @GetMapping("/searchUsersDog/{userId}")
+    public List<Dog> findUserDogs(@PathVariable Integer userId){
+        return activityService.findUsersDog(userId);
+    }
+
+    //===============使用者與狗狗報名活動===============
+    @PostMapping("/JoinActivity")
+    public List<ApplyData> userDogsJoin(@RequestParam Integer userId,
+                                        @RequestParam String note,
+                                        @RequestParam Integer[] dogIdList,
+                                        @RequestParam Integer activityId){
+        ActivityUserJoined userJoined = activityService.userApply(userId, note,activityId);
+        List<ApplyData> joinedMembers=new ArrayList<>();
+        for(Integer dogId:dogIdList){
+            ActivityDogJoined dogJoined = activityService.dogApply(dogId, activityId);
+            ApplyData applyData = new ApplyData();
+            BeanUtils.copyProperties(userJoined,applyData);
+            BeanUtils.copyProperties(dogJoined,applyData);
+            applyData.setUserId(userJoined.getUser().getUserId());
+            applyData.setActivityId(dogJoined.getVenueActivity().getActivityId());
+            applyData.setActivityDate(dogJoined.getVenueActivity().getActivityDate());
+            applyData.setDogName(dogJoined.getDog().getDogName());
+            applyData.setActivityTitle(dogJoined.getVenueActivity().getActivityTitle());
+            joinedMembers.add(applyData);
+        }
+        return joinedMembers;
     }
 
 

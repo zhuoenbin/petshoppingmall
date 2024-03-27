@@ -37,6 +37,7 @@ public class RoomController {
         return rService.findByRoomReservationId(roomReservationId);
     }
 
+    // 修改訂單時段
     @PostMapping("/updateRoom")
     public void updateRoom(@RequestBody RoomReservation roomReservation,
                            @RequestParam Integer roomReservationId) {
@@ -47,6 +48,7 @@ public class RoomController {
         rService.addRoomReservation(rr);
     }
 
+    // 新增訂房明細
     @PostMapping("/roomReservation")
     public void addRoom(@RequestBody RoomReservation roomReservation, @RequestParam Integer roomId, @RequestParam Integer dogId) {
         roomReservation.setRoom(rService.findByRoomId(roomId));
@@ -55,11 +57,22 @@ public class RoomController {
         rService.addRoomReservation(roomReservation);
     }
 
+    // 取消訂單
     @PostMapping("/cancel")
-    public void cancel(@RequestParam Integer roomReservationId,@RequestParam String cancelDirection) {
+    public void cancel(@RequestBody RoomReservation roomReservation, @RequestParam Integer roomReservationId) {
         RoomReservation rr = rService.findByRoomReservationId(roomReservationId);
         rr.setCancelTime(new Date());
-        rr.setCancelDirection(cancelDirection);
+        rr.setCancelDirection(roomReservation.getCancelDirection());
+        rService.addRoomReservation(rr);
+    }
+
+    // 評分
+    @PostMapping("/score")
+    public void score(@RequestBody RoomReservation roomReservation, @RequestParam Integer roomReservationId) {
+        RoomReservation rr = rService.findByRoomReservationId(roomReservationId);
+        rr.setStar(roomReservation.getStar());
+        rr.setConments(roomReservation.getConments());
+        rr.setConmentsTime(roomReservation.getConmentsTime());
         rService.addRoomReservation(rr);
     }
 
@@ -70,23 +83,30 @@ public class RoomController {
     }
 
     // 顯示出全部的訂房明細
+    @GetMapping("/allRoomReservationByUser")
+    public List<RoomReservation> roomReservation(HttpSession session) {
+        Passport loginUser = (Passport) session.getAttribute("loginUser");
+        return rService.findRoomReservationByUserId(loginUser.getUserId());
+    }
+
+    // 顯示出使用者的狗
+    @GetMapping("/dog")
+    public List<Dog> findDogsByUsersId(HttpSession session) {
+        Passport loginUser = (Passport) session.getAttribute("loginUser");
+        return rService.findDogsByUsersId(loginUser.getUserId());
+    }
+
+    // 顯示全部的訂單 就算不是這個使用者的也需要
     @GetMapping("/allRoomReservation")
-    public List<RoomReservation> roomReservation() {
+    public List<RoomReservation> allRoomReservation() {
         return rService.findAllRoomReservation();
     }
 
-    // 顯示出全部的狗
-    @GetMapping("/dog")
-    public List<Dog> dog() {
-        return rService.dogs();
-    }
-
-    // 顯示全部的訂單時間
+    // 顯示全部的訂單時間 就算不是這個使用者的也需要
     @GetMapping("/reservation")
     public List<List<String>> reservationTime() {
         return rService.roomReservation();
     }
-
 
 
 }

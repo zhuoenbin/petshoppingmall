@@ -3,10 +3,8 @@ package com.ispan.dogland.service;
 import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.RoomRepository;
 import com.ispan.dogland.model.dao.RoomReservationRepository;
-import com.ispan.dogland.model.entity.Dog;
-import com.ispan.dogland.model.entity.Orders;
-import com.ispan.dogland.model.entity.Room;
-import com.ispan.dogland.model.entity.RoomReservation;
+import com.ispan.dogland.model.dao.UserRepository;
+import com.ispan.dogland.model.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +23,9 @@ public class RoomService {
 
     @Autowired
     private RoomReservationRepository rRepository;
+
+    @Autowired
+    private UserRepository uRepository;
 
     @Autowired
     private DogRepository dog;
@@ -47,8 +48,10 @@ public class RoomService {
             // 創建一個新的 LocalDate 對象，表示 receiveDate 後的第一天
             LocalDate currentDay = receiveDate.plusDays(1);
             List<String> roomTime = new ArrayList<>();
-            // 加入訂房id
+            // 加入房間id
             roomTime.add(roomReservations.getRoom().getRoomId().toString());
+            // 加入訂房id
+            roomTime.add(roomReservations.getReservationId().toString());
             // 加入當天日期
             roomTime.add(receiveDate.toString());
 
@@ -66,6 +69,16 @@ public class RoomService {
         return rRepository.findAll();
     }
 
+    public List<RoomReservation> findRoomReservationByUserId(Integer userId) {
+        List<RoomReservation> roomReservations = new ArrayList<>();
+        for(RoomReservation roomReservation : rRepository.findAll()) {
+            if(roomReservation.getDog().getUser().equals(uRepository.findByUserId(userId))) {
+                roomReservations.add(roomReservation);
+            }
+        }
+        return roomReservations;
+    }
+
     public Room findByRoomId(Integer roomId) {
         return room.findByRoomId(roomId);
     }
@@ -76,9 +89,10 @@ public class RoomService {
         return rooms;
     }
 
-    public List<Dog> dogs() {
-        List<Dog> dogs = dog.findAll();
-        return dogs;
+    // findDogsByUserId
+    public List<Dog> findDogsByUsersId(Integer userId) {
+        Users user = uRepository.findByUserId(userId);
+        return user.getDogs();
     }
 
     public RoomReservation findByRoomReservationId(Integer roomReservationId) {

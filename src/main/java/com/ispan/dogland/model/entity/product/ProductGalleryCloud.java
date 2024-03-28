@@ -1,6 +1,7 @@
 package com.ispan.dogland.model.entity.product;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 
@@ -18,6 +19,7 @@ public class ProductGalleryCloud {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "product_id", referencedColumnName = "product_id", nullable = false)
+    @JsonIgnore
     private Product product;
 
     @Column(name = "cloud_path", nullable = false)

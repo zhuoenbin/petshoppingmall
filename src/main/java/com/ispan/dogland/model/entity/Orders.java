@@ -1,5 +1,7 @@
 package com.ispan.dogland.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -85,6 +87,7 @@ public class Orders {
     @OneToMany(mappedBy = "order",
             fetch = FetchType.LAZY ,
             cascade = {CascadeType.ALL})
+    @JsonIgnore
     private List<OrderDetail> orderDetail;
 
     public List<OrderDetail> getOrderDetail() {

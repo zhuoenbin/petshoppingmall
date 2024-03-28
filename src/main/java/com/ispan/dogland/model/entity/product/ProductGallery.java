@@ -1,6 +1,7 @@
 package com.ispan.dogland.model.entity.product;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 
@@ -18,6 +19,7 @@ public class ProductGallery {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "product_id", referencedColumnName = "product_id", nullable = false)
+    @JsonIgnore
     private Product product;
 
     @Column(name = "img_path", nullable = false)
@@ -58,14 +60,14 @@ public class ProductGallery {
     ////////////////////////////////////
 
 
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("ProductGallery{");
-        sb.append("imgId=").append(imgId);
-        sb.append(", product=").append(product);
-        sb.append(", imgPath='").append(imgPath).append('\'');
-        sb.append('}');
-        return sb.toString();
-    }
+//    @Override
+//    public String toString() {
+//        final StringBuffer sb = new StringBuffer("ProductGallery{");
+//        sb.append("imgId=").append(imgId);
+//        sb.append(", product=").append(product);
+//        sb.append(", imgPath='").append(imgPath).append('\'');
+//        sb.append('}');
+//        return sb.toString();
+//    }
 }
 

@@ -1,6 +1,7 @@
 package com.ispan.dogland.model.entity.product;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import com.ispan.dogland.model.entity.Employee;
@@ -79,13 +80,15 @@ public class Product {
             fetch = FetchType.LAZY ,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE,
                     CascadeType.DETACH, CascadeType.REFRESH})
+    @JsonIgnore
     private List<ProductGallery> productGalleries;
 
-    @OneToMany(mappedBy = "product",
-            fetch = FetchType.LAZY ,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-                    CascadeType.DETACH, CascadeType.REFRESH})
-    private List<ProductGalleryCloud>productGalleryClouds;
+//    @OneToMany(mappedBy = "product",
+//            fetch = FetchType.LAZY ,
+//            cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+//                    CascadeType.DETACH, CascadeType.REFRESH})
+//    @JsonIgnore
+//    private List<ProductGalleryCloud>productGalleryClouds;
 
     @OneToMany(mappedBy = "product")
     private List<ShoppingCart> shoppingCarts;
@@ -202,13 +205,13 @@ public class Product {
         this.productGalleries = productGalleries;
     }
 
-    public List<ProductGalleryCloud> getProductGalleryClouds() {
-        return productGalleryClouds;
-    }
-
-    public void setProductGalleryClouds(List<ProductGalleryCloud> productGalleryClouds) {
-        this.productGalleryClouds = productGalleryClouds;
-    }
+//    public List<ProductGalleryCloud> getProductGalleryClouds() {
+//        return productGalleryClouds;
+//    }
+//
+//    public void setProductGalleryClouds(List<ProductGalleryCloud> productGalleryClouds) {
+//        this.productGalleryClouds = productGalleryClouds;
+//    }
 
     public String getProductDescription() {
         return productDescription;
@@ -244,7 +247,7 @@ public class Product {
         sb.append(", modifiedDate=").append(modifiedDate);
         sb.append(", discountId=").append(discountId);
         sb.append(", productGalleries=").append(productGalleries);
-        sb.append(", productGalleryClouds=").append(productGalleryClouds);
+//        sb.append(", productGalleryClouds=").append(productGalleryClouds);
         sb.append(", shoppingCarts=").append(shoppingCarts);
         sb.append('}');
         return sb.toString();

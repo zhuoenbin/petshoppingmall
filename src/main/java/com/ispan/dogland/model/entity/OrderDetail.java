@@ -1,5 +1,6 @@
 package com.ispan.dogland.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -12,6 +13,7 @@ public class OrderDetail {
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name="order_id")
+    @JsonIgnore
     private Orders order;
 
     // @ManyToOne Product

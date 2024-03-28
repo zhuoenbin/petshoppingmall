@@ -24,14 +24,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/tweet")
 public class TweetController {
-
 
 
     private TweetService tweetService;
@@ -51,8 +48,18 @@ public class TweetController {
 //    }
 
     @GetMapping("/getAllTweet")
-    public List<Tweet> allTweet(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "6") int limit){
+    public List<Tweet> allTweet(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "6") int limit) {
         return tweetService.getAllTweetForPage(page, limit);
+    }
+
+    @GetMapping("/getTweetById/{tweetId}")
+    public Tweet getTweetById(@PathVariable Integer tweetId) {
+        return tweetService.findTweetByTweetId(tweetId);
+    }
+
+    @GetMapping("/getUserByTweetId/{tweetId}")
+    public Users getUserByTweetId(@PathVariable Integer tweetId) {
+        return tweetService.findUserByTweetId(tweetId);
     }
 
     @PostMapping("/postTweetWithPhoto")
@@ -75,7 +82,7 @@ public class TweetController {
             tweet.setPostDate(new Date());
             tweet.setTweetStatus(1);
             tweet.setNumReport(0);
-            if(tweetContent != null){
+            if (tweetContent != null) {
                 tweet.setTweetContent(tweetContent);
             }
             tweet.addTweetGallery(tweetGallery);
@@ -95,7 +102,7 @@ public class TweetController {
             tweet.setPostDate(new Date());
             tweet.setTweetStatus(1);
             tweet.setNumReport(0);
-            if(tweetContent != null){
+            if (tweetContent != null) {
                 tweet.setTweetContent(tweetContent);
             }
             tweetService.postNewTweet(tweet, memberId);
@@ -137,6 +144,11 @@ public class TweetController {
         return tweetService.findTweetsByUserId(userId);
     }
 
+    @GetMapping("/getTweetsByUserName/{userName}")
+    public List<Tweet> getTweetsByUserName(@PathVariable String userName) {
+        return tweetService.findTweetsByUserName(userName);
+    }
+
     @GetMapping("/getUserTweetsByTweetId/{tweetId}")
     public List<Tweet> getUserTweetsByTweetId(@PathVariable Integer tweetId) {
         Users user = tweetService.findUserByTweetId(tweetId);
@@ -146,7 +158,7 @@ public class TweetController {
 
     //找到該則tweet的所有按讚數量
     @GetMapping("/getTweetLikesNum")
-    public ResponseEntity<TweetLikesCheckResponse> getTweetLikesNum(@RequestParam Integer tweetId , @RequestParam Integer userId) {
+    public ResponseEntity<TweetLikesCheckResponse> getTweetLikesNum(@RequestParam Integer tweetId, @RequestParam Integer userId) {
         List<Users> users = tweetService.findUserLikesByTweetId(tweetId);
         Users user = accountService.getUserDetailById(userId);
         TweetLikesCheckResponse tweetLikesCheckResponse = new TweetLikesCheckResponse();
@@ -175,7 +187,7 @@ public class TweetController {
 
     //使用者按讚，使用者與like建立連結
     @PostMapping("/getLikeLink")
-    public String likeTweet(@RequestParam Integer userId,@RequestParam Integer tweetId) {
+    public String likeTweet(@RequestParam Integer userId, @RequestParam Integer tweetId) {
         System.out.println("userId: " + userId + " tweetId: " + tweetId);
 
         tweetService.createLinkWithTweetAndLike(tweetId, userId);
@@ -186,7 +198,7 @@ public class TweetController {
 
     //取消讚
     @PostMapping("/removeLikeLink")
-    public String removeLikeTweet(@RequestParam Integer userId,@RequestParam Integer tweetId) {
+    public String removeLikeTweet(@RequestParam Integer userId, @RequestParam Integer tweetId) {
         tweetService.removeLinkWithTweetAndLike(tweetId, userId);
         return "removeLikeTweet successfully!";
     }
@@ -194,7 +206,7 @@ public class TweetController {
     //回覆貼文(純文字)
     @PostMapping("/replyTweet")
     public String replyTweet(@RequestParam Integer tweetId, @RequestParam Integer memberId, @RequestParam String tweetContent) {
-            System.out.println("tweetId: " + tweetId + " memberId: " + memberId + " tweetContent: " + tweetContent);
+        System.out.println("tweetId: " + tweetId + " memberId: " + memberId + " tweetContent: " + tweetContent);
         Tweet tweet = new Tweet();
         tweet.setPreNode(tweetId);
         tweet.setPostDate(new Date());
@@ -205,4 +217,54 @@ public class TweetController {
         return "replyTweet successfully!";
     }
 
+    //確認是否有追蹤關係
+    @PostMapping("/checkFollerRelationship")
+    public Map<String, Object> checkFollowerRelationship(@RequestBody Map<String, String> request) {
+        String myId = (String) request.get("myId");
+        String tweetUserName = (String) request.get("tweetUserName");
+        Integer myIntegerId = Integer.parseInt(myId);
+        Users user = accountService.findUsersByLastName(tweetUserName);
+        boolean isFollowing = tweetService.checkIsFollow(myIntegerId, user.getUserId());
+        Map<String, Object> response = new HashMap<>();
+        response.put("isFollowing", isFollowing);
+        response.put("userId", user.getUserId());
+        return response;
+    }
+
+    // 建立追蹤關係
+    @PostMapping("/getFollerRelationship")
+    public String getFollowerRelationship(@RequestBody Map<String, String> request) {
+        String myId = request.get("myId");
+        String otherId = request.get("otherId");
+        boolean p = tweetService.followTweetUser(Integer.parseInt(myId), Integer.parseInt(otherId));
+        return String.valueOf(p);
+    }
+    //取消追蹤關係
+    @PostMapping("/removeFollerRelationship")
+    public String removeFollowerRelationship(@RequestBody Map<String, String> request) {
+        String myId = request.get("myId");
+        String otherId = request.get("otherId");
+        tweetService.deleteFollowTweetUser(Integer.parseInt(myId), Integer.parseInt(otherId));
+        boolean p = tweetService.checkIsFollow(Integer.parseInt(myId), Integer.parseInt(otherId));
+        return String.valueOf(!p);
+    }
+
+
+    @GetMapping("/getMyFollowTweets")
+    public List<Tweet> getMyFollowweet(@RequestParam Integer userId) {
+
+        List<Tweet> tweets = tweetService.findAllFollowTweetsByUserId(userId);
+        Collections.sort(tweets, new Comparator<Tweet>() {
+            @Override
+            public int compare(Tweet tweet1, Tweet tweet2) {
+                return tweet2.getPostDate().compareTo(tweet1.getPostDate()); // 按照 postDate 降序排序
+            }
+        });
+        return tweets;
+    }
+
+    @GetMapping("/getMyFollowUsers")
+    public List<Users> getMyFollowUsers(@RequestParam Integer userId) {
+        return tweetService.findAllFollowUsersByUserId(userId);
+    }
 }

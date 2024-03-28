@@ -26,4 +26,8 @@ public class EmployeeController {
     }
 
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/Ruan

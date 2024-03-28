@@ -22,6 +22,7 @@ public class RentalData {
     @Temporal(TemporalType.TIME)
     @DateTimeFormat(pattern = "hh:mm")
     private Date rentalEnd;
+    private Integer rentalTotal;
     private String rentalOrderStatus;
     private Integer paymentStatus;
     @Temporal(TemporalType.TIMESTAMP)
@@ -37,6 +38,32 @@ public class RentalData {
     public RentalData() {
     }
 
+    public RentalData(Integer venueId, Integer userId, Integer participantsNumber, Integer dogNumber, Date rentalDate, Date rentalStart, Date rentalEnd, Integer rentalTotal) {
+        this.venueId = venueId;
+        this.userId = userId;
+        this.participantsNumber = participantsNumber;
+        this.dogNumber = dogNumber;
+        this.rentalDate = rentalDate;
+        this.rentalStart = rentalStart;
+        this.rentalEnd = rentalEnd;
+        this.rentalTotal = rentalTotal;
+    }
+
+    public RentalData(Integer rentalId, Integer venueId, Integer userId, Integer participantsNumber, Integer dogNumber, Date rentalDate, Date rentalStart, Date rentalEnd, Integer rentalTotal, String rentalOrderStatus, Integer paymentStatus, Date rentalOrderDate, Date rentalUpdateDate) {
+        this.rentalId = rentalId;
+        this.venueId = venueId;
+        this.userId = userId;
+        this.participantsNumber = participantsNumber;
+        this.dogNumber = dogNumber;
+        this.rentalDate = rentalDate;
+        this.rentalStart = rentalStart;
+        this.rentalEnd = rentalEnd;
+        this.rentalTotal = rentalTotal;
+        this.rentalOrderStatus = rentalOrderStatus;
+        this.paymentStatus = paymentStatus;
+        this.rentalOrderDate = rentalOrderDate;
+        this.rentalUpdateDate = rentalUpdateDate;
+    }
 
     public RentalData(Integer userId) {
         this.userId = userId;
@@ -136,5 +163,13 @@ public class RentalData {
 
     public void setVenueId(Integer venueId) {
         this.venueId = venueId;
+    }
+
+    public Integer getRentalTotal() {
+        return rentalTotal;
+    }
+
+    public void setRentalTotal(Integer rentalTotal) {
+        this.rentalTotal = rentalTotal;
     }
 }

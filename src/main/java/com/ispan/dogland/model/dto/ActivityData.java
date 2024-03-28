@@ -21,6 +21,15 @@ public class ActivityData {
     @Temporal(TemporalType.TIME)
     @DateTimeFormat(pattern = "hh:mm")
     private Date activityEnd;
+    private String activityDescription;
+    private String activityProcess;
+    private String activityNotice;
+    @Temporal(TemporalType.TIMESTAMP)
+    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
+    private Date activityListedDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
+    private Date activityUpdateDate;
 
     private String activityStatus;
     @Temporal(TemporalType.TIMESTAMP)
@@ -28,6 +37,59 @@ public class ActivityData {
     private Date activityClosingDate;
     private Integer activityDogNumber;
     private Integer currentDogNumber;
+    private Integer activityCost;
+    private String activityCostDescription;
+    private String contactInfo;
+    private String contactMail;
+    private String contactPhone;
+
+    public ActivityData() {
+    }
+
+    public ActivityData(Integer activityId, Integer activityTypeId, Integer venueId, Integer employeeId, String activityTitle, Date activityDate, Date activityStart, Date activityEnd, String activityDescription, String activityProcess, String activityNotice, Date activityListedDate, Date activityUpdateDate, String activityStatus, Date activityClosingDate, Integer activityDogNumber, Integer currentDogNumber, Integer activityCost, String activityCostDescription, String contactInfo, String contactMail, String contactPhone) {
+        this.activityId = activityId;
+        this.activityTypeId = activityTypeId;
+        this.venueId = venueId;
+        this.employeeId = employeeId;
+        this.activityTitle = activityTitle;
+        this.activityDate = activityDate;
+        this.activityStart = activityStart;
+        this.activityEnd = activityEnd;
+        this.activityDescription = activityDescription;
+        this.activityProcess = activityProcess;
+        this.activityNotice = activityNotice;
+        this.activityListedDate = activityListedDate;
+        this.activityUpdateDate = activityUpdateDate;
+        this.activityStatus = activityStatus;
+        this.activityClosingDate = activityClosingDate;
+        this.activityDogNumber = activityDogNumber;
+        this.currentDogNumber = currentDogNumber;
+        this.activityCost = activityCost;
+        this.activityCostDescription = activityCostDescription;
+        this.contactInfo = contactInfo;
+        this.contactMail = contactMail;
+        this.contactPhone = contactPhone;
+    }
+
+    public ActivityData(Integer activityTypeId, Integer venueId, Integer employeeId, String activityTitle, Date activityDate, Date activityStart, Date activityEnd, String activityDescription, String activityProcess, String activityNotice, Date activityClosingDate, Integer activityDogNumber, Integer activityCost, String activityCostDescription, String contactInfo, String contactMail, String contactPhone) {
+        this.activityTypeId = activityTypeId;
+        this.venueId = venueId;
+        this.employeeId = employeeId;
+        this.activityTitle = activityTitle;
+        this.activityDate = activityDate;
+        this.activityStart = activityStart;
+        this.activityEnd = activityEnd;
+        this.activityDescription = activityDescription;
+        this.activityProcess = activityProcess;
+        this.activityNotice = activityNotice;
+        this.activityClosingDate = activityClosingDate;
+        this.activityDogNumber = activityDogNumber;
+        this.activityCost = activityCost;
+        this.activityCostDescription = activityCostDescription;
+        this.contactInfo = contactInfo;
+        this.contactMail = contactMail;
+        this.contactPhone = contactPhone;
+    }
 
     public Integer getActivityId() {
         return activityId;
@@ -123,5 +185,85 @@ public class ActivityData {
 
     public void setCurrentDogNumber(Integer currentDogNumber) {
         this.currentDogNumber = currentDogNumber;
+    }
+
+    public String getActivityDescription() {
+        return activityDescription;
+    }
+
+    public void setActivityDescription(String activityDescription) {
+        this.activityDescription = activityDescription;
+    }
+
+    public String getActivityProcess() {
+        return activityProcess;
+    }
+
+    public void setActivityProcess(String activityProcess) {
+        this.activityProcess = activityProcess;
+    }
+
+    public String getActivityNotice() {
+        return activityNotice;
+    }
+
+    public void setActivityNotice(String activityNotice) {
+        this.activityNotice = activityNotice;
+    }
+
+    public Date getActivityListedDate() {
+        return activityListedDate;
+    }
+
+    public void setActivityListedDate(Date activityListedDate) {
+        this.activityListedDate = activityListedDate;
+    }
+
+    public Date getActivityUpdateDate() {
+        return activityUpdateDate;
+    }
+
+    public void setActivityUpdateDate(Date activityUpdateDate) {
+        this.activityUpdateDate = activityUpdateDate;
+    }
+
+    public Integer getActivityCost() {
+        return activityCost;
+    }
+
+    public void setActivityCost(Integer activityCost) {
+        this.activityCost = activityCost;
+    }
+
+    public String getActivityCostDescription() {
+        return activityCostDescription;
+    }
+
+    public void setActivityCostDescription(String activityCostDescription) {
+        this.activityCostDescription = activityCostDescription;
+    }
+
+    public String getContactInfo() {
+        return contactInfo;
+    }
+
+    public void setContactInfo(String contactInfo) {
+        this.contactInfo = contactInfo;
+    }
+
+    public String getContactMail() {
+        return contactMail;
+    }
+
+    public void setContactMail(String contactMail) {
+        this.contactMail = contactMail;
+    }
+
+    public String getContactPhone() {
+        return contactPhone;
+    }
+
+    public void setContactPhone(String contactPhone) {
+        this.contactPhone = contactPhone;
     }
 }

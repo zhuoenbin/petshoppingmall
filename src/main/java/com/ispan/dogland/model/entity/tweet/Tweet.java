@@ -26,7 +26,7 @@ public class Tweet {
     private Date postDate;
     private Integer tweetStatus;
     private Integer numReport;
-    @OneToMany(mappedBy = "tweet",cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "tweet",cascade = {CascadeType.PERSIST, CascadeType.MERGE,
                                              CascadeType.DETACH, CascadeType.REFRESH})
     private List<TweetGallery> tweetGalleries;
 

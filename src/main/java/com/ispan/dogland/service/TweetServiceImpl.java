@@ -2,15 +2,13 @@ package com.ispan.dogland.service;
 
 import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.UserRepository;
-import com.ispan.dogland.model.dao.tweet.TweetFollowListRepository;
-import com.ispan.dogland.model.dao.tweet.TweetGalleryRepository;
-import com.ispan.dogland.model.dao.tweet.TweetLikeRepository;
-import com.ispan.dogland.model.dao.tweet.TweetRepository;
+import com.ispan.dogland.model.dao.tweet.*;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import com.ispan.dogland.model.entity.tweet.TweetFollowList;
 import com.ispan.dogland.model.entity.tweet.TweetLike;
+import com.ispan.dogland.model.entity.tweet.TweetNotification;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +28,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,22 +44,24 @@ public class TweetServiceImpl implements TweetService {
     private TweetLikeRepository tweetLikeRepository;
     private TweetFollowListRepository tweetFollowListRepository;
     private DogRepository dogRepository;
+    private TweetNotificationRepository tweetNotificationRepository;
 
     @Autowired
-    public TweetServiceImpl(TweetRepository tweetRepository, UserRepository userRepository, TweetGalleryRepository tweetGalleryRepository, TweetLikeRepository tweetLikeRepository,TweetFollowListRepository tweetFollowListRepository,DogRepository dogRepository) {
+    public TweetServiceImpl(TweetRepository tweetRepository, UserRepository userRepository, TweetGalleryRepository tweetGalleryRepository, TweetLikeRepository tweetLikeRepository,TweetFollowListRepository tweetFollowListRepository,DogRepository dogRepository,TweetNotificationRepository tweetNotificationRepository) {
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
         this.tweetGalleryRepository = tweetGalleryRepository;
         this.tweetLikeRepository = tweetLikeRepository;
         this.tweetFollowListRepository = tweetFollowListRepository;
         this.dogRepository = dogRepository;
+        this.tweetNotificationRepository = tweetNotificationRepository;
     }
 
     @Override
     public List<Tweet> findTweetsByUserId(Integer userId) {
         Users tmp = userRepository.findByUserId(userId);
         if (tmp != null) {
-            return tweetRepository.findByUserId(userId);
+            return tweetRepository.findTweetsByUserId(userId);
         }
         return null;
     }
@@ -233,6 +234,66 @@ public class TweetServiceImpl implements TweetService {
             }
         }
         return null;
+    }
+
+    @Override
+    public void sendPostTweetNotificationToFollower(Integer userId, Integer tweetId) {
+        List<TweetNotification> res = new ArrayList<>();
+        Users user = userRepository.findByUserId(userId);
+        String userName = user.getLastName();
+
+        List<TweetFollowList> li = tweetFollowListRepository.findByUserId(userId);
+
+        for(TweetFollowList t:li){
+            TweetNotification tweetNotification = new TweetNotification();
+
+            tweetNotification.setPostTime(new Date());
+            tweetNotification.setUserId(t.getFollwerId());
+            tweetNotification.setContent(userName+"發布新推文囉~快去看看!!!");
+            tweetNotification.setIsRead(0);
+            tweetNotification.setTweetId(tweetId);
+            tweetNotificationRepository.save(tweetNotification);
+        }
+
+    }
+
+    @Override
+    public void sendReplyNotificationToTweetOwner(Integer hisUserId, Integer hisTweetId,String myName) {
+        TweetNotification tweetNotification = new TweetNotification();
+
+        tweetNotification.setPostTime(new Date());
+        tweetNotification.setUserId(hisUserId);
+        tweetNotification.setContent(myName+"回覆你的推文囉~ 快去看看!!!");
+        tweetNotification.setIsRead(0);
+        tweetNotification.setTweetId(hisTweetId);
+        tweetNotificationRepository.save(tweetNotification);
+    }
+
+    @Override
+    public void sendLikeNotificationToTweetOwner(Integer hisUserId, Integer hisTweetId, String myName) {
+        List<TweetNotification> tnfs = tweetNotificationRepository.findByUserIdAndTweetId(hisUserId, hisTweetId);
+
+        if(tnfs!=null){
+            for(TweetNotification tnf:tnfs){
+                String notificationContent = tnf.getContent();
+                if(notificationContent.equals(myName+"對你的貼文看讚~ 快去看看!!!")){
+                    return;
+                }
+            }
+        }
+        TweetNotification tweetNotification = new TweetNotification();
+
+        tweetNotification.setPostTime(new Date());
+        tweetNotification.setUserId(hisUserId);
+        tweetNotification.setContent(myName+"對你的貼文看讚~ 快去看看!!!");
+        tweetNotification.setIsRead(0);
+        tweetNotification.setTweetId(hisTweetId);
+        tweetNotificationRepository.save(tweetNotification);
+    }
+
+    @Override
+    public List<TweetNotification> findMyTweetNotifications(Integer userId) {
+        return tweetNotificationRepository.findByUserId(userId);
     }
 
 

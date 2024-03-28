@@ -9,6 +9,7 @@ import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import com.ispan.dogland.model.entity.tweet.TweetGallery;
+import com.ispan.dogland.model.entity.tweet.TweetNotification;
 import com.ispan.dogland.service.interfaceFile.AccountService;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,10 +97,9 @@ public class TweetController {
             tweet.addTweetGallery(tweetGallery);
             Tweet tweet1 = tweetService.postNewTweet(tweet, memberId);
 
+            //狗的tags
             if(!dogList.isEmpty()){
                 Integer tweetId =  tweet1.getTweetId();
-                System.out.println("tweetId: "+tweetId);
-
                 for (Integer dogId : dogList) {
                     Tweet b = tweetRepository.findTweetAndDogsByTweetIdByLEFTJOIN(tweetId);
                     Dog c = dogRepository.findByDogId(dogId);
@@ -107,6 +107,9 @@ public class TweetController {
                     Tweet b2 = tweetRepository.save(b);
                 }
             }
+
+            //發送通知
+            tweetService.sendPostTweetNotificationToFollower(memberId, tweet1.getTweetId());
         }
         return ResponseEntity.ok("Tweet posted successfully");
     }
@@ -125,10 +128,10 @@ public class TweetController {
                 tweet.setTweetContent(tweetContent);
             }
             Tweet tweet1 = tweetService.postNewTweet(tweet, memberId);
+
+            //狗的tags
             if(!dogList.isEmpty()){
                 Integer tweetId =  tweet1.getTweetId();
-                System.out.println("tweetId: "+tweetId);
-
                 for (Integer dogId : dogList) {
 			        Tweet b = tweetRepository.findTweetAndDogsByTweetIdByLEFTJOIN(tweetId);
 			        Dog c = dogRepository.findByDogId(dogId);
@@ -136,6 +139,11 @@ public class TweetController {
 			        Tweet b2 = tweetRepository.save(b);
                 }
             }
+
+            //發送通知
+            tweetService.sendPostTweetNotificationToFollower(memberId, tweet1.getTweetId());
+
+
         }
         return ResponseEntity.ok("Tweet posted successfully");
     }
@@ -218,10 +226,7 @@ public class TweetController {
     //使用者按讚，使用者與like建立連結
     @PostMapping("/getLikeLink")
     public String likeTweet(@RequestParam Integer userId, @RequestParam Integer tweetId) {
-        System.out.println("userId: " + userId + " tweetId: " + tweetId);
-
         tweetService.createLinkWithTweetAndLike(tweetId, userId);
-
         return "Liked successfully!";
     }
 
@@ -236,7 +241,6 @@ public class TweetController {
     //回覆貼文(純文字)
     @PostMapping("/replyTweet")
     public String replyTweet(@RequestParam Integer tweetId, @RequestParam Integer memberId, @RequestParam String tweetContent) {
-        System.out.println("tweetId: " + tweetId + " memberId: " + memberId + " tweetContent: " + tweetContent);
         Tweet tweet = new Tweet();
         tweet.setPreNode(tweetId);
         tweet.setPostDate(new Date());
@@ -251,9 +255,12 @@ public class TweetController {
     @PostMapping("/checkFollerRelationship")
     public Map<String, Object> checkFollowerRelationship(@RequestBody Map<String, String> request) {
         String myId = (String) request.get("myId");
-        String tweetUserName = (String) request.get("tweetUserName");
+        String tweetId = (String) request.get("tweetUserId");
+
         Integer myIntegerId = Integer.parseInt(myId);
-        Users user = accountService.findUsersByLastName(tweetUserName);
+        Integer tweetUserIntegerId = Integer.parseInt(tweetId);
+
+        Users user = accountService.findUsersByTweetId(tweetUserIntegerId);
         boolean isFollowing = tweetService.checkIsFollow(myIntegerId, user.getUserId());
         Map<String, Object> response = new HashMap<>();
         response.put("isFollowing", isFollowing);
@@ -303,5 +310,30 @@ public class TweetController {
     public List<Dog> getTweetDogTags(@PathVariable Integer tweetId) {
         return tweetService.findTweetDogsByTweetId(tweetId);
 
+    }
+
+    @GetMapping("/getMyNotify/{userId}")
+    public List<TweetNotification> getMyNotify(@PathVariable Integer userId) {
+        return tweetService.findMyTweetNotifications(userId);
+    }
+
+    @GetMapping("/sendReplyNotify")
+    public String sendReplyNotify(
+            @RequestParam("hisUserId") Integer hisUserId,
+            @RequestParam("hisTweetId") Integer hisTweetId,
+            @RequestParam("myName") String myName
+    ) {
+        tweetService.sendReplyNotificationToTweetOwner(hisUserId,hisTweetId,myName);
+        return "Notification sent successfully";
+    }
+
+    @GetMapping("/sendLikeNotify")
+    public String sendLikeNotify(
+            @RequestParam("hisUserId") Integer hisUserId,
+            @RequestParam("hisTweetId") Integer hisTweetId,
+            @RequestParam("myName") String myName
+    ) {
+        tweetService.sendLikeNotificationToTweetOwner(hisUserId,hisTweetId,myName);
+        return "Notification sent successfully";
     }
 }

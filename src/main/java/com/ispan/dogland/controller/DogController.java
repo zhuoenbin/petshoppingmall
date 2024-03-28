@@ -22,6 +22,9 @@ public class DogController {
     public List<Dog> getDogs(@PathVariable Integer userId) {
         Users user = dogService.findUserAndDogsByUserId(userId);
         List<Dog> dogs = user.getDogs();
+        if(dogs.isEmpty()){
+            return null;
+        }
         return dogs;
     }
 

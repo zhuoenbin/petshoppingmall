@@ -4,6 +4,7 @@ import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import com.ispan.dogland.model.entity.tweet.TweetFollowList;
+import com.ispan.dogland.model.entity.tweet.TweetNotification;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,4 +54,14 @@ public interface TweetService {
     public Tweet addDogToTweet(Integer dogId, Integer tweetId);
 
     public Tweet removeDogFromTweet(Integer dogId, Integer tweetId);
+
+    public void sendPostTweetNotificationToFollower(Integer userId,Integer tweetId);
+
+    public void sendReplyNotificationToTweetOwner(Integer hisUserId,Integer hisTweetId,String myName);
+
+    public void sendLikeNotificationToTweetOwner(Integer hisUserId,Integer hisTweetId,String myName);
+
+    public List<TweetNotification> findMyTweetNotifications(Integer userId);
+
+
 }

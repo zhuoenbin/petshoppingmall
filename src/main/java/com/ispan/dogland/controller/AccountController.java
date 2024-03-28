@@ -176,7 +176,6 @@ public class AccountController {
     @PostMapping("/account/update")
     public ResponseEntity<String> updateAccount(@RequestBody Users user,HttpSession session) {
 
-        System.out.println("back is: "+user.toString());
         Users realUser = accountService.getUserDetailById(user.getUserId());
         realUser.setLastName(user.getLastName());
         realUser.setBirthDate(user.getBirthDate());

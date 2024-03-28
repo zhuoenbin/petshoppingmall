@@ -12,7 +12,6 @@ public interface TweetFollowListRepository extends JpaRepository<TweetFollowList
     @Query("SELECT t FROM TweetFollowList t WHERE t.userId = ?1 AND t.follwerId = ?2")
     TweetFollowList findByMyUserIdAndOtherUserId(Integer userId,Integer followerId);
 
-
     @Transactional
     void deleteByUserIdAndFollwerId(Integer userId,Integer follwerId);
 

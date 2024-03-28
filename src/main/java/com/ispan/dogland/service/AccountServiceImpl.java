@@ -167,4 +167,14 @@ public class AccountServiceImpl implements AccountService {
             throw new RuntimeException("Image uploading fail !!");
         }
     }
+
+    @Override
+    public Users findUsersByUserId(Integer userId) {
+        return usersRepository.findByUserId(userId);
+    }
+
+    @Override
+    public Users findUsersByTweetId(Integer tweetId) {
+        return usersRepository.findUserByTweetId(tweetId);
+    }
 }

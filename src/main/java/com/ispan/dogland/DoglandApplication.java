@@ -6,16 +6,15 @@ import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dao.product.ProductRepository;
 import com.ispan.dogland.model.dao.tweet.TweetFollowListRepository;
 import com.ispan.dogland.model.dao.tweet.TweetLikeRepository;
+import com.ispan.dogland.model.dao.tweet.TweetNotificationRepository;
 import com.ispan.dogland.model.dao.tweet.TweetRepository;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductGallery;
-import com.ispan.dogland.model.entity.tweet.Tweet;
-import com.ispan.dogland.model.entity.tweet.TweetFollowList;
-import com.ispan.dogland.model.entity.tweet.TweetGallery;
-import com.ispan.dogland.model.entity.tweet.TweetLike;
+import com.ispan.dogland.model.entity.tweet.*;
+import com.ispan.dogland.service.interfaceFile.AccountService;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -47,29 +46,12 @@ public class DoglandApplication {
 											   ProductRepository productRepository,
 											   TweetService tweetService,
 											   TweetLikeRepository tweetLikeRepository,
-											   TweetFollowListRepository tweetFollowListRepository) {
+											   TweetFollowListRepository tweetFollowListRepository,
+											   TweetNotificationRepository tweetNotificationRepository, AccountService accountService) {
 		return runner -> {
 
 
-			//新增功能
-//			Tweet b = tweetRepository.findTweetAndDogsByTweetIdByLEFTJOIN(50);
-//			Dog c = dogRepository.findByDogId(22);
-//			b.addDog(c);
-//			Tweet b2 = tweetRepository.save(b);
 
-			//移除功能
-//			Tweet b = tweetRepository.findTweetAndDogsByTweetId(50);
-//			if(b != null){
-//				List<Dog> dogs = b.getDogs();
-//				for(Dog d : dogs){
-//					if(d.getDogId()==24){
-//						dogs.remove(d);
-//						tweetRepository.save(b);
-//					}
-//				}
-//			}else{
-//				System.out.println("no");
-//			}
 
 
 

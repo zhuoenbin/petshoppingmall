@@ -27,21 +27,25 @@ public class Tweet {
     private Date postDate;
     private Integer tweetStatus;
     private Integer numReport;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "tweet",cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-                                             CascadeType.DETACH, CascadeType.REFRESH})
+    @OneToMany(fetch = FetchType.LAZY,
+               mappedBy = "tweet",
+               cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                          CascadeType.DETACH, CascadeType.REFRESH})
     private List<TweetGallery> tweetGalleries;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-                CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.LAZY,
+                cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                           CascadeType.DETACH, CascadeType.REFRESH})
     @JoinTable(name="tweet_like", joinColumns = @JoinColumn(name="tweet_id"),
-            inverseJoinColumns = @JoinColumn(name="user_id"))
+                                  inverseJoinColumns = @JoinColumn(name="user_id"))
     @JsonIgnore
     private List<Users> userLikes;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.LAZY,
+                cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                           CascadeType.DETACH, CascadeType.REFRESH})
     @JoinTable(name="tweet_tag_dog", joinColumns = @JoinColumn(name="tweet_id"),
-            inverseJoinColumns = @JoinColumn(name="dog_id"))
+                                     inverseJoinColumns = @JoinColumn(name="dog_id"))
     private List<Dog> dogs;
 
     public Tweet() {

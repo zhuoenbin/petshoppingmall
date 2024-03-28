@@ -42,13 +42,14 @@ public class VenueActivity {
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private Date activityUpdateDate;
-    @Column(columnDefinition = "VARCHAR(20) DEFAULT '活動中'")
+    @Column(columnDefinition = "VARCHAR(20) DEFAULT '報名中'")
     private String activityStatus;
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private Date activityClosingDate;
     private Integer activityDogNumber;
     private Integer currentDogNumber;
+    private Integer currentUserNumber;
     private Integer activityCost;
     private String activityCostDescription;
     private String contactInfo;
@@ -80,9 +81,10 @@ public class VenueActivity {
             activityListedDate = new Date();
             activityUpdateDate = new Date();
             if(activityStatus==null){
-                activityStatus="活動中";
+                activityStatus="報名中";
                 if(currentDogNumber==null){
                     currentDogNumber=0;
+                    currentUserNumber=0;
                 }
             }
         }
@@ -91,6 +93,33 @@ public class VenueActivity {
     @PreUpdate
     public void onUpdate() {
         activityUpdateDate = new Date();
+        Date currentTime = new Date();
+        if(currentTime.before(activityClosingDate)){
+            if(currentDogNumber>=activityDogNumber){
+                activityStatus="已額滿";
+            }else{
+                activityStatus="報名中";
+            }
+        }else if(currentTime.after(activityClosingDate)&&currentTime.before(activityDate)){
+            activityStatus="報名截止";
+        }else{
+            activityStatus="活動已結束";
+        }
+    }
+    @PostLoad
+    public void checkVenueAfterLoad(){
+        Date currentTime = new Date();
+        if(currentTime.before(activityClosingDate)){
+            if(currentDogNumber>=activityDogNumber){
+                activityStatus="已額滿";
+            }else{
+                activityStatus="報名中";
+            }
+        }else if(currentTime.after(activityClosingDate)&&currentTime.before(activityDate)){
+            activityStatus="報名截止";
+        }else{
+            activityStatus="活動已結束";
+        }
     }
 
     ///////////////////////////////////
@@ -305,5 +334,13 @@ public class VenueActivity {
 
     public void setActivityDogJoinedList(List<ActivityDogJoined> activityDogJoinedList) {
         this.activityDogJoinedList = activityDogJoinedList;
+    }
+
+    public Integer getCurrentUserNumber() {
+        return currentUserNumber;
+    }
+
+    public void setCurrentUserNumber(Integer currentUserNumber) {
+        this.currentUserNumber = currentUserNumber;
     }
 }

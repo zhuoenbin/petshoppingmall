@@ -109,6 +109,7 @@ public class ActivityController {
         return activityService.findActivityByPage(pageNumber);
     }
 
+
     //===============查詢使用者的狗===================
     @GetMapping("/searchUsersDog/{userId}")
     public List<Dog> findUserDogs(@PathVariable Integer userId){
@@ -121,21 +122,28 @@ public class ActivityController {
                                         @RequestParam String note,
                                         @RequestParam Integer[] dogIdList,
                                         @RequestParam Integer activityId){
-        ActivityUserJoined userJoined = activityService.userApply(userId, note,activityId);
-        List<ApplyData> joinedMembers=new ArrayList<>();
-        for(Integer dogId:dogIdList){
-            ActivityDogJoined dogJoined = activityService.dogApply(dogId, activityId);
-            ApplyData applyData = new ApplyData();
-            BeanUtils.copyProperties(userJoined,applyData);
-            BeanUtils.copyProperties(dogJoined,applyData);
-            applyData.setUserId(userJoined.getUser().getUserId());
-            applyData.setActivityId(dogJoined.getVenueActivity().getActivityId());
-            applyData.setActivityDate(dogJoined.getVenueActivity().getActivityDate());
-            applyData.setDogName(dogJoined.getDog().getDogName());
-            applyData.setActivityTitle(dogJoined.getVenueActivity().getActivityTitle());
-            joinedMembers.add(applyData);
+        VenueActivity activity = activityService.findActivityByActivityId(activityId);
+        Integer activityDogNumber = activity.getActivityDogNumber();
+        Integer currentDogNumber = activity.getCurrentDogNumber();
+        Integer length = dogIdList.length;
+        if(activityDogNumber>=currentDogNumber+length){
+            ActivityUserJoined userJoined = activityService.userApply(userId, note,activityId);
+            List<ApplyData> joinedMembers=new ArrayList<>();
+            for(Integer dogId:dogIdList){
+                ActivityDogJoined dogJoined = activityService.dogApply(dogId, activityId);
+                ApplyData applyData = new ApplyData();
+                BeanUtils.copyProperties(userJoined,applyData);
+                BeanUtils.copyProperties(dogJoined,applyData);
+                applyData.setUserId(userJoined.getUser().getUserId());
+                applyData.setActivityId(dogJoined.getVenueActivity().getActivityId());
+                applyData.setActivityDate(dogJoined.getVenueActivity().getActivityDate());
+                applyData.setDogName(dogJoined.getDog().getDogName());
+                applyData.setActivityTitle(dogJoined.getVenueActivity().getActivityTitle());
+                joinedMembers.add(applyData);
+            }
+            return joinedMembers;
         }
-        return joinedMembers;
+        throw new RuntimeException("超過狗數限制 !!");
     }
 
 

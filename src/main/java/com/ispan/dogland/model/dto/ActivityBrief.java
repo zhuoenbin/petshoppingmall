@@ -28,7 +28,10 @@ public class ActivityBrief {
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private Date activityClosingDate;
+    private Integer activityDogNumber;
     private Integer currentDogNumber;
+
+    private Integer currentUserNumber;
     private String galleryImgUrl;
 
     public Integer getActivityId() {
@@ -125,5 +128,21 @@ public class ActivityBrief {
 
     public void setGalleryImgUrl(String galleryImgUrl) {
         this.galleryImgUrl = galleryImgUrl;
+    }
+
+    public Integer getCurrentUserNumber() {
+        return currentUserNumber;
+    }
+
+    public void setCurrentUserNumber(Integer currentUserNumber) {
+        this.currentUserNumber = currentUserNumber;
+    }
+
+    public Integer getActivityDogNumber() {
+        return activityDogNumber;
+    }
+
+    public void setActivityDogNumber(Integer activityDogNumber) {
+        this.activityDogNumber = activityDogNumber;
     }
 }

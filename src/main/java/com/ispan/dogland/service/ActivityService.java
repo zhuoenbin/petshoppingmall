@@ -296,6 +296,9 @@ public class ActivityService {
     }
 
     //===============使用者與狗狗報名活動===============
+    public VenueActivity findActivityByActivityId(Integer activityId){
+        return activityRepository.findByActivityId(activityId);
+    }
     public ActivityUserJoined userApply(Integer userId, String note,Integer activityId){
         Users user = userRepository.findByUserId(userId);
         VenueActivity activity = activityRepository.findByActivityId(activityId);
@@ -304,6 +307,9 @@ public class ActivityService {
         userJoined.setUserNote(note);
         userJoined.setUser(user);
         userJoined.setVenueActivity(activity);
+
+        activity.setCurrentUserNumber(activity.getCurrentUserNumber()+1);
+        activityRepository.save(activity);
         return userJoinedRepository.save(userJoined);
     }
 
@@ -311,10 +317,23 @@ public class ActivityService {
         Dog dog = dogRepository.findByDogId(dogId);
         VenueActivity activity = activityRepository.findByActivityId(activityId);
 
-        ActivityDogJoined dogJoined = new ActivityDogJoined();
-        dogJoined.setDog(dog);
-        dogJoined.setVenueActivity(activity);
-        return dogJoinedRepository.save(dogJoined);
+        if(activity.getActivityDogNumber()>activity.getCurrentDogNumber()){
+            ActivityDogJoined dogJoined = new ActivityDogJoined();
+            dogJoined.setDog(dog);
+            dogJoined.setVenueActivity(activity);
+
+            activity.setCurrentDogNumber(activity.getCurrentDogNumber()+1);
+            //判斷加完有沒有額滿
+            if(activity.getCurrentDogNumber()==activity.getActivityDogNumber()){
+                activity.setActivityStatus("已額滿");
+            }
+            activityRepository.save(activity);
+            return dogJoinedRepository.save(dogJoined);
+        }else{
+            throw new RuntimeException("超過狗數限制 !!");
+        }
+
+
     }
 
 

@@ -14,25 +14,18 @@ import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.activity.*;
 
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -300,6 +293,47 @@ public class ActivityService {
     public List<Dog> findUsersDog(Integer userId){
         Users user = userRepository.findByUserId(userId);
         return dogRepository.findByUser(user);
+    }
+
+    //===============使用者與狗狗報名活動===============
+    public VenueActivity findActivityByActivityId(Integer activityId){
+        return activityRepository.findByActivityId(activityId);
+    }
+    public ActivityUserJoined userApply(Integer userId, String note,Integer activityId){
+        Users user = userRepository.findByUserId(userId);
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+
+        ActivityUserJoined userJoined = new ActivityUserJoined();
+        userJoined.setUserNote(note);
+        userJoined.setUser(user);
+        userJoined.setVenueActivity(activity);
+
+        activity.setCurrentUserNumber(activity.getCurrentUserNumber()+1);
+        activityRepository.save(activity);
+        return userJoinedRepository.save(userJoined);
+    }
+
+    public ActivityDogJoined dogApply(Integer dogId,Integer activityId){
+        Dog dog = dogRepository.findByDogId(dogId);
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+
+        if(activity.getActivityDogNumber()>activity.getCurrentDogNumber()){
+            ActivityDogJoined dogJoined = new ActivityDogJoined();
+            dogJoined.setDog(dog);
+            dogJoined.setVenueActivity(activity);
+
+            activity.setCurrentDogNumber(activity.getCurrentDogNumber()+1);
+            //判斷加完有沒有額滿
+            if(activity.getCurrentDogNumber()==activity.getActivityDogNumber()){
+                activity.setActivityStatus("已額滿");
+            }
+            activityRepository.save(activity);
+            return dogJoinedRepository.save(dogJoined);
+        }else{
+            throw new RuntimeException("超過狗數限制 !!");
+        }
+
+
     }
 
 

@@ -11,7 +11,7 @@ import java.util.Date;
 public class ActivityUserJoined {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int userJoinedId;
+    private Integer userJoinedId;
     @ManyToOne
     @JoinColumn(name = "activity_id")
     private VenueActivity venueActivity;
@@ -35,6 +35,9 @@ public class ActivityUserJoined {
         if(joinedTime==null && updateTime==null) {
             joinedTime=new Date();
             updateTime=new Date();
+            if(joinedStatus==null){
+                joinedStatus="參加";
+            }
         }
     }
 

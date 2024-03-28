@@ -43,6 +43,10 @@ public interface TweetRepository extends JpaRepository<Tweet, Integer> {
     @Query("SELECT t FROM Tweet t LEFT JOIN  t.userLikes WHERE t.tweetId = ?1")
     Tweet findTweetUserLikesByTweetId(Integer tweetId);
 
+    @Query("SELECT t FROM Tweet t  JOIN FETCH t.dogs WHERE t.tweetId = ?1")
+    Tweet findTweetAndDogsByTweetId(Integer tweetId);
 
+    @Query("SELECT t FROM Tweet t  LEFT JOIN FETCH t.dogs WHERE t.tweetId = ?1")
+    Tweet findTweetAndDogsByTweetIdByLEFTJOIN(Integer tweetId);
 
 }

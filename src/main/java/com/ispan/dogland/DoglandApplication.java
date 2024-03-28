@@ -23,6 +23,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -38,6 +39,7 @@ public class DoglandApplication {
 
 	//測試方法
 	@Bean
+	@Transactional
 	public CommandLineRunner commandLineRunner(UserRepository userRepository,
 											   DogRepository dogRepository,
 											   EmployeeRepository employeeRepository,
@@ -47,6 +49,28 @@ public class DoglandApplication {
 											   TweetLikeRepository tweetLikeRepository,
 											   TweetFollowListRepository tweetFollowListRepository) {
 		return runner -> {
+
+
+			//新增功能
+//			Tweet b = tweetRepository.findTweetAndDogsByTweetIdByLEFTJOIN(50);
+//			Dog c = dogRepository.findByDogId(22);
+//			b.addDog(c);
+//			Tweet b2 = tweetRepository.save(b);
+
+			//移除功能
+//			Tweet b = tweetRepository.findTweetAndDogsByTweetId(50);
+//			if(b != null){
+//				List<Dog> dogs = b.getDogs();
+//				for(Dog d : dogs){
+//					if(d.getDogId()==24){
+//						dogs.remove(d);
+//						tweetRepository.save(b);
+//					}
+//				}
+//			}else{
+//				System.out.println("no");
+//			}
+
 
 
 		};

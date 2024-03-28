@@ -1,5 +1,6 @@
 package com.ispan.dogland.service.interfaceFile;
 
+import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import com.ispan.dogland.model.entity.tweet.TweetFollowList;
@@ -17,7 +18,7 @@ public interface TweetService {
 
     public List<Tweet> getAllTweet();
 
-    public boolean postNewTweet(Tweet tweet, Integer userId);
+    public Tweet postNewTweet(Tweet tweet, Integer userId);
 
     public String saveTweetImgToLocal(MultipartFile file);
 
@@ -45,5 +46,11 @@ public interface TweetService {
 
     public List<Tweet> findAllFollowTweetsByUserId(Integer userId);
 
-    List<Users> findAllFollowUsersByUserId(Integer userId);
+    public List<Users> findAllFollowUsersByUserId(Integer userId);
+
+    public List<Dog>  findTweetDogsByTweetId(Integer tweetId);
+
+    public Tweet addDogToTweet(Integer dogId, Integer tweetId);
+
+    public Tweet removeDogFromTweet(Integer dogId, Integer tweetId);
 }

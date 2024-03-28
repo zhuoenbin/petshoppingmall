@@ -1,10 +1,12 @@
 package com.ispan.dogland.service;
 
+import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dao.tweet.TweetFollowListRepository;
 import com.ispan.dogland.model.dao.tweet.TweetGalleryRepository;
 import com.ispan.dogland.model.dao.tweet.TweetLikeRepository;
 import com.ispan.dogland.model.dao.tweet.TweetRepository;
+import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import com.ispan.dogland.model.entity.tweet.TweetFollowList;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +31,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TweetServiceImpl implements TweetService {
@@ -40,14 +44,16 @@ public class TweetServiceImpl implements TweetService {
     private TweetGalleryRepository tweetGalleryRepository;
     private TweetLikeRepository tweetLikeRepository;
     private TweetFollowListRepository tweetFollowListRepository;
+    private DogRepository dogRepository;
 
     @Autowired
-    public TweetServiceImpl(TweetRepository tweetRepository, UserRepository userRepository, TweetGalleryRepository tweetGalleryRepository, TweetLikeRepository tweetLikeRepository,TweetFollowListRepository tweetFollowListRepository) {
+    public TweetServiceImpl(TweetRepository tweetRepository, UserRepository userRepository, TweetGalleryRepository tweetGalleryRepository, TweetLikeRepository tweetLikeRepository,TweetFollowListRepository tweetFollowListRepository,DogRepository dogRepository) {
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
         this.tweetGalleryRepository = tweetGalleryRepository;
         this.tweetLikeRepository = tweetLikeRepository;
         this.tweetFollowListRepository = tweetFollowListRepository;
+        this.dogRepository = dogRepository;
     }
 
     @Override
@@ -82,16 +88,16 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
-    public boolean postNewTweet(Tweet tweet, Integer userId) {
+    public Tweet postNewTweet(Tweet tweet, Integer userId) {
         Users user = userRepository.findByUserId(userId);
         if (user != null) {
             tweet.setUserName(user.getLastName());
             Tweet t = tweetRepository.save(tweet); //into DB
             t.setUser(user);
-            tweetRepository.save(t);
-            return true;
+            Tweet t1 = tweetRepository.save(t);
+            return t1;
         }
-        return false;
+        return null;
     }
 
     @Override
@@ -195,4 +201,39 @@ public class TweetServiceImpl implements TweetService {
         }
         return totalUsers;
     }
+
+    @Override
+    public List<Dog> findTweetDogsByTweetId(Integer tweetId) {
+        Tweet a = tweetRepository.findTweetAndDogsByTweetId(tweetId);
+        if(a != null){
+            return a.getDogs();
+        }
+        return null;
+    }
+
+    @Override
+    public Tweet addDogToTweet(Integer dogId, Integer tweetId) {
+        Tweet b = tweetRepository.findTweetAndDogsByTweetIdByLEFTJOIN(tweetId);
+        Dog c = dogRepository.findByDogId(dogId);
+        b.addDog(c);
+        return tweetRepository.save(b);
+    }
+
+    @Override
+    public Tweet removeDogFromTweet(Integer dogId, Integer tweetId) {
+        Tweet b = tweetRepository.findTweetAndDogsByTweetId(tweetId);
+        if(b != null){
+            List<Dog> dogs = b.getDogs();
+            for(Dog d : dogs){
+                if(Objects.equals(d.getDogId(), dogId)){
+                    dogs.remove(d);
+                    tweetRepository.save(b);
+                    return b;
+                }
+            }
+        }
+        return null;
+    }
+
+
 }

@@ -1,8 +1,11 @@
 package com.ispan.dogland.controller;
 
 
+import com.ispan.dogland.model.dao.DogRepository;
+import com.ispan.dogland.model.dao.tweet.TweetRepository;
 import com.ispan.dogland.model.dto.TweetDto;
 import com.ispan.dogland.model.dto.TweetLikesCheckResponse;
+import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import com.ispan.dogland.model.entity.tweet.TweetGallery;
@@ -30,6 +33,10 @@ import java.util.*;
 @RequestMapping("/tweet")
 public class TweetController {
 
+    @Autowired
+    private DogRepository dogRepository;
+    @Autowired
+    private TweetRepository tweetRepository;
 
     private TweetService tweetService;
 
@@ -65,7 +72,8 @@ public class TweetController {
     @PostMapping("/postTweetWithPhoto")
     public ResponseEntity<String> postTweet(@RequestParam Integer memberId,
                                             @RequestParam String tweetContent,
-                                            @RequestParam("image") MultipartFile file) {
+                                            @RequestParam("image") MultipartFile file,
+                                            @RequestParam List<Integer> dogList) {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("Image file is empty");
         }
@@ -86,14 +94,25 @@ public class TweetController {
                 tweet.setTweetContent(tweetContent);
             }
             tweet.addTweetGallery(tweetGallery);
-            tweetService.postNewTweet(tweet, memberId);
+            Tweet tweet1 = tweetService.postNewTweet(tweet, memberId);
+
+            if(!dogList.isEmpty()){
+                Integer tweetId =  tweet1.getTweetId();
+                System.out.println("tweetId: "+tweetId);
+
+                for (Integer dogId : dogList) {
+                    Tweet b = tweetRepository.findTweetAndDogsByTweetIdByLEFTJOIN(tweetId);
+                    Dog c = dogRepository.findByDogId(dogId);
+                    b.addDog(c);
+                    Tweet b2 = tweetRepository.save(b);
+                }
+            }
         }
         return ResponseEntity.ok("Tweet posted successfully");
     }
 
     @PostMapping("/postTweetOnlyText")
-    public ResponseEntity<String> postTweetOnlyText(@RequestParam Integer memberId, @RequestParam String tweetContent) {
-
+    public ResponseEntity<String> postTweetOnlyText(@RequestParam Integer memberId, @RequestParam String tweetContent,@RequestParam List<Integer> dogList) {
         if (memberId != null) {
             Users user = accountService.getUserDetailById(memberId);
             Tweet tweet = new Tweet();
@@ -105,7 +124,18 @@ public class TweetController {
             if (tweetContent != null) {
                 tweet.setTweetContent(tweetContent);
             }
-            tweetService.postNewTweet(tweet, memberId);
+            Tweet tweet1 = tweetService.postNewTweet(tweet, memberId);
+            if(!dogList.isEmpty()){
+                Integer tweetId =  tweet1.getTweetId();
+                System.out.println("tweetId: "+tweetId);
+
+                for (Integer dogId : dogList) {
+			        Tweet b = tweetRepository.findTweetAndDogsByTweetIdByLEFTJOIN(tweetId);
+			        Dog c = dogRepository.findByDogId(dogId);
+			        b.addDog(c);
+			        Tweet b2 = tweetRepository.save(b);
+                }
+            }
         }
         return ResponseEntity.ok("Tweet posted successfully");
     }
@@ -266,5 +296,12 @@ public class TweetController {
     @GetMapping("/getMyFollowUsers")
     public List<Users> getMyFollowUsers(@RequestParam Integer userId) {
         return tweetService.findAllFollowUsersByUserId(userId);
+    }
+
+
+    @GetMapping("/getTweetDogTags/{tweetId}")
+    public List<Dog> getTweetDogTags(@PathVariable Integer tweetId) {
+        return tweetService.findTweetDogsByTweetId(tweetId);
+
     }
 }

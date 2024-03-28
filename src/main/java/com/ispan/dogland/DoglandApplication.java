@@ -3,21 +3,17 @@ package com.ispan.dogland;
 import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
-import com.ispan.dogland.model.dao.forum.ArticleCategoryRepository;
-import com.ispan.dogland.model.dao.forum.ArticleCommentRepository;
-import com.ispan.dogland.model.dao.forum.ArticleRepository;
 import com.ispan.dogland.model.dao.product.ProductRepository;
+import com.ispan.dogland.model.dao.tweet.TweetFollowListRepository;
 import com.ispan.dogland.model.dao.tweet.TweetLikeRepository;
 import com.ispan.dogland.model.dao.tweet.TweetRepository;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
-import com.ispan.dogland.model.entity.forum.ArticleCategory;
-import com.ispan.dogland.model.entity.forum.ArticleComments;
-import com.ispan.dogland.model.entity.forum.Articles;
 import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductGallery;
 import com.ispan.dogland.model.entity.tweet.Tweet;
+import com.ispan.dogland.model.entity.tweet.TweetFollowList;
 import com.ispan.dogland.model.entity.tweet.TweetGallery;
 import com.ispan.dogland.model.entity.tweet.TweetLike;
 import com.ispan.dogland.service.interfaceFile.TweetService;
@@ -49,9 +45,7 @@ public class DoglandApplication {
 											   ProductRepository productRepository,
 											   TweetService tweetService,
 											   TweetLikeRepository tweetLikeRepository,
-											   ArticleRepository articleRepository,
-											   ArticleCategoryRepository articleCategoryRepository,
-											   ArticleCommentRepository articleCommentRepository) {
+											   TweetFollowListRepository tweetFollowListRepository) {
 		return runner -> {
 
 

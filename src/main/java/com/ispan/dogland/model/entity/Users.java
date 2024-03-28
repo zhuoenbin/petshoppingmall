@@ -47,10 +47,10 @@ public class Users {
     @OneToMany(mappedBy = "users")
     private List<ShoppingCart> shoppingCarts;
 
-    @OneToMany(fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            mappedBy = "user")
-    private List<Friends> friends;
+//    @OneToMany(fetch = FetchType.LAZY,
+//            cascade = CascadeType.ALL,
+//            mappedBy = "user")
+//    private List<Friends> friends;
 
     @OneToMany(mappedBy = "user",
             cascade = CascadeType.ALL, fetch = FetchType.LAZY)

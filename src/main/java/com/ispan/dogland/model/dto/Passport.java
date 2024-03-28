@@ -61,12 +61,13 @@ public class Passport implements Serializable {
         this.role = role;
     }
 
+
     public String getPhotoUrl() {
         return photoUrl;
     }
 
     public void setPhotoUrl(String photoUrl) {
-        photoUrl = photoUrl;
+        this.photoUrl = photoUrl;
     }
 
     @Override

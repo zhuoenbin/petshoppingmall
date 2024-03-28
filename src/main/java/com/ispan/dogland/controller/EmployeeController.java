@@ -4,10 +4,12 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.ispan.dogland.model.dto.ProductDto;
 import com.ispan.dogland.model.entity.Employee;
+import com.ispan.dogland.model.entity.RoomReservation;
 import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductCategory;
 import com.ispan.dogland.model.entity.product.ProductGalleryCloud;
 import com.ispan.dogland.service.EmployeeService;
+import com.ispan.dogland.service.RoomService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +29,15 @@ import java.util.Map;
 public class EmployeeController {
     @Autowired
     private EmployeeService es;
-
+    @Autowired
+    private RoomService rService;
     @Autowired
     private Cloudinary cloudinary;
+
+    @GetMapping("/room")
+    public List<RoomReservation> reservation(){
+        return rService.findAllRoomReservation();
+    }
 
     @GetMapping("/getCategory")
     public List<ProductCategory> getCategory(){
@@ -61,3 +69,7 @@ public class EmployeeController {
     }
 
 }
+
+
+
+

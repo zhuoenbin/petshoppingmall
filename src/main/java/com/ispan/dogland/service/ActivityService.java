@@ -6,14 +6,12 @@ import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dao.activity.*;
+import com.ispan.dogland.model.dto.ActivityBrief;
 import com.ispan.dogland.model.dto.ActivityData;
 import com.ispan.dogland.model.dto.RentalData;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
-import com.ispan.dogland.model.entity.activity.ActivityType;
-import com.ispan.dogland.model.entity.activity.Venue;
-import com.ispan.dogland.model.entity.activity.VenueActivity;
-import com.ispan.dogland.model.entity.activity.VenueRental;
+import com.ispan.dogland.model.entity.activity.*;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
@@ -32,6 +30,8 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -98,42 +98,39 @@ public class ActivityService {
 
     ///////////////////////場地租借/////////////////////////
     //===============新增場地租借訂單===================
-    public RentalData createRentalOrder(VenueRental venueRental, Integer userId,Integer venueId){
-        RentalData rentalData = new RentalData();
+    public RentalData addNewRental(RentalData rentalData){
+        Integer venueId = rentalData.getVenueId();
+        Integer userId = rentalData.getUserId();
+        Users user = userRepository.findByUserId(userId);
         Venue venue = venueRepository.findByVenueId(venueId);
-        venueRental.setVenue(venue);
-        //使用者訂單
-        if(userId!=null) {
-            Users user = userRepository.findByUserId(userId);
-            venueRental.setUser(user);
+        VenueRental rental = new VenueRental();
+        BeanUtils.copyProperties(rentalData,rental);
+        rental.setUser(user);
+        rental.setVenue(venue);
+        VenueRental save = rentalRepository.save(rental);
 
-            //計算價錢
-            Date rentalEnd = venueRental.getRentalEnd();
-            Date rentalStart = venueRental.getRentalStart();
-            Integer hour= (int)Math.ceil(rentalEnd.getTime() - rentalStart.getTime())/ (1000 * 60 * 60); // 毫秒轉換為小時;
+        RentalData newData = new RentalData();
+        BeanUtils.copyProperties(save,newData);
+        newData.setUserId(save.getUser().getUserId());
+        newData.setVenueId(save.getVenue().getVenueId());
+        return newData;
+    }
+    public RentalData addOfficialRental(RentalData rentalData){
+        Integer venueId = rentalData.getVenueId();
 
-            //取得價目
-            Integer venueRent = venueRental.getVenue().getVenueRent();
-            Integer total=venueRent*hour;
-            venueRental.setRentalTotal(total);
 
-            //存入訂單
-            VenueRental saveCustomer = rentalRepository.save(venueRental);
+        Venue venue = venueRepository.findByVenueId(venueId);
+        VenueRental rental = new VenueRental();
+        BeanUtils.copyProperties(rentalData,rental);
+        rental.setUser(null);
+        rental.setVenue(venue);
+        VenueRental save = rentalRepository.save(rental);
 
-            //存入要給前端的dto
-            BeanUtils.copyProperties(saveCustomer, rentalData);
-            rentalData.setUserId(saveCustomer.getUser().getUserId());
-            rentalData.setVenueId(saveCustomer.getVenue().getVenueId());
-            return rentalData;
-        }
-
-        //官方訂單
-        venueRental.setPaymentStatus(2);
-        venueRental.setRentalTotal(0);
-        VenueRental saveOfficial = rentalRepository.save(venueRental);
-        BeanUtils.copyProperties(saveOfficial,rentalData);
-        rentalData.setVenueId(saveOfficial.getVenue().getVenueId());
-        return rentalData;
+        RentalData newData = new RentalData();
+        BeanUtils.copyProperties(save,newData);
+        newData.setUserId(null);
+        newData.setVenueId(save.getVenue().getVenueId());
+        return newData;
     }
 
     //===============查詢全部場地租借訂單===================
@@ -147,6 +144,8 @@ public class ActivityService {
                 rentalData.setVenueId(r.getVenue().getVenueId());
                 if (r.getUser() != null) {
                     rentalData.setUserId(r.getUser().getUserId());
+                }else{
+                    rentalData.setUserId(0);
                 }
                 return rentalData;
             });
@@ -169,63 +168,129 @@ public class ActivityService {
         });
         return rentalDataList;
     }
+    //===============查詢官方場地租借訂單===================
+    public Page<RentalData> findOfficialRentalByPage(Integer pageNumber){
+        Page<VenueRental> officialRental = rentalRepository.findByUserNull(PageRequest.of(pageNumber, 9));
+        System.out.println(officialRental.getTotalElements());
+        Page<RentalData> rentalDataList=officialRental.map(r->{
+            RentalData rentalData = new RentalData();
+            BeanUtils.copyProperties(r,rentalData);
+            rentalData.setVenueId((r.getVenue().getVenueId()));
+            rentalData.setUserId(0);
+            return rentalData;
+        });
+        return rentalDataList;
+    }
+
 
     ///////////////////////場地活動/////////////////////////
     //===============新增場地活動===================
-    public ActivityData createNewActivity(VenueActivity venueActivity,
-                                          Integer activityTypeId,
-                                          Integer venueId,
-                                          Integer employeeId){
-        ActivityData activityData = new ActivityData();
-
-            Employee employee = employeeRepository.findByEmployeeId(employeeId);
-            ActivityType type = typeRepository.findByActivityTypeId(activityTypeId);
-            Venue venue = venueRepository.findByVenueId(venueId);
-
-            venueActivity.setEmployee(employee);
-            venueActivity.setVenue(venue);
-            venueActivity.setActivityType(type);
-
-            VenueActivity activity = activityRepository.save(venueActivity);
-
-            BeanUtils.copyProperties(activity, activityData);
-            activityData.setEmployeeId(activity.getEmployee().getEmployeeId());
-            activityData.setVenueId(activity.getVenue().getVenueId());
-            activityData.setActivityTypeId(activity.getActivityType().getActivityTypeId());
-            return activityData;
-    }
-    //===============所有活動===============
-    public Page<ActivityData> findActivityByPage(Integer pageNumber){
-        Page<VenueActivity> activities = activityRepository.findAll(PageRequest.of(pageNumber, 9));
-        System.out.println(activities.getTotalElements());
-        Page<ActivityData> activityDataList = activities.map(a -> {
-            ActivityData activityData = new ActivityData();
-            BeanUtils.copyProperties(a, activityData);
-            activityData.setVenueId(a.getVenue().getVenueId());
-            if (a.getEmployee() != null && a.getVenue()!=null &&a.getActivityType()!=null) {
-                activityData.setEmployeeId(a.getEmployee().getEmployeeId());
-                activityData.setVenueId(a.getVenue().getVenueId());
-                activityData.setActivityTypeId(a.getActivityType().getActivityTypeId());
-            }
-            return activityData;
-        });
-        return activityDataList;
-    }
-
-    //===============依類別找活動===============
-    public Page<ActivityData> findActivityByType(Integer typeId,Integer pageNumber){
+    public ActivityData addNewActivity(ActivityData activityData){
+        Integer typeId = activityData.getActivityTypeId();
         ActivityType type = typeRepository.findByActivityTypeId(typeId);
-        Page<VenueActivity> activities = activityRepository.findByActivityType(type,PageRequest.of(pageNumber, 9));
+        Integer employeeId = activityData.getEmployeeId();
+        Employee employee = employeeRepository.findByEmployeeId(employeeId);
+        Integer venueId = activityData.getVenueId();
+        Venue venue = venueRepository.findByVenueId(venueId);
+        VenueActivity activity = new VenueActivity();
+        BeanUtils.copyProperties(activityData,activity);
+        activity.setEmployee(employee);
+        activity.setVenue(venue);
+        activity.setActivityType(type);
+        VenueActivity save = activityRepository.save(activity);
+
+        ActivityData newData = new ActivityData();
+        BeanUtils.copyProperties(save,newData);
+        newData.setActivityId(save.getActivityId());
+        newData.setEmployeeId(save.getEmployee().getEmployeeId());
+        newData.setActivityTypeId(save.getActivityType().getActivityTypeId());
+        newData.setVenueId(save.getVenue().getVenueId());
+        return  newData;
+    }
+    //===============新增活動照片===================
+    public ActivityGallery addTitleImg(MultipartFile file,Integer activityId){
+        //上傳到producutFolder裡
+        try {
+            Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "activityFolder"));
+            VenueActivity activity = activityRepository.findByActivityId(activityId);
+
+            ActivityGallery gallery = new ActivityGallery();
+            gallery.setVenueActivity(activity);
+            gallery.setGalleryImgUrl((String) data.get("url"));
+            gallery.setGalleryPublicId((String) data.get("public_id"));
+            gallery.setGalleryImgType("main");
+
+            System.out.println("活動id: "+activityId+" 的主題照片上傳成功!");
+
+            activity.setActivityUpdateDate(new Date());
+            activityRepository.save(activity);
+
+            return galleryRepository.save(gallery);
+        } catch (IOException e) {
+            throw new RuntimeException("Image uploading fail !!");
+        }
+    }
+
+    public ActivityGallery addNormalImg(MultipartFile file,Integer activityId){
+        //上傳到producutFolder裡
+        try {
+            Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "activityFolder"));
+            VenueActivity activity = activityRepository.findByActivityId(activityId);
+
+            ActivityGallery gallery = new ActivityGallery();
+            gallery.setVenueActivity(activity);
+            gallery.setGalleryImgUrl((String) data.get("url"));
+            gallery.setGalleryPublicId((String) data.get("public_id"));
+            gallery.setGalleryImgType(null);
+
+            System.out.println("活動id: "+activityId+" 的其他說明照片上傳成功!");
+
+            activity.setActivityUpdateDate(new Date());
+            activityRepository.save(activity);
+
+            return galleryRepository.save(gallery);
+        } catch (IOException e) {
+            throw new RuntimeException("Image uploading fail !!");
+        }
+    }
+
+    //===============所有活動簡述===============
+    public Page<ActivityBrief> findActivityByPage(Integer pageNumber){
+        Page<VenueActivity> all = activityRepository.findAll(PageRequest.of(pageNumber-1, 4));
+
+        Page<ActivityBrief> briefs = all.map(a->{
+            ActivityBrief ab = new ActivityBrief();
+            BeanUtils.copyProperties(a,ab);
+
+            Integer activityId = a.getActivityId();
+            VenueActivity activity = activityRepository.findByActivityId(activityId);
+            ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
+            ab.setGalleryImgUrl(main.getGalleryImgUrl());
+
+            ab.setActivityTypeName(a.getActivityType().getActivityTypeName());
+            ab.setVenueName(a.getVenue().getVenueName());
+            return ab;
+        });
+        return briefs;
+    }
+
+    //===============依類別找活動簡述===============
+    public Page<ActivityBrief> findActivityByType(Integer typeId, Integer pageNumber){
+        ActivityType type = typeRepository.findByActivityTypeId(typeId);
+        Page<VenueActivity> activities = activityRepository.findByActivityType(type,PageRequest.of(pageNumber-1, 4));
         System.out.println(activities.getTotalElements());
-        Page<ActivityData> activityDataList = activities.map(r -> {
-            ActivityData activityData = new ActivityData();
-            BeanUtils.copyProperties(r, activityData);
-            activityData.setActivityTypeId(r.getActivityType().getActivityTypeId());
-            if (r.getEmployee() != null && r.getVenue()!=null) {
-                activityData.setEmployeeId(r.getEmployee().getEmployeeId());
-                activityData.setVenueId(r.getVenue().getVenueId());
-            }
-            return activityData;
+        Page<ActivityBrief> activityDataList = activities.map(r -> {
+            ActivityBrief brief = new ActivityBrief();
+            BeanUtils.copyProperties(r, brief);
+            brief.setActivityTypeName(r.getActivityType().getActivityTypeName());
+            brief.setVenueName(r.getVenue().getVenueName());
+
+            Integer activityId = r.getActivityId();
+            VenueActivity activity = activityRepository.findByActivityId(activityId);
+            ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
+
+            brief.setGalleryImgUrl(main.getGalleryImgUrl());
+            return brief;
         });
         return activityDataList;
     }

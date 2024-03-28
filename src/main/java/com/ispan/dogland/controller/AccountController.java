@@ -3,6 +3,7 @@ package com.ispan.dogland.controller;
 
 import com.ispan.dogland.model.dto.Passport;
 import com.ispan.dogland.model.entity.Users;
+import com.ispan.dogland.model.entity.activity.ActivityGallery;
 import com.ispan.dogland.service.interfaceFile.AccountService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -36,6 +38,23 @@ public class AccountController {
         }
         return ResponseEntity.ok(userDetail);
     }
+    @GetMapping ("/getUserPassport")
+    public ResponseEntity<?> getUserPassport(HttpSession httpSession){
+        System.out.println("/getUserDetail 檢查登入 controller");
+
+        Passport loginUser = (Passport) httpSession.getAttribute("loginUser");
+        if (loginUser == null) {
+            System.out.println("session attribute 空的");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("session attribute null"); // 401
+        }
+        Users userDetail = accountService.getUserDetail(loginUser.getEmail());
+        if (userDetail == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User detail not found"); // 404
+        }
+        return ResponseEntity.ok(loginUser);
+    }
+
+
     @GetMapping("/api/users/map")
     public ResponseEntity<?> testSessionValue(HttpSession httpSession) {
         System.out.println("檢查登入 controller");
@@ -154,5 +173,32 @@ public class AccountController {
         return ResponseEntity.badRequest().body("resetPassword failed");
     }
 
+    @PostMapping("/account/update")
+    public ResponseEntity<String> updateAccount(@RequestBody Users user,HttpSession session) {
+
+        System.out.println("back is: "+user.toString());
+        Users realUser = accountService.getUserDetailById(user.getUserId());
+        realUser.setLastName(user.getLastName());
+        realUser.setBirthDate(user.getBirthDate());
+        realUser.setUserGender(user.getUserGender());
+        accountService.updateUser(realUser);
+
+        Passport loginUser=(Passport)session.getAttribute("loginUser");
+        loginUser.setUsername(user.getLastName());
+        session.setAttribute("loginUser",loginUser);
+
+        return ResponseEntity.ok("update success");
+    }
+
+    @PostMapping("/account/addMainImg")
+    public String addMainImg(@RequestParam Integer userId, @RequestParam MultipartFile mainImg,HttpSession session) {
+        String imgURL= accountService.uploadImg(mainImg,userId);
+
+        Passport loginUser=(Passport)session.getAttribute("loginUser");
+        loginUser.setPhotoUrl(imgURL);
+        session.setAttribute("loginUser",loginUser);
+
+        return imgURL;
+    }
 
 }

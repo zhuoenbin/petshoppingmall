@@ -14,7 +14,7 @@ public class TweetGallery {
 
     private String imgPath;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE,
                 CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "tweet_id")
     @JsonIgnore

@@ -94,7 +94,7 @@ public class AccountController {
 
         if(accountService.checkEmailIsEmpty(useremail)){
             userData.setLastLoginTime(new Date());
-            userData.setUserStatus("ACTIVE");
+            userData.setUserStatus("Action");
             userData.setUserViolationCount(0);
             Users user = accountService.register(userData);
             System.out.println("註冊成功");

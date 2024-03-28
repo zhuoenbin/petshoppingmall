@@ -9,6 +9,7 @@ import com.ispan.dogland.model.dao.activity.*;
 import com.ispan.dogland.model.dto.ActivityBrief;
 import com.ispan.dogland.model.dto.ActivityData;
 import com.ispan.dogland.model.dto.RentalData;
+import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.activity.*;
@@ -293,6 +294,12 @@ public class ActivityService {
             return brief;
         });
         return activityDataList;
+    }
+
+    //===============依使用者找他的狗===============
+    public List<Dog> findUsersDog(Integer userId){
+        Users user = userRepository.findByUserId(userId);
+        return dogRepository.findByUser(user);
     }
 
 

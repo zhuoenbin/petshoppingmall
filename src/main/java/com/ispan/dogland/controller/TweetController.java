@@ -182,6 +182,12 @@ public class TweetController {
         return tweetService.findTweetsAndCommentsByUserId(userId);
     }
 
+    @GetMapping("/getTweetsByUserIdWithNoComments/{userId}")
+    public List<Tweet> getTweetsByUserIdWithNoComments(@PathVariable Integer userId) {
+        System.out.println("good");
+        return tweetService.findTweetsByUserId(userId);
+    }
+
     @GetMapping("/getTweetsByUserName/{userName}")
     public List<Tweet> getTweetsByUserName(@PathVariable String userName) {
         return tweetService.findTweetsByUserName(userName);

@@ -12,6 +12,7 @@ import java.util.List;
 
 public interface TweetService {
 
+    //只找該user的主推文
     public List<Tweet> findTweetsByUserId(Integer userId);
     public Users findUserByTweetId(Integer tweetId);
 
@@ -63,6 +64,7 @@ public interface TweetService {
 
     public List<TweetNotification> findMyTweetNotifications(Integer userId);
 
+    //把該user的主推文與回文都找出來
     public List<Tweet> findTweetsAndCommentsByUserId(Integer userId);
     
     public TweetNotification findTweetNotificationByNotifiId(Integer id);

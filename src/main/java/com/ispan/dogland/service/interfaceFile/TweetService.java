@@ -63,5 +63,9 @@ public interface TweetService {
 
     public List<TweetNotification> findMyTweetNotifications(Integer userId);
 
+    public List<Tweet> findTweetsAndCommentsByUserId(Integer userId);
+    
+    public TweetNotification findTweetNotificationByNotifiId(Integer id);
 
+    void saveTweetNotification(TweetNotification t1);
 }

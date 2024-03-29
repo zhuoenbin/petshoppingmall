@@ -12,10 +12,11 @@ import java.util.List;
 public interface TweetRepository extends JpaRepository<Tweet, Integer> {
 
 
-    @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries WHERE t.user.userId = ?1 ORDER BY t.postDate DESC")
+    @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries WHERE t.user.userId = ?1 AND t.preNode = 0 ORDER BY t.postDate DESC")
     List<Tweet> findTweetsByUserId(Integer userId);
 
-
+    @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries WHERE t.user.userId = ?1 ORDER BY t.postDate DESC")
+    List<Tweet> findTweetsAndCommentsByUserId(Integer userId);
     //找所有推文與圖片
     @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries")
     List<Tweet> findAllTweetsWithGallery();

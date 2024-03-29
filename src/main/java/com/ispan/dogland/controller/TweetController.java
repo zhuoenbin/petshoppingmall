@@ -176,10 +176,10 @@ public class TweetController {
         return tweetService.getNumOfComment(tweetId); // Assuming tweetService has a method to get the number of comments for a tweet
     }
 
-    //取得userId發的所有tweets
+    //取得userId發的所有tweets，目前用在我的推文頁面
     @GetMapping("/getTweetsByUserId/{userId}")
     public List<Tweet> getTweetsByUserId(@PathVariable Integer userId) {
-        return tweetService.findTweetsByUserId(userId);
+        return tweetService.findTweetsAndCommentsByUserId(userId);
     }
 
     @GetMapping("/getTweetsByUserName/{userName}")
@@ -336,4 +336,17 @@ public class TweetController {
         tweetService.sendLikeNotificationToTweetOwner(hisUserId,hisTweetId,myName);
         return "Notification sent successfully";
     }
+
+
+    @PostMapping("/changeIsRead")
+    public String changeIsRead(@RequestBody Map<String,String> data) {
+        Integer tweetNotiId = Integer.parseInt(data.get("tweetNotiId"));
+        TweetNotification t1 = tweetService.findTweetNotificationByNotifiId(tweetNotiId);
+        t1.setIsRead(1);
+        tweetService.saveTweetNotification(t1);
+
+        return "isRead 属性已修改";
+    }
+
+
 }

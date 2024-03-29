@@ -10,4 +10,6 @@ public interface TweetNotificationRepository extends JpaRepository<TweetNotifica
     List<TweetNotification> findByUserId(Integer userId);
 
     List<TweetNotification> findByUserIdAndTweetId(Integer userId,Integer tweetId);
+
+    TweetNotification findByTweetNotiId(Integer tweetNotiId);
 }

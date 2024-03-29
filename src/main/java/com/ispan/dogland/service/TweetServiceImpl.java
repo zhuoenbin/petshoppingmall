@@ -27,10 +27,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class TweetServiceImpl implements TweetService {
@@ -293,7 +290,37 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public List<TweetNotification> findMyTweetNotifications(Integer userId) {
-        return tweetNotificationRepository.findByUserId(userId);
+
+        List<TweetNotification> notifications = tweetNotificationRepository.findByUserId(userId);
+        // 使用 Collections.sort()
+        Collections.sort(notifications, new Comparator<TweetNotification>() {
+            @Override
+            public int compare(TweetNotification notification1, TweetNotification notification2) {
+                // 按照 postTime 属性进行升序排序
+                return notification2.getPostTime().compareTo(notification1.getPostTime());
+            }
+        });
+        List<TweetNotification> top15Notifications = notifications.subList(0, Math.min(5, notifications.size()));
+
+        return top15Notifications;
+
+
+//        return tweetNotificationRepository.findByUserId(userId);
+    }
+
+    @Override
+    public List<Tweet> findTweetsAndCommentsByUserId(Integer userId) {
+        return tweetRepository.findTweetsAndCommentsByUserId(userId);
+    }
+
+    @Override
+    public TweetNotification findTweetNotificationByNotifiId(Integer id) {
+        return tweetNotificationRepository.findByTweetNotiId(id);
+    }
+
+    @Override
+    public void saveTweetNotification(TweetNotification t1) {
+        tweetNotificationRepository.save(t1);
     }
 
 

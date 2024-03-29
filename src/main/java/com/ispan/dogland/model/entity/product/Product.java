@@ -1,9 +1,11 @@
 package com.ispan.dogland.model.entity.product;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import com.ispan.dogland.model.entity.Employee;
+import com.ispan.dogland.model.entity.OrderDetail;
 import com.ispan.dogland.model.entity.ShoppingCart;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,7 +21,6 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id")
     private Integer productId;
-
 
     @Column(name = "product_name")
     private String productName;
@@ -59,22 +60,6 @@ public class Product {
     @Column(name = "discount_id")
     private Integer discountId;
 
-    /////////////////////////////////////////
-
-//    @PrePersist //在物件轉換到persistent狀態以前，做這個function
-//    public void onCreate() {
-//        if(listingDate==null && modifiedDate==null) {
-//            listingDate=new Date();
-//            modifiedDate=new Date();
-//        }
-//    }
-//
-//    @PreUpdate
-//    public void onUpdate(){
-//        modifiedDate = new Date();
-//    }
-    /////////////////////////////////////////
-
     @OneToMany(mappedBy = "product",
             fetch = FetchType.LAZY ,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE,
@@ -90,29 +75,32 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<ShoppingCart> shoppingCarts;
 
-    ///////////////////////////////////
+    //暫時不設關聯
+//    @OneToMany(mappedBy = "productId")
+//    @JsonIgnore
+//    private List<OrderDetail> orderDetails;
+
+    //---------------------------------------------------
+//      @PrePersist //在物件轉換到persistent狀態以前，做這個function
+//    public void onCreate() {
+//        if(listingDate==null && modifiedDate==null) {
+//            listingDate=new Date();
+//            modifiedDate=new Date();
+//        }
+//    }
+//    @PreUpdate
+//    public void onUpdate(){
+//        modifiedDate = new Date();
+//    }
+
     public Product() {
     }
+
     //要有這個
     public Product(Integer productId){
         this.productId = productId;
     }
 
-//    public Product(Integer productId, String productName, Employee employee, ProductCategory category, Integer unitPrice, String productDescription, Integer stock, Integer reservedQuantity, Date listingDate, Date modifiedDate) {
-//        this.productId = productId;
-//        this.productName = productName;
-//        this.employee = employee;
-//        this.category = category;
-//        this.unitPrice = unitPrice;
-//        this.productDescription = productDescription;
-//        this.stock = stock;
-//        this.reservedQuantity = reservedQuantity;
-//        this.listingDate = listingDate;
-//        this.modifiedDate = modifiedDate;
-//    }
-
-
-    ///////////////////////////////////
 
     public Integer getProductId() {
         return productId;
@@ -226,8 +214,13 @@ public class Product {
         this.shoppingCarts = shoppingCarts;
     }
 
-    //////////////////////////////////
-
+//    public List<OrderDetail> getOrderDetails() {
+//        return orderDetails;
+//    }
+//
+//    public void setOrderDetails(List<OrderDetail> orderDetails) {
+//        this.orderDetails = orderDetails;
+//    }
 
     @Override
     public String toString() {
@@ -246,7 +239,9 @@ public class Product {
         sb.append(", productGalleries=").append(productGalleries);
         sb.append(", productGalleryClouds=").append(productGalleryClouds);
         sb.append(", shoppingCarts=").append(shoppingCarts);
+//        sb.append(", orderDetails=").append(orderDetails);
         sb.append('}');
         return sb.toString();
     }
+
 }

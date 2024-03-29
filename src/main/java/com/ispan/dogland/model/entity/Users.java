@@ -47,6 +47,9 @@ public class Users {
     @OneToMany(mappedBy = "users")
     private List<ShoppingCart> shoppingCarts;
 
+    @OneToMany(mappedBy = "users")
+    private List<Orders> orders;
+
 //    @OneToMany(fetch = FetchType.LAZY,
 //            cascade = CascadeType.ALL,
 //            mappedBy = "user")
@@ -223,6 +226,21 @@ public class Users {
         tweetLikes.add(tweet);
     }
 
+    public List<ShoppingCart> getShoppingCarts() {
+        return shoppingCarts;
+    }
+
+    public void setShoppingCarts(List<ShoppingCart> shoppingCarts) {
+        this.shoppingCarts = shoppingCarts;
+    }
+
+    public List<Orders> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Orders> orders) {
+        this.orders = orders;
+    }
 
     @Override
     public String toString() {
@@ -244,11 +262,4 @@ public class Users {
         return sb.toString();
     }
 
-    public List<ShoppingCart> getShoppingCarts() {
-        return shoppingCarts;
-    }
-
-    public void setShoppingCarts(List<ShoppingCart> shoppingCarts) {
-        this.shoppingCarts = shoppingCarts;
-    }
 }

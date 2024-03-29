@@ -3,12 +3,19 @@ package com.ispan.dogland.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ispan.dogland.model.dao.OrderDetailRepository;
+import com.ispan.dogland.model.dao.OrdersRepository;
 import com.ispan.dogland.model.dao.product.ProductRepository;
+import com.ispan.dogland.model.dto.OderDto;
 import com.ispan.dogland.model.dto.Passport;
 import com.ispan.dogland.model.dto.ProductDto;
 import com.ispan.dogland.model.dto.ShoppingCartDto;
+import com.ispan.dogland.model.entity.OrderDetail;
+import com.ispan.dogland.model.entity.Orders;
 import com.ispan.dogland.model.entity.ShoppingCart;
+import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.product.Product;
+import com.ispan.dogland.model.entity.product.ProductCategory;
 import com.ispan.dogland.model.entity.product.ProductGallery;
 import com.ispan.dogland.model.vo.CheckoutPaymentRequestForm;
 import com.ispan.dogland.model.vo.ProductForm;
@@ -27,37 +34,35 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 public class ShopController {
-    @Autowired
-    private ProductRepository productRepository;
+
     @Autowired
     private ShopService shopService;
     private String allTransactionId;  //用在linepay的transactionId
+    @Autowired
+    private OrdersRepository ordersRepository;
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
+    @Autowired
+    private ProductRepository productRepository;
 
     //商品列表與商品分頁
     @GetMapping("/products/{pageNumber}")
-    public Page<ProductDto> findAllProducts(@PathVariable Integer pageNumber){
-        Page<Product> products = productRepository.findAll(PageRequest.of(pageNumber,2));
-        Page<ProductDto> productDtos = products.map(p -> {
-            ProductDto pto = new ProductDto();
-            BeanUtils.copyProperties(p, pto);
-
-            // 獲取產品的所有圖片路徑列表
-            List<String> imgPaths = new ArrayList<>();
-            for (ProductGallery gallery : p.getProductGalleries()) {
-                imgPaths.add(gallery.getImgPath());
-            }
-            pto.setImgPath(imgPaths);
-            return pto;
-        });
+    public Page<ProductDto> findProductByPage(@PathVariable Integer pageNumber){
+        Page<ProductDto> productDtos = shopService.findProductByPage(pageNumber);
         return productDtos;
     }
+
+    @GetMapping("/category/{pageNumber}/{categoryId}")
+    public Page<ProductDto> findByCategory(@PathVariable Integer pageNumber,
+                                           @PathVariable Integer categoryId) {
+        Page<ProductDto> products = shopService.findByCategoryId(pageNumber, categoryId);
+        return products;
+    }
+
 
     //加入購物車
     @RequestMapping("/product/add/{productId}")
@@ -90,24 +95,46 @@ public class ShopController {
         return shopService.deleteProductFromCart(loggedInMember.getUserId(),productId);
     }
 
-    @PostMapping("/linepay")
-    public String sendlinepay() {
+    @PostMapping("/order")
+    public void getCartData(@RequestBody List<OderDto> oderDtos, HttpSession session) {
+        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+        Orders order = shopService.addorder(loggedInMember.getUserId());
+
+        for (OderDto oderDto : oderDtos) {
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setOrders(order);
+            BeanUtils.copyProperties(oderDto, orderDetail);
+            orderDetailRepository.save(orderDetail);
+        }
+    }
+
+    @PostMapping("/linepay/{totalPrice}")
+    public String sendlinepay(@PathVariable String totalPrice) {
+        System.out.println(totalPrice);
+//        System.out.println(productName);
+        System.out.println(totalPrice);
         CheckoutPaymentRequestForm form = new CheckoutPaymentRequestForm();
-        form.setAmount(new BigDecimal("300"));  //Amount=Price*Quantity
+//        form.setAmount(new BigDecimal("300"));  //Amount=Price*Quantity
+        form.setAmount(new BigDecimal(totalPrice));  //Amount=Price*Quantity
         form.setCurrency("TWD");
-        form.setOrderId("order_id1");  //這個不能一樣(範例:merchant_order_id1)
+        form.setOrderId("order_id2");  //這個不能一樣(範例:merchant_order_id1)
 
         ProductPackageForm productPackageForm = new ProductPackageForm();
-        productPackageForm.setId("package_id");
-        productPackageForm.setName("shop_name");
-        productPackageForm.setAmount(new BigDecimal("300"));   //跟上面的Amount要一樣
+        productPackageForm.setId(UUID.randomUUID().toString()); //自動生成package_id
+//        productPackageForm.setId("package_id");
+        productPackageForm.setName("dogshop");
+//        productPackageForm.setAmount(new BigDecimal("300"));   //跟上面的Amount要一樣
+        productPackageForm.setAmount(new BigDecimal(totalPrice));   //跟上面的Amount要一樣
 
         ProductForm productForm = new ProductForm();
         productForm.setId("product_id");
-        productForm.setName("product_name");
+        productForm.setName("Dog Shop");
+//        productForm.setId(productId);
+//        productForm.setName(productName);
         productForm.setImageUrl("");
-        productForm.setQuantity(new BigDecimal("10"));
-        productForm.setPrice(new BigDecimal("30"));
+        productForm.setQuantity(new BigDecimal("1"));
+        productForm.setPrice(new BigDecimal(totalPrice));
+//        productForm.setPrice(new BigDecimal("30"));
         productPackageForm.setProducts(Arrays.asList(productForm));
         form.setPackages(Arrays.asList(productPackageForm));
 

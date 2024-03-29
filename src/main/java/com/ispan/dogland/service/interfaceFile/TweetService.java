@@ -70,4 +70,8 @@ public interface TweetService {
     public TweetNotification findTweetNotificationByNotifiId(Integer id);
 
     void saveTweetNotification(TweetNotification t1);
+
+    public Tweet updateTweetContent(Integer tweetId, String newContent);
+
+    public Tweet saveTweet(Tweet tweet);
 }

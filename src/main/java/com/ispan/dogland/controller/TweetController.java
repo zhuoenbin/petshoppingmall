@@ -184,7 +184,6 @@ public class TweetController {
 
     @GetMapping("/getTweetsByUserIdWithNoComments/{userId}")
     public List<Tweet> getTweetsByUserIdWithNoComments(@PathVariable Integer userId) {
-        System.out.println("good");
         return tweetService.findTweetsByUserId(userId);
     }
 
@@ -354,5 +353,26 @@ public class TweetController {
         return "isRead 属性已修改";
     }
 
+
+    @PostMapping("/updateTweetContent")
+    public String saveEditedTweet(@RequestBody Map<String, Object> request) {
+
+        String editTweetContentTmp = (String) request.get("editTweetContentTmp");
+        Integer tweetId = Integer.parseInt(String.valueOf(request.get("tweetId")));
+
+        Tweet t1 = tweetService.updateTweetContent(tweetId, editTweetContentTmp);
+        if(t1 == null) {
+            return "fail";
+        }
+        return t1.getTweetContent();
+    }
+
+    @PostMapping("/removeTweetContent")
+    public Tweet removeTweetContent(@RequestBody Map<String, Object> request) {
+        Integer tweetId = Integer.parseInt(String.valueOf(request.get("tweetId")));
+        Tweet t1 = tweetService.findTweetByTweetId(tweetId);
+        t1.setTweetStatus(0);
+        return tweetService.saveTweet(t1);
+    }
 
 }

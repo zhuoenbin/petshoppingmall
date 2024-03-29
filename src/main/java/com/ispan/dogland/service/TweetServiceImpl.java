@@ -323,5 +323,20 @@ public class TweetServiceImpl implements TweetService {
         tweetNotificationRepository.save(t1);
     }
 
+    @Override
+    public Tweet updateTweetContent(Integer tweetId, String newContent) {
+        Tweet t1 = tweetRepository.findTweetByTweetId(tweetId);
+        if(t1 == null){
+            return null;
+        }
+        t1.setTweetContent(newContent);
+        return tweetRepository.save(t1);
+    }
+
+    @Override
+    public Tweet saveTweet(Tweet tweet) {
+        return tweetRepository.save(tweet);
+    }
+
 
 }

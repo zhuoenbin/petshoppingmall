@@ -91,7 +91,9 @@ public class VenueActivity {
     }
 
     @PreUpdate
-    public void onUpdate() {
+    @PostLoad
+    @PostPersist
+    public void checkOnLoadAndUpdate() {
         activityUpdateDate = new Date();
         Date currentTime = new Date();
         if(currentTime.before(activityClosingDate)){
@@ -106,21 +108,7 @@ public class VenueActivity {
             activityStatus="活動已結束";
         }
     }
-    @PostLoad
-    public void checkVenueAfterLoad(){
-        Date currentTime = new Date();
-        if(currentTime.before(activityClosingDate)){
-            if(currentDogNumber>=activityDogNumber){
-                activityStatus="已額滿";
-            }else{
-                activityStatus="報名中";
-            }
-        }else if(currentTime.after(activityClosingDate)&&currentTime.before(activityDate)){
-            activityStatus="報名截止";
-        }else{
-            activityStatus="活動已結束";
-        }
-    }
+
 
     ///////////////////////////////////
     public VenueActivity() {

@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -302,39 +303,124 @@ public class ActivityService {
     public ActivityUserJoined userApply(Integer userId, String note,Integer activityId){
         Users user = userRepository.findByUserId(userId);
         VenueActivity activity = activityRepository.findByActivityId(activityId);
+        ActivityUserJoined joined = userJoinedRepository.findByVenueActivityAndUserAndJoinedStatusNot(activity, user,"已取消");
 
-        ActivityUserJoined userJoined = new ActivityUserJoined();
-        userJoined.setUserNote(note);
-        userJoined.setUser(user);
-        userJoined.setVenueActivity(activity);
+        if(joined==null) {
+            ActivityUserJoined userJoined = new ActivityUserJoined();
+            userJoined.setUserNote(note);
+            userJoined.setUser(user);
+            userJoined.setVenueActivity(activity);
 
-        activity.setCurrentUserNumber(activity.getCurrentUserNumber()+1);
-        activityRepository.save(activity);
-        return userJoinedRepository.save(userJoined);
+            activity.setCurrentUserNumber(activity.getCurrentUserNumber() + 1);
+            activityRepository.save(activity);
+            return userJoinedRepository.save(userJoined);
+        }else{
+            joined.setUpdateTime(new Date());
+            return joined;
+        }
     }
 
     public ActivityDogJoined dogApply(Integer dogId,Integer activityId){
         Dog dog = dogRepository.findByDogId(dogId);
         VenueActivity activity = activityRepository.findByActivityId(activityId);
+        ActivityDogJoined joined = dogJoinedRepository.findByVenueActivityAndDog(activity, dog);
+        if(joined==null){
+            if(activity.getActivityDogNumber()>activity.getCurrentDogNumber()){
+                ActivityDogJoined dogJoined = new ActivityDogJoined();
+                dogJoined.setDog(dog);
+                dogJoined.setVenueActivity(activity);
 
-        if(activity.getActivityDogNumber()>activity.getCurrentDogNumber()){
-            ActivityDogJoined dogJoined = new ActivityDogJoined();
-            dogJoined.setDog(dog);
-            dogJoined.setVenueActivity(activity);
-
-            activity.setCurrentDogNumber(activity.getCurrentDogNumber()+1);
-            //判斷加完有沒有額滿
-            if(activity.getCurrentDogNumber()==activity.getActivityDogNumber()){
-                activity.setActivityStatus("已額滿");
+                activity.setCurrentDogNumber(activity.getCurrentDogNumber()+1);
+                //判斷加完有沒有額滿
+                if(activity.getCurrentDogNumber()==activity.getActivityDogNumber()){
+                    activity.setActivityStatus("已額滿");
+                }
+                activityRepository.save(activity);
+                return dogJoinedRepository.save(dogJoined);
+            }else{
+                throw new RuntimeException("超過狗數限制 !!");
             }
-            activityRepository.save(activity);
-            return dogJoinedRepository.save(dogJoined);
-        }else{
-            throw new RuntimeException("超過狗數限制 !!");
+        }else{//繼續篩有沒有取消過
+            ActivityDogJoined dogNotAttend = dogJoinedRepository.findByVenueActivityAndDogAndJoinedStatusNot(activity, dog, "參加");
+            if(dogNotAttend!=null){
+                if(activity.getActivityDogNumber()>activity.getCurrentDogNumber()){
+                    ActivityDogJoined dogJoined = new ActivityDogJoined();
+                    dogJoined.setDog(dog);
+                    dogJoined.setVenueActivity(activity);
+
+                    activity.setCurrentDogNumber(activity.getCurrentDogNumber()+1);
+                    //判斷加完有沒有額滿
+                    if(activity.getCurrentDogNumber()==activity.getActivityDogNumber()){
+                        activity.setActivityStatus("已額滿");
+                    }
+                    activityRepository.save(activity);
+                    return dogJoinedRepository.save(dogJoined);
+                }else{
+                    throw new RuntimeException("超過狗數限制 !!");
+                }
+            }else{
+                throw new RuntimeException("已經報名過了");
+            }
         }
-
-
     }
+
+    //找出使用者有參加且沒取消的狗
+    public List<Dog> findUserDogsAttendThisActivity(Integer userId,Integer activityId){
+        Users user = userRepository.findByUserId(userId);
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        //先看這個使用者有沒有參加且沒取消
+        ActivityUserJoined joined = userJoinedRepository.findByVenueActivityAndUserAndJoinedStatusNot(activity, user,"已取消");
+        if (joined!=null){
+            //取出這個使用者所有狗
+            List<Dog> dogList = dogRepository.findByUser(user);
+            List<Dog> joinedDogList=new ArrayList<>();//這個裝檢查後的資料
+            for(Dog dog:dogList){
+                //狗有參加且沒取消
+                ActivityDogJoined checkDog = dogJoinedRepository.findByVenueActivityAndDogAndJoinedStatusNot(activity, dog,"已取消");
+                if(checkDog!=null){
+                    joinedDogList.add(dog);
+                }
+            }
+            return joinedDogList;
+        }else{
+            System.out.println("根本沒參加過或已取消");
+            return null;
+        }
+    }
+    //找出沒有報名且沒取消的狗
+    //check使用者有沒有報名過
+    //if false-> 給全部狗
+    //if true->檢查狗有沒有報名過
+    //          ->true:檢查有沒有取消
+//                        ->true:沒有取消:null
+//                        ->false:又取消:列入
+    //          ->false:列入
+    public List<Dog> findUserDogsStayAtHome(Integer userId,Integer activityId){
+        Users user = userRepository.findByUserId(userId);
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        //先看這個使用者有沒有參加
+        ActivityUserJoined joined = userJoinedRepository.findByVenueActivityAndUser(activity, user);
+        //取出這個使用者所有狗
+        List<Dog> dogList = dogRepository.findByUser(user);
+        if (joined!=null){
+            List<Dog> joinedDogList=new ArrayList<>();//這個裝檢查後的資料
+            for(Dog dog:dogList){
+                ActivityDogJoined checkDog = dogJoinedRepository.findByVenueActivityAndDog(activity, dog);
+                if(checkDog==null){//這隻狗沒參加過
+                    joinedDogList.add(dog);
+                }else{//這隻狗有參加過
+                    ActivityDogJoined dogCancelled = dogJoinedRepository.findByVenueActivityAndDogAndJoinedStatusNot(activity, dog, "參加");
+                    if(dogCancelled!=null){//如過他狀態不是參加
+                        joinedDogList.add(dog);
+                    }
+                }
+            }
+            return joinedDogList;
+        }else{
+           return dogList;
+        }
+    }
+
 
 
 

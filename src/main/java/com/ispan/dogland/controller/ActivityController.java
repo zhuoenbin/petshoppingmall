@@ -147,4 +147,15 @@ public class ActivityController {
     }
 
 
+    @GetMapping("/activity/{userId}/findDogListIn/{activityId}")
+    public List<Dog> findUserDogsAttendThisActivity(@PathVariable Integer userId,@PathVariable Integer activityId){
+        return activityService.findUserDogsAttendThisActivity(userId, activityId);
+    }
+
+    @GetMapping("/apply/{userId}/dogNotJoinedList/{activityId}")
+    public List<Dog> findUserDogNotInThisActivity(@PathVariable Integer userId,@PathVariable Integer activityId){
+        return activityService.findUserDogsStayAtHome(userId, activityId);
+    }
+
+
 }

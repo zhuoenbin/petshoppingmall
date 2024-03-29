@@ -3,6 +3,7 @@ package com.ispan.dogland.controller;
 import com.ispan.dogland.model.dto.Passport;
 import com.ispan.dogland.model.dto.ProductDto;
 import com.ispan.dogland.model.entity.OrderDetail;
+import com.ispan.dogland.model.entity.Orders;
 import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductGallery;
 import com.ispan.dogland.service.OrderService;
@@ -23,14 +24,22 @@ public class OrderController {
     @Autowired
     private OrderService os;
 
-
-    @GetMapping("/orderDetails")
-    public List<OrderDetail> getDetailsByOrderId(HttpSession session){
+    @GetMapping("")
+    public List<Orders> getOrdersByUserId(HttpSession session){
         Passport loggedInMember = (Passport) session.getAttribute("loginUser");
         if(loggedInMember == null){
             throw new RuntimeException("未登入錯誤");
         }
-        return os.findDetailByOrderId(1);
+        return os.findOrdersByUserId(loggedInMember.getUserId());
+    }
+
+    @GetMapping("/{orderId}/orderDetails")
+    public List<OrderDetail> getDetailsByOrderId(@PathVariable Integer orderId, HttpSession session){
+        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+        if(loggedInMember == null){
+            throw new RuntimeException("未登入錯誤");
+        }
+        return os.findDetailByOrderId(orderId);
     }
 
     @PostMapping("/getProducts")

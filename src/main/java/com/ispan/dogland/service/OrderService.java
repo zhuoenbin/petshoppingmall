@@ -42,6 +42,7 @@ public class OrderService {
         List<ProductDto> pDtoList = new ArrayList<>();
         Product p = new Product();
         List<String> imgUrls = new ArrayList<>();
+        int index = 0;
         System.out.println(productIds);
         for(int i :productIds){
             System.out.println(i);
@@ -54,11 +55,17 @@ public class OrderService {
         for(Product pTmp:pList) {
             ProductDto pDto = new ProductDto();
             BeanUtils.copyProperties(pTmp, pDto);
-            pDto.setMainImgPath(imgUrls.get(0));
+            pDto.setMainImgPath(imgUrls.get(index));
             pDtoList.add(pDto);
+            index++;
         }
+        index=0;
         System.out.println(pDtoList);
         return pDtoList;
+    }
+
+    public List<Orders> findOrdersByUserId (Integer userId){
+        return ordersRepository.findOrdersByUserId(userId);
     }
 
 }

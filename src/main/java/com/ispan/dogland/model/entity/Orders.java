@@ -17,9 +17,9 @@ public class Orders {
     private Integer orderId;
 
     // 對應 User
-//    @ManyToOne(cascade = {CascadeType.ALL})
-//    @JoinColumn(name = "user_id")
-    private Integer userId;
+    @ManyToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "user_id")
+    private Users user;
 
     // 對應 Employee
 //    @ManyToOne(cascade = {CascadeType.ALL})
@@ -110,9 +110,9 @@ public class Orders {
     public Orders() {
     }
 
-    public Orders(Integer orderId, Integer userId, Integer employeeId, Date orderDate, Integer totalPrice, Integer discountPrice, Integer couponPrice, String discountDescription, String couponDescription, Integer paymentMethod, Integer paymentStatus, Date confirmDate, Date shipDate, Date logisticsShipDate, Date logisticsArrivalDate, Date userReceiveDate, Date userConfirmDate, Date orderCancelDate, ShippingCompany shippingCompany, String city, String district, String address, Integer freight) {
+    public Orders(Integer orderId, Users user, Integer employeeId, Date orderDate, Integer totalPrice, Integer discountPrice, Integer couponPrice, String discountDescription, String couponDescription, Integer paymentMethod, Integer paymentStatus, Date confirmDate, Date shipDate, Date logisticsShipDate, Date logisticsArrivalDate, Date userReceiveDate, Date userConfirmDate, Date orderCancelDate, ShippingCompany shippingCompany, String city, String district, String address, Integer freight, List<OrderDetail> orderDetail) {
         this.orderId = orderId;
-        this.userId = userId;
+        this.user = user;
         this.employeeId = employeeId;
         this.orderDate = orderDate;
         this.totalPrice = totalPrice;
@@ -134,6 +134,7 @@ public class Orders {
         this.district = district;
         this.address = address;
         this.freight = freight;
+        this.orderDetail = orderDetail;
     }
 
     public Integer getOrderId() {
@@ -144,12 +145,12 @@ public class Orders {
         this.orderId = orderId;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public Users getUser() {
+        return user;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setUser(Users user) {
+        this.user = user;
     }
 
     public Integer getEmployeeId() {
@@ -322,9 +323,9 @@ public class Orders {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("Orders{");
+        final StringBuilder sb = new StringBuilder("Orders{");
         sb.append("orderId=").append(orderId);
-        sb.append(", userId=").append(userId);
+        sb.append(", user=").append(user);
         sb.append(", employeeId=").append(employeeId);
         sb.append(", orderDate=").append(orderDate);
         sb.append(", totalPrice=").append(totalPrice);
@@ -346,9 +347,8 @@ public class Orders {
         sb.append(", district='").append(district).append('\'');
         sb.append(", address='").append(address).append('\'');
         sb.append(", freight=").append(freight);
+        sb.append(", orderDetail=").append(orderDetail);
         sb.append('}');
         return sb.toString();
     }
-
-
 }

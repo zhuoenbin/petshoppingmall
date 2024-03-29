@@ -191,7 +191,7 @@ public class AccountController {
     }
 
     @PostMapping("/account/addMainImg")
-    public String addMainImg(@RequestParam Integer userId, @RequestParam MultipartFile mainImg,HttpSession session) {
+    public String addMainImg(@RequestParam Integer userId, @RequestParam MultipartFile mainImg, HttpSession session) {
         String imgURL= accountService.uploadImg(mainImg,userId);
 
         Passport loginUser=(Passport)session.getAttribute("loginUser");

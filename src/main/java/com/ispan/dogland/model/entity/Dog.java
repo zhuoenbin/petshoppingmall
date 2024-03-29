@@ -148,7 +148,7 @@ public class Dog {
         return dogWeight;
     }
 
-    public void setDogWeight(Double dogSize) {
+    public void setDogWeight(Double dogWeight) {
         this.dogWeight = dogWeight;
     }
 

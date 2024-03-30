@@ -4,6 +4,7 @@ package com.ispan.dogland.model.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import com.ispan.dogland.model.entity.tweet.TweetNotification;
+import com.ispan.dogland.model.entity.tweet.TweetReport;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -61,6 +62,10 @@ public class Users {
     @JoinTable(name="tweet_like", joinColumns = @JoinColumn(name="user_id"),
             inverseJoinColumns = @JoinColumn(name="tweet_id"))
     private List<Tweet> tweetLikes;
+
+    @OneToMany(mappedBy = "reporter",
+                cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TweetReport> tweetReports;
 
 
 
@@ -222,11 +227,27 @@ public class Users {
         this.tweetLikes = tweetLikes;
     }
 
+    public List<TweetReport> getTweetReports() {
+        return tweetReports;
+    }
+
+    public void setTweetReports(List<TweetReport> tweetReports) {
+        this.tweetReports = tweetReports;
+    }
+
     public void addTweetLike(Tweet tweet) {
         if(tweetLikes == null) {
             tweetLikes = new ArrayList<>();
         }
         tweetLikes.add(tweet);
+    }
+
+    public void addTweetReport(TweetReport tweetReport) {
+        if(tweetReports == null) {
+            tweetReports = new ArrayList<>();
+        }
+        tweetReports.add(tweetReport);
+        tweetReport.setReporter(this);
     }
 
 

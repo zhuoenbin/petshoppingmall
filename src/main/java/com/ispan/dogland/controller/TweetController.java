@@ -10,6 +10,7 @@ import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import com.ispan.dogland.model.entity.tweet.TweetGallery;
 import com.ispan.dogland.model.entity.tweet.TweetNotification;
+import com.ispan.dogland.model.entity.tweet.TweetReport;
 import com.ispan.dogland.service.interfaceFile.AccountService;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -338,6 +339,7 @@ public class TweetController {
             @RequestParam("hisTweetId") Integer hisTweetId,
             @RequestParam("myName") String myName
     ) {
+        System.out.println("/sendLikeNotify:"+hisUserId+" "+hisTweetId+" "+myName);
         tweetService.sendLikeNotificationToTweetOwner(hisUserId,hisTweetId,myName);
         return "Notification sent successfully";
     }
@@ -373,6 +375,47 @@ public class TweetController {
         Tweet t1 = tweetService.findTweetByTweetId(tweetId);
         t1.setTweetStatus(0);
         return tweetService.saveTweet(t1);
+    }
+
+
+    @PostMapping("/reportTweet")
+    public ResponseEntity<String> handlePostRequest(@RequestBody Map<String, Object> requestMap) {
+        //被檢舉的tweetId
+        Integer tweetId = Integer.parseInt(String.valueOf(requestMap.get("tweetId")));
+        //檢舉內容(文字表單)
+        String reportText = String.valueOf(requestMap.get("reportText"));
+        //檢舉內容(選項)
+        String reportCheckBox = String.valueOf(requestMap.get("reportCheckBox"));
+        //檢舉人的UserId
+        Integer userId = Integer.parseInt(String.valueOf(requestMap.get("reporterId")));
+
+        boolean p = tweetService.checkUserAndReportRelation(tweetId, userId);
+        if(p){
+            return new ResponseEntity<>("You have already reported this tweet.", HttpStatus.BAD_REQUEST);
+        }else{
+            TweetReport tweetReport = tweetService.addReporyToTweet(tweetId, userId, reportText, reportCheckBox);
+            if (tweetReport != null) {
+                return new ResponseEntity<>("Tweet reported successfully!", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Failed to report tweet.", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    @GetMapping("/getTweetsReports")
+    public List<TweetReport> getTweetsReports() {
+        return tweetService.findAllTweetReports();
+    }
+
+    @GetMapping("/getTweetByReportId/{reportId}")
+    public Tweet getTweetByReportId(@PathVariable Integer reportId) {
+        return tweetService.findTweetByReportId(reportId);
+    }
+
+
+    @GetMapping("/getUserByReportId/{reportId}")
+    public Tweet getUserByReportId(@PathVariable Integer reportId) {
+        return tweetService.findTweetByReportId(reportId);
     }
 
 }

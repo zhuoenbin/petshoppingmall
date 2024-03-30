@@ -23,6 +23,12 @@ public interface UserRepository extends JpaRepository<Users, Integer> {
     @Query("SELECT u FROM Users u  JOIN FETCH u.dogs d WHERE d.dogId = ?1")
     Users findUserByDogsId(Integer dogId);
 
+    @Query("SELECT u FROM Users u LEFT JOIN FETCH u.tweetReports  WHERE u.userId = ?1")
+    Users findUserAndReportsByUserId(Integer userId);
+
 //    @Query("SELECT u FROM Users u  LEFT JOIN u.tweetLikes  WHERE u.userId = ?1")
 //    Users findByUserIdWithTweetLikes(Integer userId);
+
+    @Query("SELECT u FROM Users u  LEFT JOIN u.tweetReports r  WHERE r.reportsId = ?1")
+    Users findUserByReportId(Integer reportId);
 }

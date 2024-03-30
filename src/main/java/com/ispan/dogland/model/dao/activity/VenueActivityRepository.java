@@ -13,5 +13,8 @@ public interface VenueActivityRepository extends JpaRepository<VenueActivity,Int
 
     Page<VenueActivity> findByActivityType(ActivityType activityType, Pageable pageable);
 
+    List<VenueActivity> findByActivityStatusNot(String activityStatus);
+
+
 
 }

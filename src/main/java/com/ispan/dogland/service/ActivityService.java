@@ -6,9 +6,7 @@ import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dao.activity.*;
-import com.ispan.dogland.model.dto.ActivityBrief;
-import com.ispan.dogland.model.dto.ActivityData;
-import com.ispan.dogland.model.dto.RentalData;
+import com.ispan.dogland.model.dto.*;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
@@ -305,15 +303,28 @@ public class ActivityService {
         VenueActivity activity = activityRepository.findByActivityId(activityId);
         ActivityUserJoined joined = userJoinedRepository.findByVenueActivityAndUserAndJoinedStatusNot(activity, user,"已取消");
 
-        if(joined==null) {
-            ActivityUserJoined userJoined = new ActivityUserJoined();
-            userJoined.setUserNote(note);
-            userJoined.setUser(user);
-            userJoined.setVenueActivity(activity);
+        if(joined==null) { //要再看有沒有取消過
+            ActivityUserJoined joinedPast = userJoinedRepository.findByVenueActivityAndUserAndJoinedStatusNot(activity, user, "參加");
+            if(joinedPast!=null){
+                joinedPast.setUserNote(note);
+                joinedPast.setJoinedTime(new Date());
+                joinedPast.setJoinedStatus("參加");
 
-            activity.setCurrentUserNumber(activity.getCurrentUserNumber() + 1);
-            activityRepository.save(activity);
-            return userJoinedRepository.save(userJoined);
+                activity.setCurrentUserNumber(activity.getCurrentUserNumber()+1);
+                activityRepository.save(activity);
+                return userJoinedRepository.save(joinedPast);
+
+            }else{
+                ActivityUserJoined userJoined = new ActivityUserJoined();
+                userJoined.setUserNote(note);
+                userJoined.setUser(user);
+                userJoined.setVenueActivity(activity);
+
+                activity.setCurrentUserNumber(activity.getCurrentUserNumber() + 1);
+                activityRepository.save(activity);
+                return userJoinedRepository.save(userJoined);
+            }
+
         }else{
             joined.setUpdateTime(new Date());
             return joined;
@@ -336,30 +347,38 @@ public class ActivityService {
                     activity.setActivityStatus("已額滿");
                 }
                 activityRepository.save(activity);
+                //修改使用者單更新時間
+                Users user = dogJoined.getDog().getUser();
+                ActivityUserJoined userJoined = userJoinedRepository.findByVenueActivityAndUser(activity, user);
+                userJoined.setUpdateTime(new Date());
+                userJoinedRepository.save(userJoined);
+
                 return dogJoinedRepository.save(dogJoined);
             }else{
                 throw new RuntimeException("超過狗數限制 !!");
             }
         }else{//繼續篩有沒有取消過
             ActivityDogJoined dogNotAttend = dogJoinedRepository.findByVenueActivityAndDogAndJoinedStatusNot(activity, dog, "參加");
-            if(dogNotAttend!=null){
+            if(dogNotAttend!=null){//曾經取消的狗
                 if(activity.getActivityDogNumber()>activity.getCurrentDogNumber()){
-                    ActivityDogJoined dogJoined = new ActivityDogJoined();
-                    dogJoined.setDog(dog);
-                    dogJoined.setVenueActivity(activity);
-
+                    dogNotAttend.setJoinedStatus("參加");
                     activity.setCurrentDogNumber(activity.getCurrentDogNumber()+1);
                     //判斷加完有沒有額滿
                     if(activity.getCurrentDogNumber()==activity.getActivityDogNumber()){
                         activity.setActivityStatus("已額滿");
                     }
                     activityRepository.save(activity);
-                    return dogJoinedRepository.save(dogJoined);
+                    //修改使用者單更新時間
+                    Users user = dogNotAttend.getDog().getUser();
+                    ActivityUserJoined userJoined = userJoinedRepository.findByVenueActivityAndUser(activity, user);
+                    userJoined.setUpdateTime(new Date());
+                    userJoinedRepository.save(userJoined);
+                    return dogJoinedRepository.save(dogNotAttend);
                 }else{
                     throw new RuntimeException("超過狗數限制 !!");
                 }
-            }else{
-                throw new RuntimeException("已經報名過了");
+            }else{//沒參加過的狗
+                throw new RuntimeException("已經報名了");
             }
         }
     }
@@ -420,6 +439,96 @@ public class ActivityService {
            return dogList;
         }
     }
+
+    public List<MyActivitiesDto>findUserAllJoinedActivities(Integer userId){
+        Users user = userRepository.findByUserId(userId);
+        //取得所有使用者有參加的活動
+        List<ActivityUserJoined> userJoinedList = userJoinedRepository.findByUserAndJoinedStatusNot(user, "已取消");
+        List<MyActivitiesDto> myActivities=new ArrayList<>();
+        //在這些有參加的活動中找有參加的狗
+        for(ActivityUserJoined userJoined:userJoinedList){
+            MyActivitiesDto dto = new MyActivitiesDto();
+            String userNote = userJoined.getUserNote();
+            VenueActivity activity = userJoined.getVenueActivity();
+            List<Dog> dogList = findUserDogsAttendThisActivity(userId, activity.getActivityId());
+            List<String> dogJoinedList=new ArrayList<>();
+            for(Dog dog:dogList){
+                String dogName = dog.getDogName();
+                dogJoinedList.add(dogName);
+            }
+            BeanUtils.copyProperties(activity,dto);//複製活動信息
+            BeanUtils.copyProperties(userJoined,dto);//複製使用者報名時的信息
+            dto.setDogList(dogJoinedList);
+            myActivities.add(dto);
+        }
+        return myActivities;
+    }
+
+    //取消報名
+    //找到使用者->該使用者所有有報名的狗->取消數是否==原先有報名的狗數
+    // true:全部取消 ->使用者報名狀態更新 && 狗狗狀態更新->找到這個活動更新狗數 更新人數
+    // false:部分取消 ->使用者更新時間 && 狗狗狀態更新->找到這個活動更新狗數
+
+    public MyActivitiesDto userCancelledActivity(Integer userId, Integer[] dogIdList,Integer activityId){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        Users user = userRepository.findByUserId(userId);
+        ActivityUserJoined userJoined = userJoinedRepository.findByVenueActivityAndUser(activity, user);
+        List<Dog> oldDogList = findUserDogsAttendThisActivity(userId, activityId);
+        List<String> doCancelledDogList = new ArrayList<>();
+        if(oldDogList.size()<=dogIdList.length){
+            userJoined.setJoinedStatus("已取消");
+            for(Integer dogId:dogIdList){
+                Dog dog = dogRepository.findByDogId(dogId);
+                ActivityDogJoined dogJoined = dogJoinedRepository.findByVenueActivityAndDog(activity, dog);
+                dogJoined.setJoinedStatus("已取消");
+                ActivityDogJoined dogChange = dogJoinedRepository.save(dogJoined);
+                //紀錄已取消的狗名
+                String dogName = dog.getDogName();
+                doCancelledDogList.add(dogName);
+            }
+            ActivityUserJoined userChange = userJoinedRepository.save(userJoined);
+            activity.setCurrentUserNumber(activity.getCurrentUserNumber()-1);//更新人數
+            activity.setCurrentDogNumber(activity.getCurrentDogNumber()-dogIdList.length);//更新狗數
+            VenueActivity activityChange = activityRepository.save(activity);
+            //記錄到dto中
+            MyActivitiesDto dto = new MyActivitiesDto();
+            BeanUtils.copyProperties(activityChange,dto);
+            BeanUtils.copyProperties(userChange,dto);
+            dto.setDogList(doCancelledDogList);
+            return dto;
+        }else{
+            userJoined.setUpdateTime(new Date());
+            for(Integer dogId:dogIdList){
+                Dog dog = dogRepository.findByDogId(dogId);
+                ActivityDogJoined dogJoined = dogJoinedRepository.findByVenueActivityAndDog(activity, dog);
+                dogJoined.setJoinedStatus("已取消");
+                dogJoinedRepository.save(dogJoined);
+                //紀錄已取消的狗名
+                String dogName = dog.getDogName();
+                doCancelledDogList.add(dogName);
+            }
+            ActivityUserJoined userChange = userJoinedRepository.save(userJoined);
+            activity.setCurrentDogNumber(activity.getCurrentDogNumber()-dogIdList.length);//更新狗數
+            VenueActivity activityChange = activityRepository.save(activity);
+            //記錄到dto中
+            MyActivitiesDto dto = new MyActivitiesDto();
+            BeanUtils.copyProperties(activityChange,dto);
+            BeanUtils.copyProperties(userChange,dto);
+            dto.setDogList(doCancelledDogList);
+            return dto;
+        }
+    }
+
+    //===============使用者活動管理頁面更改備註===============
+    public ActivityUserJoined renewUserNote(Integer activityId,Integer userId,String userNote){
+        Users user = userRepository.findByUserId(userId);
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        ActivityUserJoined joined = userJoinedRepository.findByVenueActivityAndUser(activity, user);
+        joined.setUserNote(userNote);
+        return userJoinedRepository.save(joined);
+    }
+
+
 
 
 

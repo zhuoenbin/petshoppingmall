@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -50,5 +51,19 @@ public interface TweetRepository extends JpaRepository<Tweet, Integer> {
 
     @Query("SELECT t FROM Tweet t  LEFT JOIN FETCH t.dogs WHERE t.tweetId = ?1 AND t.tweetStatus = 1")
     Tweet findTweetAndDogsByTweetIdByLEFTJOIN(Integer tweetId);
+
+
+    @Query("SELECT t FROM Tweet t  LEFT JOIN  t.tweetReports r WHERE r.reportsId = ?1")
+    Tweet findTweetAndReportsByTweetReportsId(Integer tweetReports);
+
+
+    @Query("SELECT t FROM Tweet t LEFT JOIN FETCH t.tweetReports r WHERE t.tweetId = ?1")
+    Tweet findTweetAndReportsByTweetId(Integer tweetId);
+
+    @Query("SELECT t FROM Tweet t JOIN FETCH t.tweetReports ")
+    List<Tweet> findAllTweetsHasReport();
+
+    @Query("SELECT t FROM Tweet t JOIN FETCH t.tweetReports r WHERE r.reportsId = ?1")
+    Tweet findTweetByReportId(Integer reportId);
 
 }

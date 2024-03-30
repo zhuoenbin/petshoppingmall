@@ -5,6 +5,7 @@ import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import com.ispan.dogland.model.entity.tweet.TweetFollowList;
 import com.ispan.dogland.model.entity.tweet.TweetNotification;
+import com.ispan.dogland.model.entity.tweet.TweetReport;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -73,5 +74,15 @@ public interface TweetService {
 
     public Tweet updateTweetContent(Integer tweetId, String newContent);
 
+    public boolean checkUserAndReportRelation(Integer tweetId, Integer userId);
+
+    public TweetReport addReporyToTweet(Integer tweetId, Integer userId,String reportText, String reportCheckBox);
+
     public Tweet saveTweet(Tweet tweet);
+
+    public List<TweetReport> findAllTweetReports();
+
+    public Tweet findTweetByReportId(Integer reportId);
+
+    public  Users findUserByReportId(Integer reportId);
 }

@@ -5,10 +5,7 @@ import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dao.tweet.*;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Users;
-import com.ispan.dogland.model.entity.tweet.Tweet;
-import com.ispan.dogland.model.entity.tweet.TweetFollowList;
-import com.ispan.dogland.model.entity.tweet.TweetLike;
-import com.ispan.dogland.model.entity.tweet.TweetNotification;
+import com.ispan.dogland.model.entity.tweet.*;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,9 +39,17 @@ public class TweetServiceImpl implements TweetService {
     private TweetFollowListRepository tweetFollowListRepository;
     private DogRepository dogRepository;
     private TweetNotificationRepository tweetNotificationRepository;
+    private TweetReportRepository tweetReportRepository;
 
     @Autowired
-    public TweetServiceImpl(TweetRepository tweetRepository, UserRepository userRepository, TweetGalleryRepository tweetGalleryRepository, TweetLikeRepository tweetLikeRepository,TweetFollowListRepository tweetFollowListRepository,DogRepository dogRepository,TweetNotificationRepository tweetNotificationRepository) {
+    public TweetServiceImpl(TweetRepository tweetRepository,
+                            UserRepository userRepository,
+                            TweetGalleryRepository tweetGalleryRepository,
+                            TweetLikeRepository tweetLikeRepository,
+                            TweetFollowListRepository tweetFollowListRepository,
+                            DogRepository dogRepository,
+                            TweetNotificationRepository tweetNotificationRepository,
+                            TweetReportRepository tweetReportRepository) {
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
         this.tweetGalleryRepository = tweetGalleryRepository;
@@ -52,6 +57,7 @@ public class TweetServiceImpl implements TweetService {
         this.tweetFollowListRepository = tweetFollowListRepository;
         this.dogRepository = dogRepository;
         this.tweetNotificationRepository = tweetNotificationRepository;
+        this.tweetReportRepository = tweetReportRepository;
     }
 
     @Override
@@ -334,8 +340,54 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
+    public boolean checkUserAndReportRelation(Integer tweetId, Integer userId) {
+        TweetReport tr = tweetReportRepository.findByTweetIdAndUserId(tweetId, userId);
+        return tr != null;
+    }
+
+    @Override
+    public TweetReport addReporyToTweet(Integer tweetId, Integer userId,String reportText, String reportCheckBox) {
+
+
+        TweetReport tweetReportTmp = new TweetReport();
+        tweetReportTmp.setReportReason(reportCheckBox);
+        tweetReportTmp.setReportDescription(reportText);
+        tweetReportTmp.setReportDate(new Date());
+        tweetReportTmp.setReportStatus(0);
+        TweetReport tweetReport = tweetReportRepository.save(tweetReportTmp);
+
+        Users user= userRepository.findUserAndReportsByUserId(userId);
+        user.addTweetReport(tweetReport);
+        userRepository.save(user);
+
+        Tweet tweet = tweetRepository.findTweetAndReportsByTweetId(tweetId);
+        Integer numReport = tweet.getNumReport();
+        tweet.setNumReport(numReport+1);
+        tweet.addTweetReport(tweetReport);
+        tweetRepository.save(tweet);
+
+        return tweetReport;
+
+    }
+
+    @Override
     public Tweet saveTweet(Tweet tweet) {
         return tweetRepository.save(tweet);
+    }
+
+    @Override
+    public List<TweetReport> findAllTweetReports() {
+        return tweetReportRepository.findAll();
+    }
+
+    @Override
+    public Tweet findTweetByReportId(Integer reportId) {
+        return tweetRepository.findTweetByReportId(reportId);
+    }
+
+    @Override
+    public Users findUserByReportId(Integer reportId) {
+        return userRepository.findUserByReportId(reportId);
     }
 
 

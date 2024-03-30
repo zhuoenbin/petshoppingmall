@@ -48,6 +48,12 @@ public class Tweet {
                                      inverseJoinColumns = @JoinColumn(name="dog_id"))
     private List<Dog> dogs;
 
+    @OneToMany(fetch = FetchType.LAZY,
+               mappedBy = "tweet",
+               cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                          CascadeType.DETACH, CascadeType.REFRESH})
+    private List<TweetReport> tweetReports;
+
     public Tweet() {
     }
     public Tweet(Users user, String userName, String tweetContent, Integer preNode, Date postDate, Integer tweetStatus, Integer numReport) {
@@ -149,6 +155,14 @@ public class Tweet {
         this.dogs = dogs;
     }
 
+    public List<TweetReport> getTweetReports() {
+        return tweetReports;
+    }
+
+    public void setTweetReports(List<TweetReport> tweetReports) {
+        this.tweetReports = tweetReports;
+    }
+
     public void addTweetGallery(TweetGallery tweetGallery) {
         if(this.tweetGalleries == null) {
             this.tweetGalleries = new ArrayList<>();
@@ -169,6 +183,14 @@ public class Tweet {
             this.dogs = new ArrayList<>();
         }
         this.dogs.add(dog);
+    }
+
+    public void addTweetReport(TweetReport tweetReport) {
+        if(this.tweetReports == null) {
+            this.tweetReports = new ArrayList<>();
+        }
+        this.tweetReports.add(tweetReport);
+        tweetReport.setTweet(this);
     }
 
     @Override

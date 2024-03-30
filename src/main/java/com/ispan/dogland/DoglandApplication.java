@@ -4,10 +4,7 @@ import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dao.product.ProductRepository;
-import com.ispan.dogland.model.dao.tweet.TweetFollowListRepository;
-import com.ispan.dogland.model.dao.tweet.TweetLikeRepository;
-import com.ispan.dogland.model.dao.tweet.TweetNotificationRepository;
-import com.ispan.dogland.model.dao.tweet.TweetRepository;
+import com.ispan.dogland.model.dao.tweet.*;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
@@ -47,17 +44,18 @@ public class DoglandApplication {
 											   TweetService tweetService,
 											   TweetLikeRepository tweetLikeRepository,
 											   TweetFollowListRepository tweetFollowListRepository,
-											   TweetNotificationRepository tweetNotificationRepository, AccountService accountService) {
+											   TweetNotificationRepository tweetNotificationRepository,
+											   AccountService accountService,
+											   TweetReportRepository tweetReportRepository) {
 		return runner -> {
-
-
-
-
-
-
 		};
 
-	}
+
+
+
+	};
+
+
 
 	private void findUserAndDogsByUserId(UserRepository userRepository,DogRepository dogRepository){
 //		Users u1 = userRepository.findUserAndDogsByUserId(1);

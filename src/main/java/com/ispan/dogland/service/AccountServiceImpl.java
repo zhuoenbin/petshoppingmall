@@ -1,15 +1,21 @@
 package com.ispan.dogland.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dto.Passport;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
+import com.ispan.dogland.model.entity.activity.ActivityGallery;
+import com.ispan.dogland.model.entity.activity.VenueActivity;
 import com.ispan.dogland.service.interfaceFile.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -19,13 +25,15 @@ public class AccountServiceImpl implements AccountService {
     private EmployeeRepository employeeRepository;
     private PasswordEncoder passwordEncoder;
     private MailService mailService;
+    private Cloudinary cloudinary;
 
     @Autowired
-    public AccountServiceImpl(UserRepository usersRepository,EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder,MailService mailService) {
+    public AccountServiceImpl(UserRepository usersRepository,EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder,MailService mailService,Cloudinary cloudinary) {
         this.usersRepository = usersRepository;
         this.passwordEncoder = passwordEncoder;
         this.mailService = mailService;
         this.employeeRepository = employeeRepository;
+        this.cloudinary=cloudinary;
     }
 
     @Override
@@ -36,7 +44,7 @@ public class AccountServiceImpl implements AccountService {
             if(passwordEncoder.matches(password, tmpUser.getUserPassword())){
                 tmpUser.setLastLoginTime(new Date());
                 usersRepository.save(tmpUser);
-                return new Passport(tmpUser.getLastName(),tmpUser.getUserEmail(), tmpUser.getUserId(), tmpUser.getUserStatus());
+                return new Passport(tmpUser.getLastName(),tmpUser.getUserEmail(), tmpUser.getUserId(), tmpUser.getUserStatus(),tmpUser.getUserImgPath());
             }
         }
         if(tmpEmp != null){
@@ -44,7 +52,6 @@ public class AccountServiceImpl implements AccountService {
                 return new Passport(tmpEmp.getLastName(),tmpEmp.getEmail(), tmpEmp.getEmployeeId(), tmpEmp.getDbAuthority());
             }
         }
-        System.out.println("4");
         return null;
     }
 
@@ -140,5 +147,34 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void updateUser(Users user) {
         usersRepository.save(user);
+    }
+
+    @Override
+    public Users findUsersByLastName(String lastName) {
+        return usersRepository.findByLastName(lastName);
+    }
+
+    @Override
+    public String uploadImg(MultipartFile file, Integer userId) {
+        try{
+            Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "accountFolder"));
+            Users user = usersRepository.findByUserId(userId);
+            user.setUserImgPath((String) data.get("url"));
+            user.setImgPublicId((String) data.get("public_id"));
+            usersRepository.save(user);
+            return (String) data.get("url");
+        }catch (IOException e){
+            throw new RuntimeException("Image uploading fail !!");
+        }
+    }
+
+    @Override
+    public Users findUsersByUserId(Integer userId) {
+        return usersRepository.findByUserId(userId);
+    }
+
+    @Override
+    public Users findUsersByTweetId(Integer tweetId) {
+        return usersRepository.findUserByTweetId(tweetId);
     }
 }

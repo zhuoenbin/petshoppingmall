@@ -11,33 +11,44 @@ import java.util.List;
 
 public interface TweetRepository extends JpaRepository<Tweet, Integer> {
 
-    @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries WHERE t.user.userId = ?1")
-    List<Tweet> findByUserId(Integer userId);
 
+    @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries WHERE t.user.userId = ?1 AND t.preNode = 0 AND t.tweetStatus = 1 ORDER BY t.postDate DESC")
+    List<Tweet> findTweetsByUserId(Integer userId);
 
-    //使用tweetId找找推特與圖
-    @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries WHERE t.tweetId = ?1")
-    Tweet findByTweetId(Integer tweetId);
-
+    @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries WHERE t.user.userId = ?1 AND t.tweetStatus = 1 ORDER BY t.postDate DESC")
+    List<Tweet> findTweetsAndCommentsByUserId(Integer userId);
     //找所有推文與圖片
-    @Query("SELECT t FROM Tweet t LEFT JOIN FETCH t.tweetGalleries")
+    @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries WHERE t.tweetStatus = 1")
     List<Tweet> findAllTweetsWithGallery();
 
 
-    @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries WHERE t.preNode = ?1")
+    @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries WHERE t.preNode = ?1 AND t.tweetStatus = 1")
     List<Tweet> findCommentByPreNodeId(Integer preNodeId);
 
     //找出所有貼文與圖片(不包括留言)，且分頁
-//    @Query("SELECT t FROM Tweet t LEFT JOIN FETCH t.tweetGalleries WHERE t.preNode = 0")
+//    @Query("SELECT t FROM Tweet t LEFT JOIN FETCH t.tweetGalleries WHERE t.preNode = 0 AND t.tweetStatus = 1" )
 //    Page<Tweet> findAllTweetsWithGallery(Pageable pageable);
-    @Query("SELECT t FROM Tweet t LEFT JOIN FETCH t.tweetGalleries WHERE t.preNode = 0 ORDER BY t.postDate DESC")
+    @Query("SELECT t FROM Tweet t LEFT JOIN FETCH t.tweetGalleries WHERE t.preNode = 0 AND t.tweetStatus = 1 ORDER BY t.postDate DESC")
     Page<Tweet> findAllTweetsWithGallery(Pageable pageable);
 
+    @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries WHERE t.user.userId = ?1 AND t.preNode = 0 AND t.tweetStatus = 1")
+    List<Tweet> findTweetsWithGalleryWithNoComment(Integer userId);
+
+    @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries WHERE t.user.lastName = ?1 AND t.preNode = 0 AND t.tweetStatus = 1")
+    List<Tweet> findTweetsByUserName(String userName);
+    @Query("SELECT t FROM Tweet t LEFT JOIN  t.tweetGalleries WHERE t.tweetId = ?1 AND t.tweetStatus = 1")
+    Tweet findTweetByTweetId(Integer tweetId);
 
     @Query("SELECT u FROM Users u JOIN FETCH u.tweetLikes t WHERE t.tweetId = ?1")
     List<Users> findUserLikesByTweetId(Integer tweetId);
 
-    @Query("SELECT t FROM Tweet t LEFT JOIN  t.userLikes WHERE t.tweetId = ?1")
+    @Query("SELECT t FROM Tweet t LEFT JOIN  t.userLikes WHERE t.tweetId = ?1 AND t.tweetStatus = 1")
     Tweet findTweetUserLikesByTweetId(Integer tweetId);
+
+    @Query("SELECT t FROM Tweet t  JOIN FETCH t.dogs WHERE t.tweetId = ?1 AND t.tweetStatus = 1")
+    Tweet findTweetAndDogsByTweetId(Integer tweetId);
+
+    @Query("SELECT t FROM Tweet t  LEFT JOIN FETCH t.dogs WHERE t.tweetId = ?1 AND t.tweetStatus = 1")
+    Tweet findTweetAndDogsByTweetIdByLEFTJOIN(Integer tweetId);
 
 }

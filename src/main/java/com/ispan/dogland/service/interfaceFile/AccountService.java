@@ -2,6 +2,7 @@ package com.ispan.dogland.service.interfaceFile;
 
 import com.ispan.dogland.model.dto.Passport;
 import com.ispan.dogland.model.entity.Users;
+import org.springframework.web.multipart.MultipartFile;
 
 
 public interface AccountService {
@@ -30,5 +31,12 @@ public interface AccountService {
 
     public void updateUser(Users user);
 
+    public Users findUsersByLastName(String lastName);
+
+    public String uploadImg(MultipartFile file, Integer userId);
+
+    public Users findUsersByUserId(Integer userId);
+
+    public Users findUsersByTweetId(Integer tweetId);
 
 }

@@ -1,6 +1,7 @@
 package com.ispan.dogland.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ispan.dogland.model.entity.tweet.Tweet;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -46,6 +47,15 @@ public class Dog {
             cascade = {CascadeType.ALL})
     @JsonIgnore
     private List<RoomReservation> roomReservation;
+
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinTable(name="tweet_tag_dog", joinColumns = @JoinColumn(name="dog_id"),
+            inverseJoinColumns = @JoinColumn(name="tweet_id"))
+    @JsonIgnore
+    private List<Tweet> tweets;
+
 
     public List<RoomReservation> getRoomReservation() {
         return roomReservation;
@@ -166,6 +176,21 @@ public class Dog {
 
     public void setUser(Users user) {
         this.user = user;
+    }
+
+    public List<Tweet> getTweets() {
+        return tweets;
+    }
+
+    public void setTweets(List<Tweet> tweets) {
+        this.tweets = tweets;
+    }
+
+    public void addTweet(Tweet tweet){
+        if(tweets==null){
+            tweets = new ArrayList<>();
+        }
+        tweets.add(tweet);
     }
 
     @Override

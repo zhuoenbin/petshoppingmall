@@ -3,6 +3,7 @@ package com.ispan.dogland.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ispan.dogland.model.entity.tweet.Tweet;
+import com.ispan.dogland.model.entity.tweet.TweetNotification;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -52,8 +53,7 @@ public class Users {
 //            mappedBy = "user")
 //    private List<Friends> friends;
 
-    @OneToMany(mappedBy = "user",
-            cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Tweet> tweets;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE,
@@ -61,6 +61,8 @@ public class Users {
     @JoinTable(name="tweet_like", joinColumns = @JoinColumn(name="user_id"),
             inverseJoinColumns = @JoinColumn(name="tweet_id"))
     private List<Tweet> tweetLikes;
+
+
 
 
     @PrePersist //在物件轉換到persistent狀態以前，做這個function
@@ -177,12 +179,16 @@ public class Users {
         this.dogs = dogs;
     }
 
+
     public void addDog(Dog dog) {
         if(this.dogs == null) {
             this.dogs = new ArrayList<>();
         }
         this.dogs.add(dog);
+        dog.setUser(this);
     }
+
+
 
     public List<Tweet> getTweets() {
         return tweets;

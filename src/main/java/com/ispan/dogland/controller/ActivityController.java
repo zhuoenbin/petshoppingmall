@@ -181,4 +181,28 @@ public class ActivityController {
         return activityService.getEmployeePass(employeeId);
     }
 
+    //===============所有過去活動===============
+    @GetMapping("/allPastAct/{pageNumber}")
+    public Page<ActivityBrief> showPastBriefByPage(@PathVariable Integer pageNumber){
+        return activityService.findPastActivityByPage(pageNumber);
+    }
+
+    //===============類別過去活動===============
+    @GetMapping("/pastAct/category/{typeId}/{pageNumber}")
+    public Page<ActivityBrief> showPastBriefByPage(@PathVariable Integer pageNumber,@PathVariable Integer typeId){
+        return activityService.findPastActByCategory(pageNumber,typeId);
+    }
+
+    //===============所有過去活動===============
+    @GetMapping("/allNowAct/{pageNumber}")
+    public Page<ActivityBrief> showNowBriefByPage(@PathVariable Integer pageNumber){
+        return activityService.findNowActivityByPage(pageNumber);
+    }
+
+    //===============類別過去活動===============
+    @GetMapping("/nowAct/category/{typeId}/{pageNumber}")
+    public Page<ActivityBrief> showNowBriefByPage(@PathVariable Integer pageNumber,@PathVariable Integer typeId){
+        return activityService.findNowActByCategory(pageNumber,typeId);
+    }
+
 }

@@ -10,10 +10,18 @@ import java.util.List;
 
 public interface VenueActivityRepository extends JpaRepository<VenueActivity,Integer> {
     VenueActivity findByActivityId(Integer activityId);
+    Page<VenueActivity> findAllByOrderByActivityStartAsc(Pageable pageable);
 
     Page<VenueActivity> findByActivityType(ActivityType activityType, Pageable pageable);
 
-    List<VenueActivity> findByActivityStatusNot(String activityStatus);
+    //找活動狀態是
+    Page<VenueActivity> findByActivityStatusOrderByActivityStartAsc(String activityStatus, Pageable pageable);
+    //找活動狀態非
+    Page<VenueActivity> findByActivityStatusNotOrderByActivityStartAsc(String activityStatus, Pageable pageable);
+    //找類別活動狀態是
+    Page<VenueActivity> findByActivityTypeAndActivityStatusOrderByActivityStartAsc(ActivityType activityType,String activityStatus, Pageable pageable);
+    //找類別活動狀態非
+    Page<VenueActivity> findByActivityTypeAndActivityStatusNotOrderByActivityStartAsc(ActivityType activityType,String activityStatus, Pageable pageable);
 
 
 

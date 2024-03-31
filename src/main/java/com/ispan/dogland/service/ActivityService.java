@@ -249,7 +249,7 @@ public class ActivityService {
 
     //===============所有活動簡述===============
     public Page<ActivityBrief> findActivityByPage(Integer pageNumber){
-        Page<VenueActivity> all = activityRepository.findAll(PageRequest.of(pageNumber-1, 4));
+        Page<VenueActivity> all = activityRepository.findAllByOrderByActivityStartAsc(PageRequest.of(pageNumber-1, 6));
 
         Page<ActivityBrief> briefs = all.map(a->{
             ActivityBrief ab = new ActivityBrief();
@@ -534,6 +534,86 @@ public class ActivityService {
         EmployeeDto dto = new EmployeeDto();
         BeanUtils.copyProperties(employee,dto);
         return dto;
+    }
+    //===============所有過去活動簡述===============
+    public Page<ActivityBrief> findPastActivityByPage(Integer pageNumber){
+        Page<VenueActivity> all = activityRepository.findByActivityStatusOrderByActivityStartAsc("活動已結束",PageRequest.of(pageNumber-1, 6));
+
+        Page<ActivityBrief> briefs = all.map(a->{
+            ActivityBrief ab = new ActivityBrief();
+            BeanUtils.copyProperties(a,ab);
+
+            Integer activityId = a.getActivityId();
+            VenueActivity activity = activityRepository.findByActivityId(activityId);
+            ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
+            ab.setGalleryImgUrl(main.getGalleryImgUrl());
+
+            ab.setActivityTypeName(a.getActivityType().getActivityTypeName());
+            ab.setVenueName(a.getVenue().getVenueName());
+            return ab;
+        });
+        return briefs;
+    }
+
+    //===============過去類別活動簡述===============
+    public Page<ActivityBrief> findPastActByCategory(Integer pageNumber,Integer typeId){
+        ActivityType type = typeRepository.findByActivityTypeId(typeId);
+        Page<VenueActivity> all = activityRepository.findByActivityTypeAndActivityStatusOrderByActivityStartAsc(type,"活動已結束",PageRequest.of(pageNumber-1, 6));
+
+        Page<ActivityBrief> briefs = all.map(a->{
+            ActivityBrief ab = new ActivityBrief();
+            BeanUtils.copyProperties(a,ab);
+
+            Integer activityId = a.getActivityId();
+            VenueActivity activity = activityRepository.findByActivityId(activityId);
+            ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
+            ab.setGalleryImgUrl(main.getGalleryImgUrl());
+
+            ab.setActivityTypeName(a.getActivityType().getActivityTypeName());
+            ab.setVenueName(a.getVenue().getVenueName());
+            return ab;
+        });
+        return briefs;
+    }
+    //===============所有現在活動簡述===============
+    public Page<ActivityBrief> findNowActivityByPage(Integer pageNumber){
+        Page<VenueActivity> all = activityRepository.findByActivityStatusNotOrderByActivityStartAsc("活動已結束",PageRequest.of(pageNumber-1, 6));
+
+        Page<ActivityBrief> briefs = all.map(a->{
+            ActivityBrief ab = new ActivityBrief();
+            BeanUtils.copyProperties(a,ab);
+
+            Integer activityId = a.getActivityId();
+            VenueActivity activity = activityRepository.findByActivityId(activityId);
+            ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
+            ab.setGalleryImgUrl(main.getGalleryImgUrl());
+
+            ab.setActivityTypeName(a.getActivityType().getActivityTypeName());
+            ab.setVenueName(a.getVenue().getVenueName());
+            return ab;
+        });
+        return briefs;
+    }
+
+    //===============現在類別活動簡述===============
+    public Page<ActivityBrief> findNowActByCategory(Integer pageNumber,Integer typeId){
+        ActivityType type = typeRepository.findByActivityTypeId(typeId);
+        Page<VenueActivity> all = activityRepository.findByActivityTypeAndActivityStatusNotOrderByActivityStartAsc(type,"活動已結束",PageRequest.of(pageNumber-1, 6));
+
+        Page<ActivityBrief> briefs = all.map(a->{
+            ActivityBrief ab = new ActivityBrief();
+            BeanUtils.copyProperties(a,ab);
+
+            Integer activityId = a.getActivityId();
+            VenueActivity activity = activityRepository.findByActivityId(activityId);
+            ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
+            ab.setGalleryImgUrl(main.getGalleryImgUrl());
+
+            ab.setActivityTypeName(a.getActivityType().getActivityTypeName());
+            ab.setVenueName(a.getVenue().getVenueName());
+            return ab;
+        });
+        return briefs;
     }
 
 

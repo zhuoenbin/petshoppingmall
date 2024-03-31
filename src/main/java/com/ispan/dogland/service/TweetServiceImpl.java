@@ -1,9 +1,11 @@
 package com.ispan.dogland.service;
 
 import com.ispan.dogland.model.dao.DogRepository;
+import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dao.tweet.*;
 import com.ispan.dogland.model.entity.Dog;
+import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.tweet.*;
 import com.ispan.dogland.service.interfaceFile.TweetService;
@@ -40,6 +42,7 @@ public class TweetServiceImpl implements TweetService {
     private DogRepository dogRepository;
     private TweetNotificationRepository tweetNotificationRepository;
     private TweetReportRepository tweetReportRepository;
+    private EmployeeRepository employeeRepository;
 
     @Autowired
     public TweetServiceImpl(TweetRepository tweetRepository,
@@ -49,7 +52,8 @@ public class TweetServiceImpl implements TweetService {
                             TweetFollowListRepository tweetFollowListRepository,
                             DogRepository dogRepository,
                             TweetNotificationRepository tweetNotificationRepository,
-                            TweetReportRepository tweetReportRepository) {
+                            TweetReportRepository tweetReportRepository,
+                            EmployeeRepository employeeRepository) {
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
         this.tweetGalleryRepository = tweetGalleryRepository;
@@ -58,6 +62,7 @@ public class TweetServiceImpl implements TweetService {
         this.dogRepository = dogRepository;
         this.tweetNotificationRepository = tweetNotificationRepository;
         this.tweetReportRepository = tweetReportRepository;
+        this.employeeRepository = employeeRepository;
     }
 
     @Override
@@ -295,6 +300,18 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
+    public void sendBanTweetNotificationToUser(Integer userId,Tweet tweet) {
+        TweetNotification tweetNotification = new TweetNotification();
+
+        tweetNotification.setPostTime(new Date());
+        tweetNotification.setUserId(userId);
+        tweetNotification.setContent("您的一則貼文因違反平台政策，已被移除。\n推文內容：" + tweet.getTweetContent());
+        tweetNotification.setIsRead(0);
+        tweetNotificationRepository.save(tweetNotification);
+    }
+
+
+    @Override
     public List<TweetNotification> findMyTweetNotifications(Integer userId) {
 
         List<TweetNotification> notifications = tweetNotificationRepository.findByUserId(userId);
@@ -388,6 +405,32 @@ public class TweetServiceImpl implements TweetService {
     @Override
     public Users findUserByReportId(Integer reportId) {
         return userRepository.findUserByReportId(reportId);
+    }
+
+    @Override
+    public Tweet banTweet(Integer tweetId) {
+        Tweet t1 = tweetRepository.findTweetAndUserByTweetIdForEMP(tweetId);
+        if(t1 == null){
+            return null;
+        }
+        t1.setTweetStatus(0);
+        return tweetRepository.save(t1);
+    }
+
+
+    @Override
+    public String addEmployeeToReport(Integer reportsId, Integer empId) {
+        Employee emp = employeeRepository.findEmployeeAndReportsByEmployeeId(empId);
+        TweetReport tr = tweetReportRepository.findByTweetReportId(reportsId);
+        tr.setReportStatus(1);
+        emp.addTweetReport(tr);
+        employeeRepository.save(emp);
+        return null;
+    }
+
+    @Override
+    public Employee findEmployeeByReportId(Integer reportId) {
+        return employeeRepository.findEmployeeByTweetReportId(reportId);
     }
 
 

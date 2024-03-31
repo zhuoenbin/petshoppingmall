@@ -1,6 +1,7 @@
 package com.ispan.dogland.service.interfaceFile;
 
 import com.ispan.dogland.model.entity.Dog;
+import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import com.ispan.dogland.model.entity.tweet.TweetFollowList;
@@ -63,6 +64,8 @@ public interface TweetService {
 
     public void sendLikeNotificationToTweetOwner(Integer hisUserId,Integer hisTweetId,String myName);
 
+    public void sendBanTweetNotificationToUser(Integer userId,Tweet tweet);
+
     public List<TweetNotification> findMyTweetNotifications(Integer userId);
 
     //把該user的主推文與回文都找出來
@@ -85,4 +88,11 @@ public interface TweetService {
     public Tweet findTweetByReportId(Integer reportId);
 
     public  Users findUserByReportId(Integer reportId);
+
+    public Tweet banTweet(Integer tweetId);
+
+
+    public String addEmployeeToReport(Integer reportsId, Integer empId);
+
+    Employee findEmployeeByReportId(Integer reportId);
 }

@@ -1,7 +1,7 @@
-package com.ispan.dogland.model.entity;
+package com.ispan.dogland.model.entity.room;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ispan.dogland.model.entity.Room;
+import com.ispan.dogland.model.entity.Dog;
+import com.ispan.dogland.model.entity.Users;
 import jakarta.persistence.*;
 import java.util.Date;
 
@@ -15,8 +15,12 @@ public class RoomReservation {
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name="room_id")
-
     private Room room;
+
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumn(name="user_id")
+    private Users user;
+
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name="dog_id")
     private Dog dog;
@@ -46,9 +50,10 @@ public class RoomReservation {
     public RoomReservation() {
     }
 
-    public RoomReservation(Integer reservationId, Room room, Dog dog, Date startTime, Date endTime, Integer totalPrice, Date reservationTime, Date cancelTime, String cancelDirection, String paymentMethod, String paymentStatus, Integer star, String conments, Date conmentsTime) {
+    public RoomReservation(Integer reservationId, Room room, Users user, Dog dog, Date startTime, Date endTime, Integer totalPrice, Date reservationTime, Date cancelTime, String cancelDirection, String paymentMethod, String paymentStatus, Integer star, String conments, Date conmentsTime) {
         this.reservationId = reservationId;
         this.room = room;
+        this.user = user;
         this.dog = dog;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -77,6 +82,14 @@ public class RoomReservation {
 
     public void setRoom(Room room) {
         this.room = room;
+    }
+
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
     }
 
     public Dog getDog() {
@@ -180,6 +193,7 @@ public class RoomReservation {
         final StringBuffer sb = new StringBuffer("RoomReservation{");
         sb.append("reservationId=").append(reservationId);
         sb.append(", room=").append(room);
+        sb.append(", user=").append(user);
         sb.append(", dog=").append(dog);
         sb.append(", startTime=").append(startTime);
         sb.append(", endTime=").append(endTime);

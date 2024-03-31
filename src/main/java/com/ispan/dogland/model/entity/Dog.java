@@ -1,6 +1,7 @@
 package com.ispan.dogland.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ispan.dogland.model.entity.room.RoomReservation;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;

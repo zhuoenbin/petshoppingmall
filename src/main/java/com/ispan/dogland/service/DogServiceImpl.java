@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -36,6 +37,11 @@ public class DogServiceImpl implements DogService {
         return userRepository.findUserAndDogsByUserId(userId);
     }
 
+    public List<Dog> findDogsByUsersId(Integer userId) {
+        Users user = userRepository.findByUserId(userId);
+        return user.getDogs();
+    }
+
     @Override
     public Dog addUserDog(Dog dog, Integer userId) {
         dog.setUser(userRepository.findByUserId(userId));
@@ -54,6 +60,18 @@ public class DogServiceImpl implements DogService {
         }catch (IOException e){
             throw new RuntimeException("Image uploading fail !!");
         }
+    }
+
+    @Override
+    public void updateDog(Dog dog, Integer dogId) {
+        Dog dog1 = dogRepository.findByDogId(dogId);
+        dog1.setDogName(dog.getDogName());
+        dog1.setDogGender(dog.getDogGender());
+        dog1.setDogBirthDate(dog.getDogBirthDate());
+        dog1.setDogBreed(dog.getDogBreed());
+        dog1.setDogWeight(dog.getDogWeight());
+        dog1.setDogIntroduce(dog.getDogIntroduce());
+        dogRepository.save(dog1);
     }
 
 

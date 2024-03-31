@@ -40,8 +40,14 @@ public class DogController {
     }
 
     @PostMapping("/addDogImg")
-    public void addDogImg(Integer dogId, @RequestParam MultipartFile dogImgPathCloud) {
-        dogService.uploadImg(dogId, dogImgPathCloud);
+    public String addDogImg(Integer dogId, @RequestParam MultipartFile dogImgPathCloud) {
+        return dogService.uploadImg(dogId, dogImgPathCloud);
+    }
+
+    @PostMapping("/update")
+    public Integer update(@RequestBody Dog dog, @RequestParam Integer dogId) {
+        dogService.updateDog(dog, dogId);
+        return dogId;
     }
 
 }

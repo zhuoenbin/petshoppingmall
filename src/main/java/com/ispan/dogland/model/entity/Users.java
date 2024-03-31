@@ -2,9 +2,9 @@ package com.ispan.dogland.model.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ispan.dogland.model.entity.room.RoomReservation;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import jakarta.persistence.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,6 +62,12 @@ public class Users {
             inverseJoinColumns = @JoinColumn(name="tweet_id"))
     private List<Tweet> tweetLikes;
 
+
+    @OneToMany(mappedBy = "user",
+            fetch = FetchType.LAZY ,
+            cascade = {CascadeType.ALL})
+    @JsonIgnore
+    private List<RoomReservation> roomReservation;
 
     @PrePersist //在物件轉換到persistent狀態以前，做這個function
     public void onCreate() {

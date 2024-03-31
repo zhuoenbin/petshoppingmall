@@ -1,7 +1,12 @@
 package com.ispan.dogland.model.entity;
 
+import com.ispan.dogland.model.entity.tweet.TweetGallery;
+import com.ispan.dogland.model.entity.tweet.TweetReport;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Table
 @Entity
@@ -28,6 +33,12 @@ public class Employee {
     private String district;
     private String address;
     private String dbAuthority;
+
+    @OneToMany(fetch = FetchType.LAZY,
+                mappedBy = "employee",
+                cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                           CascadeType.DETACH, CascadeType.REFRESH})
+    private List<TweetReport> tweetReports;
 
     public Employee(){
     }
@@ -126,6 +137,22 @@ public class Employee {
 
     public void setDbAuthority(String dbAuthority) {
         this.dbAuthority = dbAuthority;
+    }
+
+    public List<TweetReport> getTweetReports() {
+        return tweetReports;
+    }
+
+    public void setTweetReports(List<TweetReport> tweetReports) {
+        this.tweetReports = tweetReports;
+    }
+
+    public void addTweetReport(TweetReport tweetReport) {
+        if(this.tweetReports == null) {
+            this.tweetReports = new ArrayList<>();
+        }
+        this.tweetReports.add(tweetReport);
+        tweetReport.setEmployee(this);
     }
 
     @Override

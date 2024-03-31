@@ -5,6 +5,7 @@ import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.tweet.TweetRepository;
 import com.ispan.dogland.model.dto.TweetDto;
 import com.ispan.dogland.model.dto.TweetLikesCheckResponse;
+import com.ispan.dogland.model.dto.UserDto;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.tweet.Tweet;
@@ -377,7 +378,6 @@ public class TweetController {
         return tweetService.saveTweet(t1);
     }
 
-
     @PostMapping("/reportTweet")
     public ResponseEntity<String> handlePostRequest(@RequestBody Map<String, Object> requestMap) {
         //被檢舉的tweetId
@@ -412,10 +412,11 @@ public class TweetController {
         return tweetService.findTweetByReportId(reportId);
     }
 
-
     @GetMapping("/getUserByReportId/{reportId}")
-    public Tweet getUserByReportId(@PathVariable Integer reportId) {
-        return tweetService.findTweetByReportId(reportId);
+    public UserDto getUserByReportId(@PathVariable Integer reportId) {
+        UserDto userDto = new UserDto();
+        userDto.setUser(tweetService.findUserByReportId(reportId));
+        return userDto;
     }
 
 }

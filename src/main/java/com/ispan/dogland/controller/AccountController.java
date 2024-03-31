@@ -200,4 +200,34 @@ public class AccountController {
         return imgURL;
     }
 
+    @PostMapping("/account/updatePassword")
+    public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> requestBody,HttpSession session) {
+        String oldPassword = requestBody.get("oldPassword");
+        String newPassword = requestBody.get("newPassword");
+
+        Passport loginUser=(Passport)session.getAttribute("loginUser");
+        Users user = accountService.findUsersByUserId(loginUser.getUserId());
+
+        //google登入後是無密碼狀態
+        if(Objects.equals(user.getUserPassword(), "")){
+            accountService.resetPassword(user.getUserEmail(), newPassword);
+            return ResponseEntity.ok("resetPassword success");
+        }
+
+        if(accountService.loginCheck(loginUser.getEmail(), oldPassword) != null){
+            accountService.resetPassword(loginUser.getEmail(), newPassword);
+            return ResponseEntity.ok("resetPassword success");
+        }
+        return ResponseEntity.badRequest().body("舊密碼有誤");
+    }
+
+
+    @GetMapping("/account/checkPasswordIsEmpty")
+    public boolean checkPasswordIsEmpty(HttpSession session) {
+        Passport loginUser=(Passport)session.getAttribute("loginUser");
+        Users user = accountService.findUsersByUserId(loginUser.getUserId());
+        return Objects.equals(user.getUserPassword(), "");
+    }
+
+
 }

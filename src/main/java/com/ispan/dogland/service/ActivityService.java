@@ -528,6 +528,16 @@ public class ActivityService {
         return userJoinedRepository.save(joined);
     }
 
+    //===============請求員工資料===============
+    public EmployeeDto getEmployeePass(Integer employeeId){
+        Employee employee = employeeRepository.findByEmployeeId(employeeId);
+        EmployeeDto dto = new EmployeeDto();
+        BeanUtils.copyProperties(employee,dto);
+        return dto;
+    }
+
+
+
 
 
 

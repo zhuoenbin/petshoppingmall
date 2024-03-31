@@ -175,4 +175,10 @@ public class ActivityController {
         return activityService.renewUserNote(activityId,userId,userNote);
     }
 
+    //===============請求員工資料===============
+    @GetMapping("/official/employeePass/{employeeId}")
+    public EmployeeDto getEmployeePass(@PathVariable Integer employeeId){
+        return activityService.getEmployeePass(employeeId);
+    }
+
 }

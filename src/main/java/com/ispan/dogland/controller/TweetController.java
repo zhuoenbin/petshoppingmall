@@ -15,21 +15,16 @@ import com.ispan.dogland.model.entity.tweet.TweetReport;
 import com.ispan.dogland.service.interfaceFile.AccountService;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
@@ -76,6 +71,16 @@ public class TweetController {
     public String getUserNameByTweetId(@PathVariable Integer tweetId) {
         return tweetService.findUserByTweetId(tweetId).getLastName();
     }
+
+    @GetMapping("/getUserByTweetId/{tweetId}")
+    public UserDto getUserByTweetId(@PathVariable Integer tweetId) {
+        Users user = tweetService.findUserByTweetId(tweetId);
+        UserDto userDto = new UserDto();
+        userDto.setUserId(user.getUserId());
+        userDto.setLastName(user.getLastName());
+        return userDto;
+    }
+
 
     @PostMapping("/postTweetWithPhoto")
     public ResponseEntity<String> postTweet(@RequestParam Integer memberId,
@@ -229,9 +234,17 @@ public class TweetController {
 
     //取得該貼文所有按讚的用戶
     @GetMapping("/getTweetLikesUser")
-    public ResponseEntity<List<Users>> getTweetLikesUser(@RequestParam Integer tweetId) {
+    public ResponseEntity<List<UserDto>> getTweetLikesUser(@RequestParam Integer tweetId) {
         List<Users> users = tweetService.findUserLikesByTweetId(tweetId);
-        return ResponseEntity.ok(users);
+        List<UserDto> userDtos= new ArrayList<>();
+
+        UserDto userDto = null;
+        for (Users user : users) {
+            userDto = new UserDto();
+            userDto.setUserWithOutPassword(user);
+            userDtos.add(userDto);
+        }
+        return ResponseEntity.ok(userDtos);
     }
 
 

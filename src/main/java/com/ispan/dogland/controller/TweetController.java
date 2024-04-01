@@ -313,8 +313,15 @@ public class TweetController {
     }
 
     @GetMapping("/getMyFollowUsers")
-    public List<Users> getMyFollowUsers(@RequestParam Integer userId) {
-        return tweetService.findAllFollowUsersByUserId(userId);
+    public List<UserDto> getMyFollowUsers(@RequestParam Integer userId) {
+        List<Users> users = tweetService.findAllFollowUsersByUserId(userId);
+        List<UserDto> userDtos = new ArrayList<>();
+        for (Users user : users) {
+            UserDto userDto = new UserDto();
+            userDto.setUser(user);
+            userDtos.add(userDto);
+        }
+        return userDtos;
     }
 
 

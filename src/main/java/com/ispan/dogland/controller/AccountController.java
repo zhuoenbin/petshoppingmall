@@ -225,7 +225,6 @@ public class AccountController {
             accountService.resetPassword(user.getUserEmail(), newPassword);
             return ResponseEntity.ok("resetPassword success");
         }
-
         if(accountService.loginCheck(loginUser.getEmail(), oldPassword) != null){
             accountService.resetPassword(loginUser.getEmail(), newPassword);
             return ResponseEntity.ok("resetPassword success");
@@ -238,8 +237,14 @@ public class AccountController {
     public boolean checkPasswordIsEmpty(HttpSession session) {
         Passport loginUser=(Passport)session.getAttribute("loginUser");
         Users user = accountService.findUsersByUserId(loginUser.getUserId());
-        return Objects.equals(user.getUserPassword(), "");
+        String userPassword = user.getUserPassword();
+        if(userPassword==null){
+            return true;
+        }
+        return false;
     }
+
+
 
 
 }

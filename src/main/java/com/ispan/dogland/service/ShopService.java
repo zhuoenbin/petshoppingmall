@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ShopService {
@@ -44,9 +45,31 @@ public class ShopService {
     @Autowired
     OrderDetailRepository orderDetailRepository;
 
-    // 根據頁碼搜尋商品
+    // 根據頁碼搜尋商品(目前沒用到)
     public Page<ProductDto> findProductByPage(Integer pageNumber){
         Page<Product> products = productRepository.findAll(PageRequest.of(pageNumber,6));
+        Page<ProductDto> productDtos = products.map(p -> {
+            ProductDto pto = new ProductDto();
+            BeanUtils.copyProperties(p, pto);
+            // 獲取產品的所有圖片路徑列表
+            List<String> imgPaths = new ArrayList<>();
+            for (ProductGallery gallery : p.getProductGalleries()) {
+                imgPaths.add(gallery.getImgPath());
+            }
+            pto.setImgPath(imgPaths);
+            return pto;
+        });
+        return productDtos;
+    }
+
+    // 根據頁碼搜尋商品(增加搜尋功能)
+    public Page<ProductDto> findProductByPageWithKeyword(Integer pageNumber, String keyword) {
+        Page<Product> products;
+        if (keyword != null && !keyword.isEmpty()) {
+            products = productRepository.findAllByProductNameContaining(PageRequest.of(pageNumber, 6), keyword);
+        } else {
+            products = productRepository.findAll(PageRequest.of(pageNumber, 6));
+        }
         Page<ProductDto> productDtos = products.map(p -> {
             ProductDto pto = new ProductDto();
             BeanUtils.copyProperties(p, pto);
@@ -79,21 +102,89 @@ public class ShopService {
         return productDtos;
     }
 
-    // 加入指定商品到指定會員的購物車
-    public ShoppingCart addOneProductToCart(Integer userId,Integer productId){
-        Users m = new Users(userId);
-        Product p = new Product(productId);
+    //根據productID回傳商品
+    public List<ProductDto> findByProductPage(Integer productId) {
+        List<Product> products = productRepository.findByProductId(productId);
+        List<ProductDto> productDtos = products.stream().map(product -> {
+            ProductDto dto = new ProductDto();
+            BeanUtils.copyProperties(product, dto);
+            // 獲取產品的所有圖片路徑列表
+            List<String> imgPaths = new ArrayList<>();
+            for (ProductGallery gallery : product.getProductGalleries()) {
+                imgPaths.add(gallery.getImgPath());
+            }
+            dto.setImgPath(imgPaths);
+            return dto;
+        }).collect(Collectors.toList());
+        return productDtos;
+    }
 
-        ShoppingCart shoppingCartItem = shoppingCartRepository.findByUsersAndProduct(m,p);
+    // 加入指定商品到指定會員的購物車(ShopPage)
+//    public ShoppingCart addOneProductToCart(Integer userId,Integer productId){
+//        Users m = new Users(userId);
+//        Product p = new Product(productId);
+//
+//        ShoppingCart shoppingCartItem = shoppingCartRepository.findByUsersAndProduct(m,p);
+//
+//        if(shoppingCartItem !=null){
+//            shoppingCartItem.setQuantity(shoppingCartItem.getQuantity() + 1);
+//        }
+//        if(shoppingCartItem ==null) {
+//            shoppingCartItem = new ShoppingCart();
+//            shoppingCartItem.setUsers(m);
+//            shoppingCartItem.setProduct(p);
+//            shoppingCartItem.setQuantity(1);
+//        }
+//        return shoppingCartRepository.save(shoppingCartItem);
+//    }
 
-        if(shoppingCartItem !=null){
+    // 加入指定商品到指定會員的購物車(ProductPage)
+//    public ShoppingCart pageAddToCart(Integer userId,Integer productId,Integer quantity){
+//        Users m = new Users(userId);
+//        Product p = new Product(productId);
+//
+//        ShoppingCart shoppingCartItem = shoppingCartRepository.findByUsersAndProduct(m,p);
+//
+//        if(shoppingCartItem !=null){
+//            shoppingCartItem.setQuantity(quantity);
+//        }
+//        if(shoppingCartItem ==null) {
+//            shoppingCartItem = new ShoppingCart();
+//            shoppingCartItem.setUsers(m);
+//            shoppingCartItem.setProduct(p);
+//            shoppingCartItem.setQuantity(quantity);
+//        }
+//        return shoppingCartRepository.save(shoppingCartItem);
+//    }
+
+    //共用版加入購物車
+    public ShoppingCart totalAddToCart(Integer userId, Integer productId, Integer quantity) {
+        Users user = new Users(userId);
+        Product product = new Product(productId);
+
+        ShoppingCart shoppingCartItem = shoppingCartRepository.findByUsersAndProduct(user, product);
+
+        if (shoppingCartItem != null && quantity == null) {
+            // 如果購物車項目存在且數量為null，增加一個數量
             shoppingCartItem.setQuantity(shoppingCartItem.getQuantity() + 1);
         }
-        if(shoppingCartItem ==null) {
+        if (shoppingCartItem != null && quantity != null) {
+            // 如果購物車項目存在且數量不為null，設置新的數量
+            shoppingCartItem.setQuantity(shoppingCartItem.getQuantity() + quantity);
+        }
+        if (shoppingCartItem == null && quantity == null) {
+            // 如果購物車項目不存在且數量為null，創建一個新的購物車項目，並將數量設置為1
             shoppingCartItem = new ShoppingCart();
-            shoppingCartItem.setUsers(m);
-            shoppingCartItem.setProduct(p);
+            shoppingCartItem.setUsers(user);
+            shoppingCartItem.setProduct(product);
             shoppingCartItem.setQuantity(1);
+        }
+        if (shoppingCartItem == null && quantity != null) {
+            // 如果購物車項目不存在且數量不為null，創建一個新的購物車項目，並將數量設置為指定的數量
+            shoppingCartItem = new ShoppingCart();
+            shoppingCartItem.setUsers(user);
+            shoppingCartItem.setProduct(product);
+            shoppingCartItem.setQuantity(quantity);
         }
         return shoppingCartRepository.save(shoppingCartItem);
     }
@@ -139,7 +230,7 @@ public class ShopService {
         return ordersRepository.save(order);
     }
 
-    //------------LinePay------------
+    //------------------------LinePay------------------------
     //Hmac 簽章
     public static String encrypt(final String keys, final String data) {
         return toBase64String(HmacUtils.getInitializedMac(HmacAlgorithms.HMAC_SHA_256, keys.getBytes()).doFinal(data.getBytes()));

@@ -14,10 +14,14 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product,Integer> {
-//    Product findByProductId(Integer productId);
-//    List<Product> findByProductName(String productName);
 
     @Query("SELECT p FROM Product p WHERE p.category.categoryId = :categoryId")
     Page<Product> findByCategoryId(Pageable pageable,Integer categoryId);
+
+    //關鍵字搜尋功能
+    Page<Product> findAllByProductNameContaining(Pageable pageable,String keyword);
+
+    @Query("SELECT p FROM Product p WHERE p.productId = :productId")
+    List<Product> findByProductId(Integer productId);
 
 }

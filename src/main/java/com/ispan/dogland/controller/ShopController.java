@@ -39,9 +39,9 @@ import java.util.*;
 @RestController
 public class ShopController {
 
+    private String allTransactionId;  //用在linepay的transactionId
     @Autowired
     private ShopService shopService;
-    private String allTransactionId;  //用在linepay的transactionId
     @Autowired
     private OrdersRepository ordersRepository;
     @Autowired
@@ -49,13 +49,22 @@ public class ShopController {
     @Autowired
     private ProductRepository productRepository;
 
-    //商品列表與商品分頁
+    //商品列表與商品分頁(沒有加關鍵字查詢)目前沒用到
     @GetMapping("/products/{pageNumber}")
     public Page<ProductDto> findProductByPage(@PathVariable Integer pageNumber){
         Page<ProductDto> productDtos = shopService.findProductByPage(pageNumber);
         return productDtos;
     }
 
+    //商品列表與商品分頁(增加搜尋功能)
+    @GetMapping("/products-keyword/{pageNumber}")
+    public Page<ProductDto> findProductByPageWithKeyword(@PathVariable Integer pageNumber,
+                                                         @RequestParam(required = false) String keyword) {
+        Page<ProductDto> productDtos = shopService.findProductByPageWithKeyword(pageNumber, keyword);
+        return productDtos;
+    }
+
+    //用類別查詢商品
     @GetMapping("/category/{pageNumber}/{categoryId}")
     public Page<ProductDto> findByCategory(@PathVariable Integer pageNumber,
                                            @PathVariable Integer categoryId) {
@@ -63,17 +72,48 @@ public class ShopController {
         return products;
     }
 
+    //根據productID回傳商品
+    @GetMapping("/productPage/{productId}")
+    public List<ProductDto> findProductByPageWithKeyword(@PathVariable Integer productId) {
+        List<ProductDto> productDtos = shopService.findByProductPage(productId);
+        return productDtos;
+    }
+    
+    //加入購物車(ShopPage)
+//    @RequestMapping("/product/add/{productId}")
+//    public ShoppingCart addOneProductToCart(@PathVariable Integer productId, HttpSession session){
+//        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+//        if(loggedInMember == null){
+//            throw new RuntimeException("未登入錯誤");
+//        }
+//        return shopService.addOneProductToCart(loggedInMember.getUserId(),productId);
+//    }
 
-    //加入購物車
-    @RequestMapping("/product/add/{productId}")
-    public ShoppingCart addOneProductToCart(@PathVariable Integer productId, HttpSession session){
+//    //加入購物車(ProductPage)
+//    @RequestMapping("/productPage/add/{productId}/{quantity}")
+//    public ShoppingCart pageAddToCart(@PathVariable Integer productId,
+//                                      @PathVariable Integer quantity,
+//                                      HttpSession session){
+//        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+//        if(loggedInMember == null){
+//            throw new RuntimeException("未登入錯誤");
+//        }
+//        return shopService.pageAddToCart(loggedInMember.getUserId(),productId,quantity);
+//    }
+
+    ///加入購物車(totalAddToCart)
+    @RequestMapping("/totalAddToCart/add/{productId}")
+    public ShoppingCart totalAddToCart(@PathVariable Integer productId,
+                                       @RequestParam(required = false) Integer quantity,
+                                      HttpSession session){
         Passport loggedInMember = (Passport) session.getAttribute("loginUser");
         if(loggedInMember == null){
             throw new RuntimeException("未登入錯誤");
         }
-        return shopService.addOneProductToCart(loggedInMember.getUserId(),productId);
+        return shopService.totalAddToCart(loggedInMember.getUserId(),productId,quantity);
     }
 
+    //拿到購物車的商品
     @RequestMapping("/cart")
     public List<ShoppingCartDto> getCartByMemberId( HttpSession session){
         Passport loggedInMember = (Passport) session.getAttribute("loginUser");
@@ -95,6 +135,7 @@ public class ShopController {
         return shopService.deleteProductFromCart(loggedInMember.getUserId(),productId);
     }
 
+    //加入訂單
     @PostMapping("/order")
     public void getCartData(@RequestBody List<OderDto> oderDtos, HttpSession session) {
         Passport loggedInMember = (Passport) session.getAttribute("loginUser");
@@ -110,36 +151,29 @@ public class ShopController {
 
     @PostMapping("/linepay/{totalPrice}")
     public String sendlinepay(@PathVariable String totalPrice) {
-        System.out.println(totalPrice);
-//        System.out.println(productName);
-        System.out.println(totalPrice);
         CheckoutPaymentRequestForm form = new CheckoutPaymentRequestForm();
-//        form.setAmount(new BigDecimal("300"));  //Amount=Price*Quantity
+
         form.setAmount(new BigDecimal(totalPrice));  //Amount=Price*Quantity
         form.setCurrency("TWD");
-        form.setOrderId("order_id2");  //這個不能一樣(範例:merchant_order_id1)
+        form.setOrderId(UUID.randomUUID().toString());  //這個不能一樣(order_id)先用UUID
 
         ProductPackageForm productPackageForm = new ProductPackageForm();
-        productPackageForm.setId(UUID.randomUUID().toString()); //自動生成package_id
-//        productPackageForm.setId("package_id");
+        productPackageForm.setId(UUID.randomUUID().toString()); //自動生成package_id(先用UUID)
         productPackageForm.setName("dogshop");
-//        productPackageForm.setAmount(new BigDecimal("300"));   //跟上面的Amount要一樣
         productPackageForm.setAmount(new BigDecimal(totalPrice));   //跟上面的Amount要一樣
 
         ProductForm productForm = new ProductForm();
         productForm.setId("product_id");
         productForm.setName("Dog Shop");
-//        productForm.setId(productId);
-//        productForm.setName(productName);
         productForm.setImageUrl("");
         productForm.setQuantity(new BigDecimal("1"));
         productForm.setPrice(new BigDecimal(totalPrice));
-//        productForm.setPrice(new BigDecimal("30"));
+
         productPackageForm.setProducts(Arrays.asList(productForm));
         form.setPackages(Arrays.asList(productPackageForm));
 
         RedirectUrls redirectUrls = new RedirectUrls();
-        redirectUrls.setConfirmUrl("http://localhost:5173/shop"); //轉址的網址
+        redirectUrls.setConfirmUrl("http://localhost:5173/shop/shopPage"); //轉址的網址
         form.setRedirectUrls(redirectUrls);
 
         String ChannelId="2003912658";
@@ -150,7 +184,6 @@ public class ShopController {
         String requestBody;
         try {
             requestBody = objectMapper.writeValueAsString(form);
-//            SignatureUtil signatureUtil = new SignatureUtil();
             String signature = ShopService.encrypt(ChannelSecret, ChannelSecret + requestUri + requestBody + nonce);
 
             HttpHeaders headers = new HttpHeaders();

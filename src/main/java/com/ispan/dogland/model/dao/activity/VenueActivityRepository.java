@@ -25,6 +25,7 @@ public interface VenueActivityRepository extends JpaRepository<VenueActivity,Int
     Page<VenueActivity> findByActivityTypeAndActivityStatusNotOrderByActivityDateAsc(ActivityType activityType,String activityStatus, Pageable pageable);
 
     List<VenueActivity> findByActivityStatusNotAndActivityDateBetweenOrderByActivityDateAsc(String activityStatus, Date start,Date end);
+    List<VenueActivity> findByActivityStatusAndActivityDateBetweenOrderByActivityDateAsc(String activityStatus, Date start,Date end);
 
 
 }

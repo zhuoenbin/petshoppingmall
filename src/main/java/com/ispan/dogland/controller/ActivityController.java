@@ -205,4 +205,15 @@ public class ActivityController {
         return activityService.findNowActByCategory(pageNumber,typeId);
     }
 
+    //===============官方管理頁面===============
+    @PostMapping("/official/activityManager/past")
+    public List<ActivityBrief> findPastActivityInThisPeriod(@RequestParam Date startDate,@RequestParam Date endDate){
+        return activityService.officialActManagerByStatus(startDate,endDate);
+    }
+
+    @PostMapping("/official/activityManager/now")
+    public List<ActivityBrief> findNowActivityInThisPeriod(@RequestParam Date startDate,@RequestParam Date endDate){
+        return activityService.officialActManagerByStatusNot(startDate,endDate);
+    }
+
 }

@@ -616,6 +616,38 @@ public class ActivityService {
         return briefs;
     }
 
+    public List<ActivityBrief> officialActManagerByStatusNot(Date start,Date end){
+        List<VenueActivity> allEnd = activityRepository.findByActivityStatusNotAndActivityDateBetweenOrderByActivityDateAsc("活動已結束", start, end);
+        List<ActivityBrief> abList = new ArrayList<>();//裝資料的
+        for(VenueActivity one:allEnd){
+            ActivityBrief brief = new ActivityBrief();
+
+            BeanUtils.copyProperties(one,brief);//venueActivity
+            brief.setVenueName(one.getVenue().getVenueName());
+            brief.setActivityTypeName(one.getActivityType().getActivityTypeName());
+            ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(one, "main");
+            brief.setGalleryImgUrl(main.getGalleryImgUrl());
+            abList.add(brief);
+        }
+        return abList;
+    }
+
+    public List<ActivityBrief> officialActManagerByStatus(Date start,Date end){
+        List<VenueActivity> allEnd = activityRepository.findByActivityStatusNotAndActivityDateBetweenOrderByActivityDateAsc("活動已結束", start, end);
+        List<ActivityBrief> abList = new ArrayList<>();//裝資料的
+        for(VenueActivity one:allEnd){
+            ActivityBrief brief = new ActivityBrief();
+
+            BeanUtils.copyProperties(one,brief);//venueActivity
+            brief.setVenueName(one.getVenue().getVenueName());
+            brief.setActivityTypeName(one.getActivityType().getActivityTypeName());
+            ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(one, "main");
+            brief.setGalleryImgUrl(main.getGalleryImgUrl());
+            abList.add(brief);
+        }
+        return abList;
+    }
+
 
 
 

@@ -1,8 +1,8 @@
 package com.ispan.dogland.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,12 +14,14 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderId;
 
-    // 對應 User
-//    @ManyToOne(cascade = {CascadeType.ALL})
-//    @JoinColumn(name = "user_id")
-    private Integer userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonIgnore  //後來加的
+    private Users users;
 
-    // 對應 Employee
+    @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL)  //"orders"對應OrderDetail的orders屬性
+    private List<OrderDetail> orderDetails;
+
 //    @ManyToOne(cascade = {CascadeType.ALL})
 //    @JoinColumn(name = "employee_id")
     private Integer employeeId;
@@ -70,9 +72,9 @@ public class Orders {
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private Date orderCancelDate;
 
-    @ManyToOne
-    @JoinColumn(name = "shipping_company_id")
-    private ShippingCompany shippingCompany;
+//    @ManyToOne
+//    @JoinColumn(name = "shipping_company_id")
+//    private ShippingCompany shippingCompany;
 
     private String city;
 
@@ -82,55 +84,15 @@ public class Orders {
 
     private Integer freight;
 
-    @OneToMany(mappedBy = "order",
-            fetch = FetchType.LAZY ,
-            cascade = {CascadeType.ALL})
-    private List<OrderDetail> orderDetail;
-
-    public List<OrderDetail> getOrderDetail() {
-        return orderDetail;
-    }
-
-    public void setOrderDetail(List<OrderDetail> orderDetail) {
-        this.orderDetail = orderDetail;
-    }
-
-    public void add(OrderDetail tmpOrderDetail){
-        if(orderDetail==null){
-            orderDetail = new ArrayList<>();
-        }
-        orderDetail.add(tmpOrderDetail);
-
-        tmpOrderDetail.setOrder(this);
-    }
+//    public void add(OrderDetail tmpOrderDetail){
+//        if(orderDetail==null){
+//            orderDetail = new ArrayList<>();
+//        }
+//        orderDetail.add(tmpOrderDetail);
+//        tmpOrderDetail.setOrder(this);
+//    }
 
     public Orders() {
-    }
-
-    public Orders(Integer orderId, Integer userId, Integer employeeId, Date orderDate, Integer totalPrice, Integer discountPrice, Integer couponPrice, String discountDescription, String couponDescription, Integer paymentMethod, Integer paymentStatus, Date confirmDate, Date shipDate, Date logisticsShipDate, Date logisticsArrivalDate, Date userReceiveDate, Date userConfirmDate, Date orderCancelDate, ShippingCompany shippingCompany, String city, String district, String address, Integer freight) {
-        this.orderId = orderId;
-        this.userId = userId;
-        this.employeeId = employeeId;
-        this.orderDate = orderDate;
-        this.totalPrice = totalPrice;
-        this.discountPrice = discountPrice;
-        this.couponPrice = couponPrice;
-        this.discountDescription = discountDescription;
-        this.couponDescription = couponDescription;
-        this.paymentMethod = paymentMethod;
-        this.paymentStatus = paymentStatus;
-        this.confirmDate = confirmDate;
-        this.shipDate = shipDate;
-        this.logisticsShipDate = logisticsShipDate;
-        this.logisticsArrivalDate = logisticsArrivalDate;
-        this.userReceiveDate = userReceiveDate;
-        this.userConfirmDate = userConfirmDate;
-        this.orderCancelDate = orderCancelDate;
-        this.shippingCompany = shippingCompany;
-        this.city = city;
-        this.district = district;
-        this.address = address;
-        this.freight = freight;
     }
 
     public Integer getOrderId() {
@@ -141,12 +103,20 @@ public class Orders {
         this.orderId = orderId;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public Users getUsers() {
+        return users;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setUsers(Users users) {
+        this.users = users;
+    }
+
+    public List<OrderDetail> getOrderDetails() {
+        return orderDetails;
+    }
+
+    public void setOrderDetails(List<OrderDetail> orderDetails) {
+        this.orderDetails = orderDetails;
     }
 
     public Integer getEmployeeId() {
@@ -277,14 +247,6 @@ public class Orders {
         this.orderCancelDate = orderCancelDate;
     }
 
-    public ShippingCompany getShippingCompany() {
-        return shippingCompany;
-    }
-
-    public void setShippingCompany(ShippingCompany shippingCompany) {
-        this.shippingCompany = shippingCompany;
-    }
-
     public String getCity() {
         return city;
     }
@@ -321,7 +283,8 @@ public class Orders {
     public String toString() {
         final StringBuffer sb = new StringBuffer("Orders{");
         sb.append("orderId=").append(orderId);
-        sb.append(", userId=").append(userId);
+        sb.append(", users=").append(users);
+        sb.append(", orderDetails=").append(orderDetails);
         sb.append(", employeeId=").append(employeeId);
         sb.append(", orderDate=").append(orderDate);
         sb.append(", totalPrice=").append(totalPrice);
@@ -338,7 +301,6 @@ public class Orders {
         sb.append(", userReceiveDate=").append(userReceiveDate);
         sb.append(", userConfirmDate=").append(userConfirmDate);
         sb.append(", orderCancelDate=").append(orderCancelDate);
-        sb.append(", shippingCompany=").append(shippingCompany);
         sb.append(", city='").append(city).append('\'');
         sb.append(", district='").append(district).append('\'');
         sb.append(", address='").append(address).append('\'');
@@ -346,6 +308,5 @@ public class Orders {
         sb.append('}');
         return sb.toString();
     }
-
 
 }

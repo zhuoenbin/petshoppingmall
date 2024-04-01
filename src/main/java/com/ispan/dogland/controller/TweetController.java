@@ -67,9 +67,14 @@ public class TweetController {
         return tweetService.findTweetByTweetId(tweetId);
     }
 
-    @GetMapping("/getUserByTweetId/{tweetId}")
-    public Users getUserByTweetId(@PathVariable Integer tweetId) {
-        return tweetService.findUserByTweetId(tweetId);
+    @GetMapping("/getUserIdByTweetId/{tweetId}")
+    public String getUserIdByTweetId(@PathVariable Integer tweetId) {
+        return tweetService.findUserByTweetId(tweetId).getUserId().toString();
+    }
+
+    @GetMapping("/getUserNameByTweetId/{tweetId}")
+    public String getUserNameByTweetId(@PathVariable Integer tweetId) {
+        return tweetService.findUserByTweetId(tweetId).getLastName();
     }
 
     @PostMapping("/postTweetWithPhoto")

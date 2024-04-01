@@ -3,6 +3,7 @@ package com.ispan.dogland.controller;
 import com.ispan.dogland.model.entity.room.Room;
 import com.ispan.dogland.model.entity.room.RoomReservation;
 import com.ispan.dogland.service.RoomServicelmpl;
+import com.ispan.dogland.service.interfaceFile.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,7 +15,7 @@ import java.util.List;
 public class EmployeeController {
 
     @Autowired
-    private RoomServicelmpl rService;
+    private RoomService rService;
 
     @GetMapping("/roomReservation")
     public List<RoomReservation> reservation(){

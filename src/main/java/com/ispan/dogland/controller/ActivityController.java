@@ -1,10 +1,7 @@
 package com.ispan.dogland.controller;
 
 import com.cloudinary.utils.ObjectUtils;
-import com.ispan.dogland.model.dto.ActivityBrief;
-import com.ispan.dogland.model.dto.ActivityData;
-import com.ispan.dogland.model.dto.ApplyData;
-import com.ispan.dogland.model.dto.RentalData;
+import com.ispan.dogland.model.dto.*;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.activity.*;
 import com.ispan.dogland.service.ActivityService;
@@ -146,5 +143,66 @@ public class ActivityController {
         throw new RuntimeException("超過狗數限制 !!");
     }
 
+
+    @GetMapping("/apply/{userId}/dogNotJoinedList/{activityId}")
+    public List<Dog> findUserDogNotInThisActivity(@PathVariable Integer userId,@PathVariable Integer activityId){
+        return activityService.findUserDogsStayAtHome(userId, activityId);
+    }
+
+    @GetMapping("/activityManager/{userId}/findDogListIn/{activityId}")
+    public List<Dog> findUserDogsAttendThisActivity(@PathVariable Integer userId,@PathVariable Integer activityId){
+        return activityService.findUserDogsAttendThisActivity(userId, activityId);
+    }
+
+    @GetMapping("/activityManager/{userId}")
+    public List<MyActivitiesDto>findUserAllJoinedActivities(@PathVariable Integer userId){
+        return activityService.findUserAllJoinedActivities(userId);
+    }
+
+    //===============使用者活動管理頁面取消報名===============
+    @PostMapping ("/activityManager/doCancelProcess")
+    public MyActivitiesDto userCancelledActivity(@RequestParam Integer userId,
+                                                 @RequestParam Integer[] dogIdList,
+                                                 @RequestParam Integer activityId){
+        return activityService.userCancelledActivity(userId,dogIdList,activityId);
+    }
+
+    //===============使用者活動管理頁面更改備註===============
+    @PostMapping ("/activityManager/doRenewNoteProcess")
+    public ActivityUserJoined renewUserNote(@RequestParam Integer activityId,
+                                            @RequestParam Integer userId,
+                                            @RequestParam String userNote){
+        return activityService.renewUserNote(activityId,userId,userNote);
+    }
+
+    //===============請求員工資料===============
+    @GetMapping("/official/employeePass/{employeeId}")
+    public EmployeeDto getEmployeePass(@PathVariable Integer employeeId){
+        return activityService.getEmployeePass(employeeId);
+    }
+
+    //===============所有過去活動===============
+    @GetMapping("/allPastAct/{pageNumber}")
+    public Page<ActivityBrief> showPastBriefByPage(@PathVariable Integer pageNumber){
+        return activityService.findPastActivityByPage(pageNumber);
+    }
+
+    //===============類別過去活動===============
+    @GetMapping("/pastAct/category/{typeId}/{pageNumber}")
+    public Page<ActivityBrief> showPastBriefByPage(@PathVariable Integer pageNumber,@PathVariable Integer typeId){
+        return activityService.findPastActByCategory(pageNumber,typeId);
+    }
+
+    //===============所有過去活動===============
+    @GetMapping("/allNowAct/{pageNumber}")
+    public Page<ActivityBrief> showNowBriefByPage(@PathVariable Integer pageNumber){
+        return activityService.findNowActivityByPage(pageNumber);
+    }
+
+    //===============類別過去活動===============
+    @GetMapping("/nowAct/category/{typeId}/{pageNumber}")
+    public Page<ActivityBrief> showNowBriefByPage(@PathVariable Integer pageNumber,@PathVariable Integer typeId){
+        return activityService.findNowActByCategory(pageNumber,typeId);
+    }
 
 }

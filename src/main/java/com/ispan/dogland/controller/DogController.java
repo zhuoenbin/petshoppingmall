@@ -1,13 +1,14 @@
 package com.ispan.dogland.controller;
 
+import com.cloudinary.Cloudinary;
+import com.ispan.dogland.model.dto.Passport;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.service.interfaceFile.DogService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class DogController {
     @Autowired
     private DogService dogService;
 
+
     @GetMapping("/getDogs/{userId}")
     public List<Dog> getDogs(@PathVariable Integer userId) {
         Users user = dogService.findUserAndDogsByUserId(userId);
@@ -27,6 +29,25 @@ public class DogController {
         }
         return dogs;
     }
+
+    @PostMapping("/addUserDog")
+    public Integer addUserDog(@RequestBody Dog dog, HttpSession session) {
+        Passport loginUser = (Passport) session.getAttribute("loginUser");
+        Dog dog1 = dogService.addUserDog(dog, loginUser.getUserId());
+        return dog1.getDogId();
+    }
+
+    @PostMapping("/addDogImg")
+    public String addDogImg(Integer dogId, @RequestParam MultipartFile dogImgPathCloud) {
+        return dogService.uploadImg(dogId, dogImgPathCloud);
+    }
+
+    @PostMapping("/update")
+    public Integer update(@RequestBody Dog dog, @RequestParam Integer dogId) {
+        dogService.updateDog(dog, dogId);
+        return dogId;
+    }
+
 
 
 }

@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
+import java.util.List;
+
 public interface DogRepository extends JpaRepository<Dog, Integer> {
     Dog findByDogId(Integer dogId);
 

@@ -2,6 +2,7 @@ package com.ispan.dogland.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ispan.dogland.model.entity.tweet.Tweet;
+import com.ispan.dogland.model.entity.room.RoomReservation;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -158,7 +159,7 @@ public class Dog {
         return dogWeight;
     }
 
-    public void setDogWeight(Double dogSize) {
+    public void setDogWeight(Double dogWeight) {
         this.dogWeight = dogWeight;
     }
 

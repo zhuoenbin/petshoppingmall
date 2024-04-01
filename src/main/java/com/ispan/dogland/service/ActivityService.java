@@ -249,7 +249,7 @@ public class ActivityService {
 
     //===============所有活動簡述===============
     public Page<ActivityBrief> findActivityByPage(Integer pageNumber){
-        Page<VenueActivity> all = activityRepository.findAllByOrderByActivityStartAsc(PageRequest.of(pageNumber-1, 6));
+        Page<VenueActivity> all = activityRepository.findAllByOrderByActivityDateDesc(PageRequest.of(pageNumber-1, 6));
 
         Page<ActivityBrief> briefs = all.map(a->{
             ActivityBrief ab = new ActivityBrief();
@@ -537,7 +537,7 @@ public class ActivityService {
     }
     //===============所有過去活動簡述===============
     public Page<ActivityBrief> findPastActivityByPage(Integer pageNumber){
-        Page<VenueActivity> all = activityRepository.findByActivityStatusOrderByActivityStartAsc("活動已結束",PageRequest.of(pageNumber-1, 6));
+        Page<VenueActivity> all = activityRepository.findByActivityStatusOrderByActivityDateAsc("活動已結束",PageRequest.of(pageNumber-1, 6));
 
         Page<ActivityBrief> briefs = all.map(a->{
             ActivityBrief ab = new ActivityBrief();
@@ -558,7 +558,7 @@ public class ActivityService {
     //===============過去類別活動簡述===============
     public Page<ActivityBrief> findPastActByCategory(Integer pageNumber,Integer typeId){
         ActivityType type = typeRepository.findByActivityTypeId(typeId);
-        Page<VenueActivity> all = activityRepository.findByActivityTypeAndActivityStatusOrderByActivityStartAsc(type,"活動已結束",PageRequest.of(pageNumber-1, 6));
+        Page<VenueActivity> all = activityRepository.findByActivityTypeAndActivityStatusOrderByActivityDateAsc(type,"活動已結束",PageRequest.of(pageNumber-1, 6));
 
         Page<ActivityBrief> briefs = all.map(a->{
             ActivityBrief ab = new ActivityBrief();
@@ -577,7 +577,7 @@ public class ActivityService {
     }
     //===============所有現在活動簡述===============
     public Page<ActivityBrief> findNowActivityByPage(Integer pageNumber){
-        Page<VenueActivity> all = activityRepository.findByActivityStatusNotOrderByActivityStartAsc("活動已結束",PageRequest.of(pageNumber-1, 6));
+        Page<VenueActivity> all = activityRepository.findByActivityStatusNotOrderByActivityDateAsc("活動已結束",PageRequest.of(pageNumber-1, 6));
 
         Page<ActivityBrief> briefs = all.map(a->{
             ActivityBrief ab = new ActivityBrief();
@@ -598,7 +598,7 @@ public class ActivityService {
     //===============現在類別活動簡述===============
     public Page<ActivityBrief> findNowActByCategory(Integer pageNumber,Integer typeId){
         ActivityType type = typeRepository.findByActivityTypeId(typeId);
-        Page<VenueActivity> all = activityRepository.findByActivityTypeAndActivityStatusNotOrderByActivityStartAsc(type,"活動已結束",PageRequest.of(pageNumber-1, 6));
+        Page<VenueActivity> all = activityRepository.findByActivityTypeAndActivityStatusNotOrderByActivityDateAsc(type,"活動已結束",PageRequest.of(pageNumber-1, 6));
 
         Page<ActivityBrief> briefs = all.map(a->{
             ActivityBrief ab = new ActivityBrief();

@@ -433,7 +433,7 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
-    public Tweet postTweetForActivityShare(Integer userId,  Integer activityId,String title, String imgUrl) {
+    public Tweet postTweetForActivityShare(Integer userId,String title, String imgUrl) {
         String tweetContent = "我與我的狗狗報名了超讚的活動: " + title + " ，一起來參加吧 !";
         //tweet
         TweetGallery tweetGallery = new TweetGallery();

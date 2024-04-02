@@ -46,7 +46,7 @@ public class TweetShareController {
         ActivityGallery gallery = activityGalleryRepository.findByVenueActivityAndGalleryImgType(activity,"main");
         String imgUrl = gallery.getGalleryImgUrl();
         //發送Tweet，如果要改推文內容，這邊改。
-        Tweet tweet1 = tweetService.postTweetForActivityShare(userId,activityId,title,imgUrl);
+        Tweet tweet1 = tweetService.postTweetForActivityShare(userId,title,imgUrl);
         //發送通知
         tweetService.sendPostTweetNotificationToFollower(userId, tweet1.getTweetId());
 

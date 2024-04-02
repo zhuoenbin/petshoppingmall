@@ -2,6 +2,7 @@ package com.ispan.dogland.controller;
 
 
 import com.ispan.dogland.model.dto.Passport;
+import com.ispan.dogland.model.entity.OrderDetail;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.activity.ActivityGallery;
 import com.ispan.dogland.service.interfaceFile.AccountService;

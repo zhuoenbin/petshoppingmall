@@ -14,12 +14,7 @@ public class TweetNotification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer tweetNotiId;
     private Date postTime;
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-                                                  CascadeType.DETACH, CascadeType.REFRESH})
-    @JoinColumn(name = "user_id")
-    @JsonIgnore
-    private Users user;
+    private Integer userId;
     private String content;
     private Integer tweetId;
     private Integer isRead;
@@ -28,9 +23,9 @@ public class TweetNotification {
     public TweetNotification() {
     }
 
-    public TweetNotification(Date postTime, Users user, String content, Integer tweetId, Integer isRead) {
+    public TweetNotification(Date postTime, Integer userId, String content, Integer tweetId, Integer isRead) {
         this.postTime = postTime;
-        this.user = user;
+        this.userId = userId;
         this.content = content;
         this.tweetId = tweetId;
         this.isRead = isRead;
@@ -52,12 +47,12 @@ public class TweetNotification {
         this.postTime = postTime;
     }
 
-    public Users getUser() {
-        return user;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setUser(Users user) {
-        this.user = user;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public String getContent() {
@@ -89,7 +84,7 @@ public class TweetNotification {
         final StringBuffer sb = new StringBuffer("TweetNotification{");
         sb.append("tweetNotiId=").append(tweetNotiId);
         sb.append(", postTime=").append(postTime);
-        sb.append(", user=").append(user);
+        sb.append(", userId=").append(userId);
         sb.append(", content='").append(content).append('\'');
         sb.append(", tweetId=").append(tweetId);
         sb.append(", isRead=").append(isRead);

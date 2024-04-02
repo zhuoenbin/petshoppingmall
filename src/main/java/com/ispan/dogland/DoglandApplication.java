@@ -4,16 +4,14 @@ import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dao.product.ProductRepository;
-import com.ispan.dogland.model.dao.tweet.TweetFollowListRepository;
-import com.ispan.dogland.model.dao.tweet.TweetLikeRepository;
-import com.ispan.dogland.model.dao.tweet.TweetNotificationRepository;
-import com.ispan.dogland.model.dao.tweet.TweetRepository;
+import com.ispan.dogland.model.dao.tweet.*;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductGallery;
 import com.ispan.dogland.model.entity.tweet.*;
+import com.ispan.dogland.service.interfaceFile.AccountService;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -46,49 +44,19 @@ public class DoglandApplication {
 											   TweetService tweetService,
 											   TweetLikeRepository tweetLikeRepository,
 											   TweetFollowListRepository tweetFollowListRepository,
-											   TweetNotificationRepository tweetNotificationRepository) {
+											   TweetNotificationRepository tweetNotificationRepository,
+											   AccountService accountService,
+											   TweetReportRepository tweetReportRepository) {
 		return runner -> {
-
-			//測試方法
-			//使用者通知，monted使用的方法
-//			Users u1 = userRepository.findUserAndTweetNotificationByUserId(2);
-//			List<TweetNotification> li = u1.getTweetNotifications();
-
-
-//			Users u1 = userRepository.findUserAndTweetNotificationByUserId(2);
-//			TweetNotification tweetNotification = new TweetNotification();
-//			tweetNotification.setPostTime(new Date()); // 设置 postTime
-//			tweetNotification.setContent("Notification content"); // 设置 content
-//			tweetNotification.setIsRead(0); // 设置 isRead
-//			u1.addTweetNotification(tweetNotification);
-//			userRepository.save(u1);
-
-
-			//新增功能
-//			Tweet b = tweetRepository.findTweetAndDogsByTweetIdByLEFTJOIN(50);
-//			Dog c = dogRepository.findByDogId(22);
-//			b.addDog(c);
-//			Tweet b2 = tweetRepository.save(b);
-
-			//移除功能
-//			Tweet b = tweetRepository.findTweetAndDogsByTweetId(50);
-//			if(b != null){
-//				List<Dog> dogs = b.getDogs();
-//				for(Dog d : dogs){
-//					if(d.getDogId()==24){
-//						dogs.remove(d);
-//						tweetRepository.save(b);
-//					}
-//				}
-//			}else{
-//				System.out.println("no");
-//			}
-
-
 
 		};
 
-	}
+
+
+
+	};
+
+
 
 	private void findUserAndDogsByUserId(UserRepository userRepository,DogRepository dogRepository){
 //		Users u1 = userRepository.findUserAndDogsByUserId(1);

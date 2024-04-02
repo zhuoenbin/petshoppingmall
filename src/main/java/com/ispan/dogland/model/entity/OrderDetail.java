@@ -1,6 +1,7 @@
 package com.ispan.dogland.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ispan.dogland.model.entity.product.Product;
 import jakarta.persistence.*;
 
 @Entity
@@ -14,28 +15,24 @@ public class OrderDetail {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name="order_id")
     @JsonIgnore
-    private Orders order;
-
-    // @ManyToOne Product
-    @Column(name = "product_id")
-    private Integer productId;
+    private Orders orders;
 
     private Integer quantity;
 
-    private Integer price;
+//    private Integer price;
+    @Column(name = "price")
+    private Integer unitPrice;
 
     private Integer discount;
 
-    public OrderDetail() {
-    }
+//    @ManyToOne
+//    @JoinColumn(name = "product_id")
+//    private Product productId;
+//    @ManyToOne
+//    @JoinColumn(name = "product_id")
+    private Integer productId;
 
-    public OrderDetail(Integer orderDetailId, Orders order, Integer productId, Integer quantity, Integer price, Integer discount) {
-        this.orderDetailId = orderDetailId;
-        this.order = order;
-        this.productId = productId;
-        this.quantity = quantity;
-        this.price = price;
-        this.discount = discount;
+    public OrderDetail() {
     }
 
     public Integer getOrderDetailId() {
@@ -46,23 +43,6 @@ public class OrderDetail {
         this.orderDetailId = orderDetailId;
     }
 
-
-    public Orders getOrder() {
-        return order;
-    }
-
-    public void setOrder(Orders order) {
-        this.order = order;
-    }
-
-    public Integer getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Integer productId) {
-        this.productId = productId;
-    }
-
     public Integer getQuantity() {
         return quantity;
     }
@@ -71,12 +51,12 @@ public class OrderDetail {
         this.quantity = quantity;
     }
 
-    public Integer getPrice() {
-        return price;
+    public Integer getUnitPrice() {
+        return unitPrice;
     }
 
-    public void setPrice(Integer price) {
-        this.price = price;
+    public void setUnitPrice(Integer unitPrice) {
+        this.unitPrice = unitPrice;
     }
 
     public Integer getDiscount() {
@@ -87,16 +67,20 @@ public class OrderDetail {
         this.discount = discount;
     }
 
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("OrderDetail{");
-        sb.append("orderDetailId=").append(orderDetailId);
-        sb.append(", order=").append(order);
-        sb.append(", productId=").append(productId);
-        sb.append(", quantity=").append(quantity);
-        sb.append(", price=").append(price);
-        sb.append(", discount=").append(discount);
-        sb.append('}');
-        return sb.toString();
+    public Orders getOrders() {
+        return orders;
     }
+
+    public void setOrders(Orders orders) {
+        this.orders = orders;
+    }
+
+    public Integer getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Integer productId) {
+        this.productId = productId;
+    }
+
 }

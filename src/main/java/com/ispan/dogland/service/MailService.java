@@ -12,8 +12,6 @@ public class MailService {
 
     @Autowired
     private JavaMailSender mailSender;
-
-
     private String emailFrom = "電商官網<a50064xxx@gmail.com>";
 
     //發送一般文字郵件，receivers:接收帳號(List)、subject:郵件title、content:郵件內文

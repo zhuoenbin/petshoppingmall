@@ -13,17 +13,32 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import com.cloudinary.Cloudinary;
+import com.ispan.dogland.model.dao.DogRepository;
+import com.ispan.dogland.model.dao.EmployeeRepository;
+import com.ispan.dogland.model.dao.UserRepository;
+import com.ispan.dogland.model.entity.Employee;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
 public class EmployeeService {
 
+    public EmployeeRepository employeeRepository;
+
+    @Autowired
+    public EmployeeService(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
+    }
+
+    public List<Employee> findAllEmployee() { return employeeRepository.findAll(); }
+
     @Autowired
     private ProductRepository productRepository;
     @Autowired
     private ProductCategoryRepository productCategoryRepository;
-    @Autowired
-    private EmployeeRepository employeeRepository;
 
     public void addNewProduct(String productName, Integer categoryId, Integer unitPrice, String productDescription, Integer stock , String imgUrl){
         Product p = new Product();

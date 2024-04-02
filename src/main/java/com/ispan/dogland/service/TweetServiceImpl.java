@@ -1,14 +1,13 @@
 package com.ispan.dogland.service;
 
+import com.ispan.dogland.model.dao.DogRepository;
+import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
-import com.ispan.dogland.model.dao.tweet.TweetFollowListRepository;
-import com.ispan.dogland.model.dao.tweet.TweetGalleryRepository;
-import com.ispan.dogland.model.dao.tweet.TweetLikeRepository;
-import com.ispan.dogland.model.dao.tweet.TweetRepository;
+import com.ispan.dogland.model.dao.tweet.*;
+import com.ispan.dogland.model.entity.Dog;
+import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
-import com.ispan.dogland.model.entity.tweet.Tweet;
-import com.ispan.dogland.model.entity.tweet.TweetFollowList;
-import com.ispan.dogland.model.entity.tweet.TweetLike;
+import com.ispan.dogland.model.entity.tweet.*;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,8 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class TweetServiceImpl implements TweetService {
@@ -40,21 +39,37 @@ public class TweetServiceImpl implements TweetService {
     private TweetGalleryRepository tweetGalleryRepository;
     private TweetLikeRepository tweetLikeRepository;
     private TweetFollowListRepository tweetFollowListRepository;
+    private DogRepository dogRepository;
+    private TweetNotificationRepository tweetNotificationRepository;
+    private TweetReportRepository tweetReportRepository;
+    private EmployeeRepository employeeRepository;
 
     @Autowired
-    public TweetServiceImpl(TweetRepository tweetRepository, UserRepository userRepository, TweetGalleryRepository tweetGalleryRepository, TweetLikeRepository tweetLikeRepository,TweetFollowListRepository tweetFollowListRepository) {
+    public TweetServiceImpl(TweetRepository tweetRepository,
+                            UserRepository userRepository,
+                            TweetGalleryRepository tweetGalleryRepository,
+                            TweetLikeRepository tweetLikeRepository,
+                            TweetFollowListRepository tweetFollowListRepository,
+                            DogRepository dogRepository,
+                            TweetNotificationRepository tweetNotificationRepository,
+                            TweetReportRepository tweetReportRepository,
+                            EmployeeRepository employeeRepository) {
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
         this.tweetGalleryRepository = tweetGalleryRepository;
         this.tweetLikeRepository = tweetLikeRepository;
         this.tweetFollowListRepository = tweetFollowListRepository;
+        this.dogRepository = dogRepository;
+        this.tweetNotificationRepository = tweetNotificationRepository;
+        this.tweetReportRepository = tweetReportRepository;
+        this.employeeRepository = employeeRepository;
     }
 
     @Override
     public List<Tweet> findTweetsByUserId(Integer userId) {
         Users tmp = userRepository.findByUserId(userId);
         if (tmp != null) {
-            return tweetRepository.findByUserId(userId);
+            return tweetRepository.findTweetsByUserId(userId);
         }
         return null;
     }
@@ -82,16 +97,16 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
-    public boolean postNewTweet(Tweet tweet, Integer userId) {
+    public Tweet postNewTweet(Tweet tweet, Integer userId) {
         Users user = userRepository.findByUserId(userId);
         if (user != null) {
             tweet.setUserName(user.getLastName());
             Tweet t = tweetRepository.save(tweet); //into DB
             t.setUser(user);
-            tweetRepository.save(t);
-            return true;
+            Tweet t1 = tweetRepository.save(t);
+            return t1;
         }
-        return false;
+        return null;
     }
 
     @Override
@@ -195,4 +210,228 @@ public class TweetServiceImpl implements TweetService {
         }
         return totalUsers;
     }
+
+    @Override
+    public List<Dog> findTweetDogsByTweetId(Integer tweetId) {
+        Tweet a = tweetRepository.findTweetAndDogsByTweetId(tweetId);
+        if(a != null){
+            return a.getDogs();
+        }
+        return null;
+    }
+
+    @Override
+    public Tweet addDogToTweet(Integer dogId, Integer tweetId) {
+        Tweet b = tweetRepository.findTweetAndDogsByTweetIdByLEFTJOIN(tweetId);
+        Dog c = dogRepository.findByDogId(dogId);
+        b.addDog(c);
+        return tweetRepository.save(b);
+    }
+
+    @Override
+    public Tweet removeDogFromTweet(Integer dogId, Integer tweetId) {
+        Tweet b = tweetRepository.findTweetAndDogsByTweetId(tweetId);
+        if(b != null){
+            List<Dog> dogs = b.getDogs();
+            for(Dog d : dogs){
+                if(Objects.equals(d.getDogId(), dogId)){
+                    dogs.remove(d);
+                    tweetRepository.save(b);
+                    return b;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void sendPostTweetNotificationToFollower(Integer userId, Integer tweetId) {
+        List<TweetNotification> res = new ArrayList<>();
+        Users user = userRepository.findByUserId(userId);
+        String userName = user.getLastName();
+
+        List<TweetFollowList> li = tweetFollowListRepository.findByUserId(userId);
+
+        for(TweetFollowList t:li){
+            TweetNotification tweetNotification = new TweetNotification();
+
+            tweetNotification.setPostTime(new Date());
+            tweetNotification.setUserId(t.getFollwerId());
+            tweetNotification.setContent(userName+"發布新推文囉~快去看看!!!");
+            tweetNotification.setIsRead(0);
+            tweetNotification.setTweetId(tweetId);
+            tweetNotificationRepository.save(tweetNotification);
+        }
+
+    }
+
+    @Override
+    public void sendReplyNotificationToTweetOwner(Integer hisUserId, Integer hisTweetId,String myName) {
+        TweetNotification tweetNotification = new TweetNotification();
+
+        tweetNotification.setPostTime(new Date());
+        tweetNotification.setUserId(hisUserId);
+        tweetNotification.setContent(myName+"回覆你的推文囉~ 快去看看!!!");
+        tweetNotification.setIsRead(0);
+        tweetNotification.setTweetId(hisTweetId);
+        tweetNotificationRepository.save(tweetNotification);
+    }
+
+    @Override
+    public void sendLikeNotificationToTweetOwner(Integer hisUserId, Integer hisTweetId, String myName) {
+        List<TweetNotification> tnfs = tweetNotificationRepository.findByUserIdAndTweetId(hisUserId, hisTweetId);
+
+        if(tnfs!=null){
+            for(TweetNotification tnf:tnfs){
+                String notificationContent = tnf.getContent();
+                if(notificationContent.equals(myName+"對你的貼文看讚~ 快去看看!!!")){
+                    return;
+                }
+            }
+        }
+        TweetNotification tweetNotification = new TweetNotification();
+
+        tweetNotification.setPostTime(new Date());
+        tweetNotification.setUserId(hisUserId);
+        tweetNotification.setContent(myName+"對你的貼文看讚~ 快去看看!!!");
+        tweetNotification.setIsRead(0);
+        tweetNotification.setTweetId(hisTweetId);
+        tweetNotificationRepository.save(tweetNotification);
+    }
+
+    @Override
+    public void sendBanTweetNotificationToUser(Integer userId,Tweet tweet) {
+        TweetNotification tweetNotification = new TweetNotification();
+
+        tweetNotification.setPostTime(new Date());
+        tweetNotification.setUserId(userId);
+        tweetNotification.setContent("您的一則貼文因違反平台政策，已被移除。\n推文內容：" + tweet.getTweetContent());
+        tweetNotification.setIsRead(0);
+        tweetNotificationRepository.save(tweetNotification);
+    }
+
+
+    @Override
+    public List<TweetNotification> findMyTweetNotifications(Integer userId) {
+
+        List<TweetNotification> notifications = tweetNotificationRepository.findByUserId(userId);
+        // 使用 Collections.sort()
+        Collections.sort(notifications, new Comparator<TweetNotification>() {
+            @Override
+            public int compare(TweetNotification notification1, TweetNotification notification2) {
+                // 按照 postTime 属性进行升序排序
+                return notification2.getPostTime().compareTo(notification1.getPostTime());
+            }
+        });
+        List<TweetNotification> top15Notifications = notifications.subList(0, Math.min(5, notifications.size()));
+
+        return top15Notifications;
+
+
+//        return tweetNotificationRepository.findByUserId(userId);
+    }
+
+    @Override
+    public List<Tweet> findTweetsAndCommentsByUserId(Integer userId) {
+        return tweetRepository.findTweetsAndCommentsByUserId(userId);
+    }
+
+    @Override
+    public TweetNotification findTweetNotificationByNotifiId(Integer id) {
+        return tweetNotificationRepository.findByTweetNotiId(id);
+    }
+
+    @Override
+    public void saveTweetNotification(TweetNotification t1) {
+        tweetNotificationRepository.save(t1);
+    }
+
+    @Override
+    public Tweet updateTweetContent(Integer tweetId, String newContent) {
+        Tweet t1 = tweetRepository.findTweetByTweetId(tweetId);
+        if(t1 == null){
+            return null;
+        }
+        t1.setTweetContent(newContent);
+        return tweetRepository.save(t1);
+    }
+
+    @Override
+    public boolean checkUserAndReportRelation(Integer tweetId, Integer userId) {
+        TweetReport tr = tweetReportRepository.findByTweetIdAndUserId(tweetId, userId);
+        return tr != null;
+    }
+
+    @Override
+    public TweetReport addReporyToTweet(Integer tweetId, Integer userId,String reportText, String reportCheckBox) {
+
+
+        TweetReport tweetReportTmp = new TweetReport();
+        tweetReportTmp.setReportReason(reportCheckBox);
+        tweetReportTmp.setReportDescription(reportText);
+        tweetReportTmp.setReportDate(new Date());
+        tweetReportTmp.setReportStatus(0);
+        TweetReport tweetReport = tweetReportRepository.save(tweetReportTmp);
+
+        Users user= userRepository.findUserAndReportsByUserId(userId);
+        user.addTweetReport(tweetReport);
+        userRepository.save(user);
+
+        Tweet tweet = tweetRepository.findTweetAndReportsByTweetId(tweetId);
+        Integer numReport = tweet.getNumReport();
+        tweet.setNumReport(numReport+1);
+        tweet.addTweetReport(tweetReport);
+        tweetRepository.save(tweet);
+
+        return tweetReport;
+
+    }
+
+    @Override
+    public Tweet saveTweet(Tweet tweet) {
+        return tweetRepository.save(tweet);
+    }
+
+    @Override
+    public List<TweetReport> findAllTweetReports() {
+        return tweetReportRepository.findAll();
+    }
+
+    @Override
+    public Tweet findTweetByReportId(Integer reportId) {
+        return tweetRepository.findTweetByReportId(reportId);
+    }
+
+    @Override
+    public Users findUserByReportId(Integer reportId) {
+        return userRepository.findUserByReportId(reportId);
+    }
+
+    @Override
+    public Tweet banTweet(Integer tweetId) {
+        Tweet t1 = tweetRepository.findTweetAndUserByTweetIdForEMP(tweetId);
+        if(t1 == null){
+            return null;
+        }
+        t1.setTweetStatus(0);
+        return tweetRepository.save(t1);
+    }
+
+
+    @Override
+    public String addEmployeeToReport(Integer reportsId, Integer empId) {
+        Employee emp = employeeRepository.findEmployeeAndReportsByEmployeeId(empId);
+        TweetReport tr = tweetReportRepository.findByTweetReportId(reportsId);
+        tr.setReportStatus(1);
+        emp.addTweetReport(tr);
+        employeeRepository.save(emp);
+        return null;
+    }
+
+    @Override
+    public Employee findEmployeeByReportId(Integer reportId) {
+        return employeeRepository.findEmployeeByTweetReportId(reportId);
+    }
+
+
 }

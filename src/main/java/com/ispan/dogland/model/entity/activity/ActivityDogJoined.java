@@ -25,7 +25,7 @@ public class ActivityDogJoined {
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private Date joinedTime;
 
-    @Column(columnDefinition = "VARCHAR(20) DEFAULT '參加'")
+    @Column(columnDefinition = "VARCHAR(20) DEFAULT '參加'")//已取消
     private String joinedStatus;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -38,6 +38,9 @@ public class ActivityDogJoined {
         if(joinedTime==null && updateTime==null) {
             joinedTime=new Date();
             updateTime=new Date();
+            if(joinedStatus==null){
+                joinedStatus="參加";
+            }
         }
     }
 

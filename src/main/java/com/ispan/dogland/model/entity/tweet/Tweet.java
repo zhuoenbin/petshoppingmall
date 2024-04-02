@@ -1,6 +1,7 @@
 package com.ispan.dogland.model.entity.tweet;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Users;
 import jakarta.persistence.*;
 
@@ -26,16 +27,32 @@ public class Tweet {
     private Date postDate;
     private Integer tweetStatus;
     private Integer numReport;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "tweet",cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-                                             CascadeType.DETACH, CascadeType.REFRESH})
+    @OneToMany(fetch = FetchType.LAZY,
+               mappedBy = "tweet",
+               cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                          CascadeType.DETACH, CascadeType.REFRESH})
     private List<TweetGallery> tweetGalleries;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-                CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.LAZY,
+                cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                           CascadeType.DETACH, CascadeType.REFRESH})
     @JoinTable(name="tweet_like", joinColumns = @JoinColumn(name="tweet_id"),
-            inverseJoinColumns = @JoinColumn(name="user_id"))
+                                  inverseJoinColumns = @JoinColumn(name="user_id"))
     @JsonIgnore
     private List<Users> userLikes;
+
+    @ManyToMany(fetch = FetchType.LAZY,
+                cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                           CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinTable(name="tweet_tag_dog", joinColumns = @JoinColumn(name="tweet_id"),
+                                     inverseJoinColumns = @JoinColumn(name="dog_id"))
+    private List<Dog> dogs;
+
+    @OneToMany(fetch = FetchType.LAZY,
+               mappedBy = "tweet",
+               cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                          CascadeType.DETACH, CascadeType.REFRESH})
+    private List<TweetReport> tweetReports;
 
     public Tweet() {
     }
@@ -130,6 +147,22 @@ public class Tweet {
         this.userLikes = userLikes;
     }
 
+    public List<Dog> getDogs() {
+        return dogs;
+    }
+
+    public void setDogs(List<Dog> dogs) {
+        this.dogs = dogs;
+    }
+
+    public List<TweetReport> getTweetReports() {
+        return tweetReports;
+    }
+
+    public void setTweetReports(List<TweetReport> tweetReports) {
+        this.tweetReports = tweetReports;
+    }
+
     public void addTweetGallery(TweetGallery tweetGallery) {
         if(this.tweetGalleries == null) {
             this.tweetGalleries = new ArrayList<>();
@@ -143,6 +176,21 @@ public class Tweet {
             this.userLikes = new ArrayList<>();
         }
         this.userLikes.add(user);
+    }
+
+    public void addDog(Dog dog) {
+        if(this.dogs == null) {
+            this.dogs = new ArrayList<>();
+        }
+        this.dogs.add(dog);
+    }
+
+    public void addTweetReport(TweetReport tweetReport) {
+        if(this.tweetReports == null) {
+            this.tweetReports = new ArrayList<>();
+        }
+        this.tweetReports.add(tweetReport);
+        tweetReport.setTweet(this);
     }
 
     @Override

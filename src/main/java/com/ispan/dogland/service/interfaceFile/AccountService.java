@@ -35,4 +35,8 @@ public interface AccountService {
 
     public String uploadImg(MultipartFile file, Integer userId);
 
+    public Users findUsersByUserId(Integer userId);
+
+    public Users findUsersByTweetId(Integer tweetId);
+
 }

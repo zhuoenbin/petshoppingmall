@@ -1,8 +1,12 @@
 package com.ispan.dogland.service.interfaceFile;
 
+import com.ispan.dogland.model.entity.Dog;
+import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import com.ispan.dogland.model.entity.tweet.TweetFollowList;
+import com.ispan.dogland.model.entity.tweet.TweetNotification;
+import com.ispan.dogland.model.entity.tweet.TweetReport;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,6 +14,7 @@ import java.util.List;
 
 public interface TweetService {
 
+    //只找該user的主推文
     public List<Tweet> findTweetsByUserId(Integer userId);
     public Users findUserByTweetId(Integer tweetId);
 
@@ -17,7 +22,7 @@ public interface TweetService {
 
     public List<Tweet> getAllTweet();
 
-    public boolean postNewTweet(Tweet tweet, Integer userId);
+    public Tweet postNewTweet(Tweet tweet, Integer userId);
 
     public String saveTweetImgToLocal(MultipartFile file);
 
@@ -45,5 +50,49 @@ public interface TweetService {
 
     public List<Tweet> findAllFollowTweetsByUserId(Integer userId);
 
-    List<Users> findAllFollowUsersByUserId(Integer userId);
+    public List<Users> findAllFollowUsersByUserId(Integer userId);
+
+    public List<Dog>  findTweetDogsByTweetId(Integer tweetId);
+
+    public Tweet addDogToTweet(Integer dogId, Integer tweetId);
+
+    public Tweet removeDogFromTweet(Integer dogId, Integer tweetId);
+
+    public void sendPostTweetNotificationToFollower(Integer userId,Integer tweetId);
+
+    public void sendReplyNotificationToTweetOwner(Integer hisUserId,Integer hisTweetId,String myName);
+
+    public void sendLikeNotificationToTweetOwner(Integer hisUserId,Integer hisTweetId,String myName);
+
+    public void sendBanTweetNotificationToUser(Integer userId,Tweet tweet);
+
+    public List<TweetNotification> findMyTweetNotifications(Integer userId);
+
+    //把該user的主推文與回文都找出來
+    public List<Tweet> findTweetsAndCommentsByUserId(Integer userId);
+    
+    public TweetNotification findTweetNotificationByNotifiId(Integer id);
+
+    void saveTweetNotification(TweetNotification t1);
+
+    public Tweet updateTweetContent(Integer tweetId, String newContent);
+
+    public boolean checkUserAndReportRelation(Integer tweetId, Integer userId);
+
+    public TweetReport addReporyToTweet(Integer tweetId, Integer userId,String reportText, String reportCheckBox);
+
+    public Tweet saveTweet(Tweet tweet);
+
+    public List<TweetReport> findAllTweetReports();
+
+    public Tweet findTweetByReportId(Integer reportId);
+
+    public  Users findUserByReportId(Integer reportId);
+
+    public Tweet banTweet(Integer tweetId);
+
+
+    public String addEmployeeToReport(Integer reportsId, Integer empId);
+
+    Employee findEmployeeByReportId(Integer reportId);
 }

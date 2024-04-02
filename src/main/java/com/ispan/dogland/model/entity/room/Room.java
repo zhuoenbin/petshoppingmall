@@ -1,4 +1,4 @@
-package com.ispan.dogland.model.entity;
+package com.ispan.dogland.model.entity.room;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

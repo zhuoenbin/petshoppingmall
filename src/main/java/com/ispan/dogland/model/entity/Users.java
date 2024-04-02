@@ -2,9 +2,11 @@ package com.ispan.dogland.model.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ispan.dogland.model.entity.room.RoomReservation;
 import com.ispan.dogland.model.entity.tweet.Tweet;
+import com.ispan.dogland.model.entity.tweet.TweetNotification;
+import com.ispan.dogland.model.entity.tweet.TweetReport;
 import jakarta.persistence.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,13 +49,15 @@ public class Users {
     @OneToMany(mappedBy = "users")
     private List<ShoppingCart> shoppingCarts;
 
+    @OneToMany(mappedBy = "users")
+    private List<Orders> orders;
+
 //    @OneToMany(fetch = FetchType.LAZY,
 //            cascade = CascadeType.ALL,
 //            mappedBy = "user")
 //    private List<Friends> friends;
 
-    @OneToMany(mappedBy = "user",
-            cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Tweet> tweets;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE,
@@ -62,6 +66,18 @@ public class Users {
             inverseJoinColumns = @JoinColumn(name="tweet_id"))
     private List<Tweet> tweetLikes;
 
+    @OneToMany(mappedBy = "reporter",
+                cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TweetReport> tweetReports;
+
+
+
+
+    @OneToMany(mappedBy = "user",
+            fetch = FetchType.LAZY ,
+            cascade = {CascadeType.ALL})
+    @JsonIgnore
+    private List<RoomReservation> roomReservation;
 
     @PrePersist //在物件轉換到persistent狀態以前，做這個function
     public void onCreate() {
@@ -177,12 +193,16 @@ public class Users {
         this.dogs = dogs;
     }
 
+
     public void addDog(Dog dog) {
         if(this.dogs == null) {
             this.dogs = new ArrayList<>();
         }
         this.dogs.add(dog);
+        dog.setUser(this);
     }
+
+
 
     public List<Tweet> getTweets() {
         return tweets;
@@ -216,6 +236,14 @@ public class Users {
         this.tweetLikes = tweetLikes;
     }
 
+    public List<TweetReport> getTweetReports() {
+        return tweetReports;
+    }
+
+    public void setTweetReports(List<TweetReport> tweetReports) {
+        this.tweetReports = tweetReports;
+    }
+
     public void addTweetLike(Tweet tweet) {
         if(tweetLikes == null) {
             tweetLikes = new ArrayList<>();
@@ -223,6 +251,29 @@ public class Users {
         tweetLikes.add(tweet);
     }
 
+    public void addTweetReport(TweetReport tweetReport) {
+        if(tweetReports == null) {
+            tweetReports = new ArrayList<>();
+        }
+        tweetReports.add(tweetReport);
+        tweetReport.setReporter(this);
+    }
+
+    public List<ShoppingCart> getShoppingCarts() {
+        return shoppingCarts;
+    }
+
+    public void setShoppingCarts(List<ShoppingCart> shoppingCarts) {
+        this.shoppingCarts = shoppingCarts;
+    }
+
+    public List<Orders> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Orders> orders) {
+        this.orders = orders;
+    }
 
     @Override
     public String toString() {
@@ -244,11 +295,5 @@ public class Users {
         return sb.toString();
     }
 
-    public List<ShoppingCart> getShoppingCarts() {
-        return shoppingCarts;
-    }
 
-    public void setShoppingCarts(List<ShoppingCart> shoppingCarts) {
-        this.shoppingCarts = shoppingCarts;
-    }
 }

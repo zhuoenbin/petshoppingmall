@@ -1,12 +1,12 @@
 package com.ispan.dogland.controller;
 
 import com.cloudinary.utils.ObjectUtils;
-import com.ispan.dogland.model.dto.ActivityBrief;
-import com.ispan.dogland.model.dto.ActivityData;
-import com.ispan.dogland.model.dto.RentalData;
+import com.ispan.dogland.model.dto.*;
+import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.activity.*;
 import com.ispan.dogland.service.ActivityService;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -106,5 +106,114 @@ public class ActivityController {
         return activityService.findActivityByPage(pageNumber);
     }
 
+
+    //===============查詢使用者的狗===================
+    @GetMapping("/searchUsersDog/{userId}")
+    public List<Dog> findUserDogs(@PathVariable Integer userId){
+        return activityService.findUsersDog(userId);
+    }
+
+    //===============使用者與狗狗報名活動===============
+    @PostMapping("/JoinActivity")
+    public List<ApplyData> userDogsJoin(@RequestParam Integer userId,
+                                        @RequestParam String note,
+                                        @RequestParam Integer[] dogIdList,
+                                        @RequestParam Integer activityId){
+        VenueActivity activity = activityService.findActivityByActivityId(activityId);
+        Integer activityDogNumber = activity.getActivityDogNumber();
+        Integer currentDogNumber = activity.getCurrentDogNumber();
+        Integer length = dogIdList.length;
+        if(activityDogNumber>=currentDogNumber+length){
+            ActivityUserJoined userJoined = activityService.userApply(userId, note,activityId);
+            List<ApplyData> joinedMembers=new ArrayList<>();
+            for(Integer dogId:dogIdList){
+                ActivityDogJoined dogJoined = activityService.dogApply(dogId, activityId);
+                ApplyData applyData = new ApplyData();
+                BeanUtils.copyProperties(userJoined,applyData);
+                BeanUtils.copyProperties(dogJoined,applyData);
+                applyData.setUserId(userJoined.getUser().getUserId());
+                applyData.setActivityId(dogJoined.getVenueActivity().getActivityId());
+                applyData.setActivityDate(dogJoined.getVenueActivity().getActivityDate());
+                applyData.setDogName(dogJoined.getDog().getDogName());
+                applyData.setActivityTitle(dogJoined.getVenueActivity().getActivityTitle());
+                joinedMembers.add(applyData);
+            }
+            return joinedMembers;
+        }
+        throw new RuntimeException("超過狗數限制 !!");
+    }
+
+
+    @GetMapping("/apply/{userId}/dogNotJoinedList/{activityId}")
+    public List<Dog> findUserDogNotInThisActivity(@PathVariable Integer userId,@PathVariable Integer activityId){
+        return activityService.findUserDogsStayAtHome(userId, activityId);
+    }
+
+    @GetMapping("/activityManager/{userId}/findDogListIn/{activityId}")
+    public List<Dog> findUserDogsAttendThisActivity(@PathVariable Integer userId,@PathVariable Integer activityId){
+        return activityService.findUserDogsAttendThisActivity(userId, activityId);
+    }
+
+    @GetMapping("/activityManager/{userId}")
+    public List<MyActivitiesDto>findUserAllJoinedActivities(@PathVariable Integer userId){
+        return activityService.findUserAllJoinedActivities(userId);
+    }
+
+    //===============使用者活動管理頁面取消報名===============
+    @PostMapping ("/activityManager/doCancelProcess")
+    public MyActivitiesDto userCancelledActivity(@RequestParam Integer userId,
+                                                 @RequestParam Integer[] dogIdList,
+                                                 @RequestParam Integer activityId){
+        return activityService.userCancelledActivity(userId,dogIdList,activityId);
+    }
+
+    //===============使用者活動管理頁面更改備註===============
+    @PostMapping ("/activityManager/doRenewNoteProcess")
+    public ActivityUserJoined renewUserNote(@RequestParam Integer activityId,
+                                            @RequestParam Integer userId,
+                                            @RequestParam String userNote){
+        return activityService.renewUserNote(activityId,userId,userNote);
+    }
+
+    //===============請求員工資料===============
+    @GetMapping("/official/employeePass/{employeeId}")
+    public EmployeeDto getEmployeePass(@PathVariable Integer employeeId){
+        return activityService.getEmployeePass(employeeId);
+    }
+
+    //===============所有過去活動===============
+    @GetMapping("/allPastAct/{pageNumber}")
+    public Page<ActivityBrief> showPastBriefByPage(@PathVariable Integer pageNumber){
+        return activityService.findPastActivityByPage(pageNumber);
+    }
+
+    //===============類別過去活動===============
+    @GetMapping("/pastAct/category/{typeId}/{pageNumber}")
+    public Page<ActivityBrief> showPastBriefByPage(@PathVariable Integer pageNumber,@PathVariable Integer typeId){
+        return activityService.findPastActByCategory(pageNumber,typeId);
+    }
+
+    //===============所有過去活動===============
+    @GetMapping("/allNowAct/{pageNumber}")
+    public Page<ActivityBrief> showNowBriefByPage(@PathVariable Integer pageNumber){
+        return activityService.findNowActivityByPage(pageNumber);
+    }
+
+    //===============類別過去活動===============
+    @GetMapping("/nowAct/category/{typeId}/{pageNumber}")
+    public Page<ActivityBrief> showNowBriefByPage(@PathVariable Integer pageNumber,@PathVariable Integer typeId){
+        return activityService.findNowActByCategory(pageNumber,typeId);
+    }
+
+    //===============官方管理頁面===============
+    @PostMapping("/official/activityManager/past")
+    public List<ActivityBrief> findPastActivityInThisPeriod(@RequestParam Date startDate,@RequestParam Date endDate){
+        return activityService.officialActManagerByStatus(startDate,endDate);
+    }
+
+    @PostMapping("/official/activityManager/now")
+    public List<ActivityBrief> findNowActivityInThisPeriod(@RequestParam Date startDate,@RequestParam Date endDate){
+        return activityService.officialActManagerByStatusNot(startDate,endDate);
+    }
 
 }

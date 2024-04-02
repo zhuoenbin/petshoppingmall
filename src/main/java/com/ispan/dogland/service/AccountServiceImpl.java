@@ -44,7 +44,7 @@ public class AccountServiceImpl implements AccountService {
             if(passwordEncoder.matches(password, tmpUser.getUserPassword())){
                 tmpUser.setLastLoginTime(new Date());
                 usersRepository.save(tmpUser);
-                return new Passport(tmpUser.getLastName(),tmpUser.getUserEmail(), tmpUser.getUserId(), tmpUser.getUserStatus());
+                return new Passport(tmpUser.getLastName(),tmpUser.getUserEmail(), tmpUser.getUserId(), tmpUser.getUserStatus(),tmpUser.getUserImgPath());
             }
         }
         if(tmpEmp != null){
@@ -52,7 +52,6 @@ public class AccountServiceImpl implements AccountService {
                 return new Passport(tmpEmp.getLastName(),tmpEmp.getEmail(), tmpEmp.getEmployeeId(), tmpEmp.getDbAuthority());
             }
         }
-        System.out.println("4");
         return null;
     }
 
@@ -167,5 +166,15 @@ public class AccountServiceImpl implements AccountService {
         }catch (IOException e){
             throw new RuntimeException("Image uploading fail !!");
         }
+    }
+
+    @Override
+    public Users findUsersByUserId(Integer userId) {
+        return usersRepository.findByUserId(userId);
+    }
+
+    @Override
+    public Users findUsersByTweetId(Integer tweetId) {
+        return usersRepository.findUserByTweetId(tweetId);
     }
 }

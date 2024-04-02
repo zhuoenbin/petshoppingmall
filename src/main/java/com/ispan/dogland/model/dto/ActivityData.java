@@ -37,6 +37,7 @@ public class ActivityData {
     private Date activityClosingDate;
     private Integer activityDogNumber;
     private Integer currentDogNumber;
+    private Integer currentUserNumber;
     private Integer activityCost;
     private String activityCostDescription;
     private String contactInfo;
@@ -265,5 +266,13 @@ public class ActivityData {
 
     public void setContactPhone(String contactPhone) {
         this.contactPhone = contactPhone;
+    }
+
+    public Integer getCurrentUserNumber() {
+        return currentUserNumber;
+    }
+
+    public void setCurrentUserNumber(Integer currentUserNumber) {
+        this.currentUserNumber = currentUserNumber;
     }
 }

@@ -15,10 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/activity/api")
@@ -206,14 +203,60 @@ public class ActivityController {
     }
 
     //===============官方管理頁面===============
+    @GetMapping("/official/activityManager/past")
+    public List<ActivityBrief> findPastActivityInThisPeriod(){
+        Date currentDate = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDate);
+
+        // 月初第一天
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        Date startDate = calendar.getTime();
+        System.out.println("activityManager/past執行月初：" + startDate);
+
+        // 用下個月第一天來取當月最後一天
+        calendar.add(Calendar.MONTH, 1);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.add(Calendar.DATE, -1); // 月初-1為上月月末
+
+        Date endDate = calendar.getTime();
+        System.out.println("activityManager/past執行月末：" + endDate);
+        return activityService.officialActManagerByStatus(startDate,endDate);
+    }
     @PostMapping("/official/activityManager/past")
     public List<ActivityBrief> findPastActivityInThisPeriod(@RequestParam Date startDate,@RequestParam Date endDate){
         return activityService.officialActManagerByStatus(startDate,endDate);
     }
+
+    @GetMapping("/official/activityManager/now")
+    public List<ActivityBrief> findNowActivityInThisPeriod(){
+        Date currentDate = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDate);
+
+        // 月初第一天
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        Date startDate = calendar.getTime();
+        System.out.println("activityManager/now執行月初：" + startDate);
+
+        // 用下個月第一天來取當月最後一天
+        calendar.add(Calendar.MONTH, 1);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.add(Calendar.DATE, -1); // 月初-1為上月月末
+
+        Date endDate = calendar.getTime();
+        System.out.println("activityManager/now執行月末：" + endDate);
+        return activityService.officialActManagerByStatusNot(startDate,endDate);
+    }
+
 
     @PostMapping("/official/activityManager/now")
     public List<ActivityBrief> findNowActivityInThisPeriod(@RequestParam Date startDate,@RequestParam Date endDate){
         return activityService.officialActManagerByStatusNot(startDate,endDate);
     }
 
+    @GetMapping("/official/activityManager/{activityId}/attendeeList")
+    public List<ActOfficialAttendeeDto> findOnePastActAttendeeList (@PathVariable Integer activityId){
+        return activityService.findOneActAttendeeList(activityId,"已取消");
+    }
 }

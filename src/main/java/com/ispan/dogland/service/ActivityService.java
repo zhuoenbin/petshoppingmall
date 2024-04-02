@@ -616,6 +616,7 @@ public class ActivityService {
         return briefs;
     }
 
+    //===============以區間找現在活動===============
     public List<ActivityBrief> officialActManagerByStatusNot(Date start,Date end){
         List<VenueActivity> allEnd = activityRepository.findByActivityStatusNotAndActivityDateBetweenOrderByActivityDateAsc("活動已結束", start, end);
         List<ActivityBrief> abList = new ArrayList<>();//裝資料的
@@ -632,8 +633,9 @@ public class ActivityService {
         return abList;
     }
 
+    //===============以區間找過去活動===============
     public List<ActivityBrief> officialActManagerByStatus(Date start,Date end){
-        List<VenueActivity> allEnd = activityRepository.findByActivityStatusNotAndActivityDateBetweenOrderByActivityDateAsc("活動已結束", start, end);
+        List<VenueActivity> allEnd = activityRepository.findByActivityStatusAndActivityDateBetweenOrderByActivityDateAsc("活動已結束", start, end);
         List<ActivityBrief> abList = new ArrayList<>();//裝資料的
         for(VenueActivity one:allEnd){
             ActivityBrief brief = new ActivityBrief();
@@ -647,6 +649,39 @@ public class ActivityService {
         }
         return abList;
     }
+
+    //===============找某個活動 過去/現在 活動所有參加者跟狗資料===============
+    public List<ActOfficialAttendeeDto> findOneActAttendeeList(Integer activityId,String joinStatus){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        List<ActivityUserJoined> userJoinedList = userJoinedRepository.findByVenueActivityAndJoinedStatusNot(activity, joinStatus);
+        List<ActOfficialAttendeeDto> dtoList=new ArrayList<>();
+        for(ActivityUserJoined userJoined:userJoinedList){
+            ActOfficialAttendeeDto dto=new ActOfficialAttendeeDto();
+            //userJoined 資料
+            BeanUtils.copyProperties(userJoined,dto);
+            //activity 資料
+            dto.setActivityId(activityId);
+            //user 資料
+            Users user = userJoined.getUser();
+            dto.setUserId(user.getUserId());
+            dto.setFirstName(user.getFirstName());
+            //dog 資料
+            List<Dog> dogList = findUserDogsAttendThisActivity(user.getUserId(), activityId);
+            List<String> dogNameList =new ArrayList<>();
+            List<String> dogProfileList =new ArrayList<>();
+            for(Dog dog:dogList){
+                String img = dog.getDogImgPathCloud();
+                String dogName = dog.getDogName();
+                dogNameList.add(dogName);
+                dogProfileList.add(img);
+            }
+            dto.setDogNameList(dogNameList);
+            dto.setDogProfileList(dogProfileList);
+            dtoList.add(dto);
+        }
+        return dtoList;
+    }
+
 
 
 

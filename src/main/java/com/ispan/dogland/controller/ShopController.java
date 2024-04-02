@@ -17,10 +17,7 @@ import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductCategory;
 import com.ispan.dogland.model.entity.product.ProductGallery;
-import com.ispan.dogland.model.vo.CheckoutPaymentRequestForm;
-import com.ispan.dogland.model.vo.ProductForm;
-import com.ispan.dogland.model.vo.ProductPackageForm;
-import com.ispan.dogland.model.vo.RedirectUrls;
+import com.ispan.dogland.model.vo.*;
 import com.ispan.dogland.service.ShopService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
@@ -49,13 +46,6 @@ public class ShopController {
     @Autowired
     private ProductRepository productRepository;
 
-    //商品列表與商品分頁(沒有加關鍵字查詢)目前沒用到
-    @GetMapping("/products/{pageNumber}")
-    public Page<ProductDto> findProductByPage(@PathVariable Integer pageNumber){
-        Page<ProductDto> productDtos = shopService.findProductByPage(pageNumber);
-        return productDtos;
-    }
-
     //商品列表與商品分頁(增加搜尋功能)
     @GetMapping("/products-keyword/{pageNumber}")
     public Page<ProductDto> findProductByPageWithKeyword(@PathVariable Integer pageNumber,
@@ -78,28 +68,6 @@ public class ShopController {
         List<ProductDto> productDtos = shopService.findByProductPage(productId);
         return productDtos;
     }
-    
-    //加入購物車(ShopPage)
-//    @RequestMapping("/product/add/{productId}")
-//    public ShoppingCart addOneProductToCart(@PathVariable Integer productId, HttpSession session){
-//        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
-//        if(loggedInMember == null){
-//            throw new RuntimeException("未登入錯誤");
-//        }
-//        return shopService.addOneProductToCart(loggedInMember.getUserId(),productId);
-//    }
-
-//    //加入購物車(ProductPage)
-//    @RequestMapping("/productPage/add/{productId}/{quantity}")
-//    public ShoppingCart pageAddToCart(@PathVariable Integer productId,
-//                                      @PathVariable Integer quantity,
-//                                      HttpSession session){
-//        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
-//        if(loggedInMember == null){
-//            throw new RuntimeException("未登入錯誤");
-//        }
-//        return shopService.pageAddToCart(loggedInMember.getUserId(),productId,quantity);
-//    }
 
     ///加入購物車(totalAddToCart)
     @RequestMapping("/totalAddToCart/add/{productId}")
@@ -135,11 +103,21 @@ public class ShopController {
         return shopService.deleteProductFromCart(loggedInMember.getUserId(),productId);
     }
 
+    //結帳後刪除購物車(依照會員ID)
+    @RequestMapping("/product/deleteByUser")
+    public List<ShoppingCart> deleteCartByUser(HttpSession session){
+        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+        if(loggedInMember == null){
+            throw new RuntimeException("未登入錯誤");
+        }
+        return shopService.deleteCartByUser(loggedInMember.getUserId());
+    }
+
     //加入訂單
     @PostMapping("/order")
     public void getCartData(@RequestBody List<OderDto> oderDtos, HttpSession session) {
         Passport loggedInMember = (Passport) session.getAttribute("loginUser");
-        Orders order = shopService.addorder(loggedInMember.getUserId());
+        Orders order = shopService.addOrder(loggedInMember.getUserId());
 
         for (OderDto oderDto : oderDtos) {
             OrderDetail orderDetail = new OrderDetail();
@@ -206,6 +184,42 @@ public class ShopController {
             System.out.println("transactionId =>" + transactionId);
 
             return paymentUrl;  // 轉址到獲取的 URL
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null; // 如果發生異常，返回 null 或者其他適當的值
+    }
+
+    @PostMapping("/confirm/{totalPrice}")
+    public String sendconfirm(@PathVariable String totalPrice) {
+        //ConfirmAPI
+        String ChannelId="2003912658";  //這個要用自己的
+        String ChannelSecret = "b852dee8fbe5117039966646d0ff44e5";  //這個要用自己的
+        String requestBody;
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            ConfirmData confirmData =new ConfirmData();
+            confirmData.setAmount(new BigDecimal(totalPrice));
+            confirmData.setCurrency("TWD");
+            String confirmNonce = UUID.randomUUID().toString();
+            String confirmUrl ="/v3/payments/" + allTransactionId + "/confirm";
+            requestBody = objectMapper.writeValueAsString(confirmData);
+
+            String confirmSignature = ShopService.encrypt(ChannelSecret, ChannelSecret + confirmUrl + requestBody + confirmNonce);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-LINE-ChannelId", ChannelId);
+            headers.set("X-LINE-Authorization-Nonce", confirmNonce);
+            headers.set("X-LINE-Authorization", confirmSignature);
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+            String linePayApiUrl = "https://sandbox-api-pay.line.me/v3/payments/" + allTransactionId + "/confirm"; //transactionId
+            String response = restTemplate.postForObject(linePayApiUrl, requestEntity, String.class);
+
+            return "sellerok";
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

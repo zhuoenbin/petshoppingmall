@@ -45,23 +45,6 @@ public class ShopService {
     @Autowired
     OrderDetailRepository orderDetailRepository;
 
-    // 根據頁碼搜尋商品(目前沒用到)
-    public Page<ProductDto> findProductByPage(Integer pageNumber){
-        Page<Product> products = productRepository.findAll(PageRequest.of(pageNumber,6));
-        Page<ProductDto> productDtos = products.map(p -> {
-            ProductDto pto = new ProductDto();
-            BeanUtils.copyProperties(p, pto);
-            // 獲取產品的所有圖片路徑列表
-            List<String> imgPaths = new ArrayList<>();
-            for (ProductGallery gallery : p.getProductGalleries()) {
-                imgPaths.add(gallery.getImgPath());
-            }
-            pto.setImgPath(imgPaths);
-            return pto;
-        });
-        return productDtos;
-    }
-
     // 根據頁碼搜尋商品(增加搜尋功能)
     public Page<ProductDto> findProductByPageWithKeyword(Integer pageNumber, String keyword) {
         Page<Product> products;
@@ -102,7 +85,7 @@ public class ShopService {
         return productDtos;
     }
 
-    //根據productID回傳商品
+    //根據productID回傳商品(productPage)
     public List<ProductDto> findByProductPage(Integer productId) {
         List<Product> products = productRepository.findByProductId(productId);
         List<ProductDto> productDtos = products.stream().map(product -> {
@@ -118,44 +101,6 @@ public class ShopService {
         }).collect(Collectors.toList());
         return productDtos;
     }
-
-    // 加入指定商品到指定會員的購物車(ShopPage)
-//    public ShoppingCart addOneProductToCart(Integer userId,Integer productId){
-//        Users m = new Users(userId);
-//        Product p = new Product(productId);
-//
-//        ShoppingCart shoppingCartItem = shoppingCartRepository.findByUsersAndProduct(m,p);
-//
-//        if(shoppingCartItem !=null){
-//            shoppingCartItem.setQuantity(shoppingCartItem.getQuantity() + 1);
-//        }
-//        if(shoppingCartItem ==null) {
-//            shoppingCartItem = new ShoppingCart();
-//            shoppingCartItem.setUsers(m);
-//            shoppingCartItem.setProduct(p);
-//            shoppingCartItem.setQuantity(1);
-//        }
-//        return shoppingCartRepository.save(shoppingCartItem);
-//    }
-
-    // 加入指定商品到指定會員的購物車(ProductPage)
-//    public ShoppingCart pageAddToCart(Integer userId,Integer productId,Integer quantity){
-//        Users m = new Users(userId);
-//        Product p = new Product(productId);
-//
-//        ShoppingCart shoppingCartItem = shoppingCartRepository.findByUsersAndProduct(m,p);
-//
-//        if(shoppingCartItem !=null){
-//            shoppingCartItem.setQuantity(quantity);
-//        }
-//        if(shoppingCartItem ==null) {
-//            shoppingCartItem = new ShoppingCart();
-//            shoppingCartItem.setUsers(m);
-//            shoppingCartItem.setProduct(p);
-//            shoppingCartItem.setQuantity(quantity);
-//        }
-//        return shoppingCartRepository.save(shoppingCartItem);
-//    }
 
     //共用版加入購物車
     public ShoppingCart totalAddToCart(Integer userId, Integer productId, Integer quantity) {
@@ -219,11 +164,22 @@ public class ShopService {
         if (shoppingCartItem != null) {
             shoppingCartRepository.delete(shoppingCartItem); // 找到了購物車項目，進行刪除
         }
-        return null; // 返回被刪除的購物車項目，或者返回null（視情況而定）
+        return null; // 返回被刪除的購物車項目，或者返回null
+    }
+
+    //結帳後刪除購物車(依照會員ID)
+    public List<ShoppingCart> deleteCartByUser(Integer userId) {
+        Users user = new Users(userId);
+        List<ShoppingCart> shoppingCartItem = shoppingCartRepository.findByUsers(user);
+        // 遍歷購物車項目，並逐個刪除
+        for (ShoppingCart cartItem : shoppingCartItem) {
+            shoppingCartRepository.delete(cartItem);
+        }
+        return shoppingCartItem;
     }
 
     //把userId加到oder
-    public Orders addorder(Integer userId) {
+    public Orders addOrder(Integer userId) {
         Users user = new Users(userId);
         Orders order = new Orders();
         order.setUsers(user);

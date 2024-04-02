@@ -52,18 +52,6 @@ public class DoglandApplication {
 											   TweetReportRepository tweetReportRepository,
 											   RoomReservationRepository roomReservationRepository) {
 		return runner -> {
-			RoomReservation roomReservation = roomReservationRepository.findByReservationId(1);
-
-			Room r = roomReservation.getRoom();
-			Users u = roomReservation.getUser();
-			Dog d = roomReservation.getDog();
-			String c = roomReservation.getConments();
-			Integer s = roomReservation.getStar();
-			System.out.println(r.getRoomName());
-			System.out.println(u.getLastName());
-			System.out.println(d.getDogName());
-			System.out.println(c);
-			System.out.println(s);
 		};
 
 

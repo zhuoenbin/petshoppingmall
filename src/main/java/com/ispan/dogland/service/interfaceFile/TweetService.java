@@ -96,5 +96,5 @@ public interface TweetService {
 
     Employee findEmployeeByReportId(Integer reportId);
 
-    Tweet postTweetForActivityShare(Integer userId, String title, String imgUrl);
+    Tweet postTweetForShare(Integer userId, String content, String imgUrl);
 }

@@ -475,13 +475,12 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
-    public Tweet postTweetForActivityShare(Integer userId,String title, String imgUrl) {
-        String tweetContent = "我與我的狗狗報名了超讚的活動: " + title + " ，一起來參加吧 ! 立刻點擊圖片到活動頁面報名!!!";
+    public Tweet postTweetForShare(Integer userId,String content, String imgUrl) {
         //tweet
         TweetGallery tweetGallery = new TweetGallery();
         tweetGallery.setImgPath(imgUrl);
         Tweet tweet = new Tweet();
-        tweet.setTweetContent(tweetContent);
+        tweet.setTweetContent(content);
         tweet.setPreNode(0);
         tweet.setPostDate(new Date());
         tweet.setTweetStatus(1);

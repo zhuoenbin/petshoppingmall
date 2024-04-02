@@ -246,7 +246,6 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public void sendPostTweetNotificationToFollower(Integer userId, Integer tweetId) {
-        List<TweetNotification> res = new ArrayList<>();
         Users user = userRepository.findByUserId(userId);
         String userName = user.getLastName();
 
@@ -431,6 +430,24 @@ public class TweetServiceImpl implements TweetService {
     @Override
     public Employee findEmployeeByReportId(Integer reportId) {
         return employeeRepository.findEmployeeByTweetReportId(reportId);
+    }
+
+    @Override
+    public Tweet postTweetForActivityShare(Integer userId,  Integer activityId,String title, String imgUrl) {
+        String tweetContent = "我與我的狗狗報名了超讚的活動: " + title + " ，一起來參加吧 !";
+        //tweet
+        TweetGallery tweetGallery = new TweetGallery();
+        tweetGallery.setImgPath(imgUrl);
+        Tweet tweet = new Tweet();
+        tweet.setTweetContent(tweetContent);
+        tweet.setPreNode(0);
+        tweet.setPostDate(new Date());
+        tweet.setTweetStatus(1);
+        tweet.setNumReport(0);
+        tweet.addTweetGallery(tweetGallery);
+        Tweet tweetInDb = tweetRepository.save(tweet);
+        Tweet tweetForReturn = this.postNewTweet(tweetInDb, userId);
+        return tweetForReturn;
     }
 
 

@@ -95,4 +95,6 @@ public interface TweetService {
     public String addEmployeeToReport(Integer reportsId, Integer empId);
 
     Employee findEmployeeByReportId(Integer reportId);
+
+    Tweet postTweetForActivityShare(Integer userId,Integer activityId, String title, String imgUrl);
 }

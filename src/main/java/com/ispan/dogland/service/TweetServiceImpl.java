@@ -9,16 +9,21 @@ import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.tweet.*;
 import com.ispan.dogland.service.interfaceFile.TweetService;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,6 +31,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.*;
 
 @Service
@@ -33,6 +39,7 @@ public class TweetServiceImpl implements TweetService {
 
     @Value("${imagepath}")
     private String uploadDir;
+    private static final long MAX_FILE_SIZE_BYTES = 3 * 1024 * 1024; // 3MB
 
     private TweetRepository tweetRepository;
     private UserRepository userRepository;
@@ -109,23 +116,62 @@ public class TweetServiceImpl implements TweetService {
         return null;
     }
 
-    @Override
     public String saveTweetImgToLocal(MultipartFile file) {
-        String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
-        String timeStamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        String fileName = timeStamp + "_" + originalFileName;
-        File uploadPath = new File(uploadDir);
-        if (!uploadPath.exists()) {
-            uploadPath.mkdirs();
-        }
-        Path filePath = Paths.get(uploadDir, fileName);
         try {
-            Files.copy(file.getInputStream(), filePath);
+            String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
+            String timeStamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+            String fileName = timeStamp + "_" + originalFileName;
+            File uploadPath = new File(uploadDir);
+            if (!uploadPath.exists()) {
+                uploadPath.mkdirs();
+            }
+            Path filePath = Paths.get(uploadDir, fileName);
+
+            // 如果大於3MB就壓縮
+            if (file.getSize() > MAX_FILE_SIZE_BYTES) {
+                BufferedImage originalImage = ImageIO.read(file.getInputStream());
+                BufferedImage resizedImage = resizeImage(originalImage);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(resizedImage, "jpg", baos);
+                ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+                FileUtils.copyInputStreamToFile(bais, filePath.toFile());
+            } else {
+                Files.copy(file.getInputStream(), filePath);
+            }
+
             return fileName;
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private BufferedImage resizeImage(BufferedImage originalImage) {
+        System.out.println("壓縮圖片...........");
+        int targetWidth = originalImage.getWidth();
+        int targetHeight = originalImage.getHeight();
+        while (calculateSize(originalImage) > MAX_FILE_SIZE_BYTES) {
+            targetWidth *= 0.9;
+            targetHeight *= 0.9;
+        }
+
+        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = resizedImage.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+        g.dispose();
+
+        return resizedImage;
+    }
+
+    private long calculateSize(BufferedImage image) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(image, "jpg", baos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return baos.toByteArray().length;
     }
 
     @Override
@@ -318,16 +364,12 @@ public class TweetServiceImpl implements TweetService {
         Collections.sort(notifications, new Comparator<TweetNotification>() {
             @Override
             public int compare(TweetNotification notification1, TweetNotification notification2) {
-                // 按照 postTime 属性进行升序排序
+                // postTime 排序
                 return notification2.getPostTime().compareTo(notification1.getPostTime());
             }
         });
         List<TweetNotification> top15Notifications = notifications.subList(0, Math.min(5, notifications.size()));
-
         return top15Notifications;
-
-
-//        return tweetNotificationRepository.findByUserId(userId);
     }
 
     @Override
@@ -434,7 +476,7 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public Tweet postTweetForActivityShare(Integer userId,String title, String imgUrl) {
-        String tweetContent = "我與我的狗狗報名了超讚的活動: " + title + " ，一起來參加吧 !";
+        String tweetContent = "我與我的狗狗報名了超讚的活動: " + title + " ，一起來參加吧 ! 立刻點擊圖片到活動頁面報名!!!";
         //tweet
         TweetGallery tweetGallery = new TweetGallery();
         tweetGallery.setImgPath(imgUrl);

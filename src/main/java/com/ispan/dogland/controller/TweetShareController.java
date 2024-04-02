@@ -49,7 +49,10 @@ public class TweetShareController {
         Tweet tweet1 = tweetService.postTweetForActivityShare(userId,title,imgUrl);
         //發送通知
         tweetService.sendPostTweetNotificationToFollower(userId, tweet1.getTweetId());
-
         return null;
     }
+
+
+
+//    @GetMapping("/postTweetForRoomShare")
 }

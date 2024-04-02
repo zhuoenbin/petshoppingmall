@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface OrderDetailRepository extends JpaRepository<OrderDetail,Integer> {
-    @Query("SELECT od FROM OrderDetail od JOIN od.order o ON o.orderId = :orderId")
+    @Query("SELECT od FROM OrderDetail od JOIN od.orders o ON o.orderId = :orderId")
     List<OrderDetail> findByOrderId(Integer orderId);
 }

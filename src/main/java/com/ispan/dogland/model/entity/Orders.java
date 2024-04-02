@@ -85,20 +85,6 @@ public class Orders {
 
     private Integer freight;
 
-    @OneToMany(mappedBy = "order",
-            fetch = FetchType.LAZY ,
-            cascade = {CascadeType.ALL})
-    @JsonIgnore
-    private List<OrderDetail> orderDetail;
-
-    public List<OrderDetail> getOrderDetail() {
-        return orderDetail;
-    }
-
-    public void setOrderDetail(List<OrderDetail> orderDetail) {
-        this.orderDetail = orderDetail;
-    }
-
 //    public void add(OrderDetail tmpOrderDetail){
 //        if(orderDetail==null){
 //            orderDetail = new ArrayList<>();

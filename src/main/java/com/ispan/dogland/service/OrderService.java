@@ -49,7 +49,7 @@ public class OrderService {
             for(ProductGallery pgs:productGalleryRepository.findByProductId(i)){
                 imgUrls.add(pgs.getImgPath());
             }
-            p = productRepository.findByProductId(i);
+            p = productRepository.findSingleByProductId(i);
             pList.add(p);
         }
         for(Product pTmp:pList) {

@@ -26,6 +26,7 @@ public interface TweetService {
 
     public String saveTweetImgToLocal(MultipartFile file);
 
+
     public List<Tweet> getNumOfComment(Integer tweetId);
 
     public List<Tweet> getAllTweetForPage(int page, int limit);

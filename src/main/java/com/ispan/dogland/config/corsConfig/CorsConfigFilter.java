@@ -5,11 +5,14 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 import java.io.IOException;
 
 @WebFilter(filterName = "CorsFilter",urlPatterns = "/*")
 @Configuration
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class CorsConfigFilter implements Filter {
 
     @Value("${front.end.host}")

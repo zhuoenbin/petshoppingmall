@@ -146,6 +146,7 @@ public class TweetServiceImpl implements TweetService {
         return null;
     }
 
+
     private BufferedImage resizeImage(BufferedImage originalImage) {
         System.out.println("壓縮圖片...........");
         int targetWidth = originalImage.getWidth();

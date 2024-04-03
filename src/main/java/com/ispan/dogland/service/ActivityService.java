@@ -682,6 +682,32 @@ public class ActivityService {
         return dtoList;
     }
 
+    //===============activityShowPage===============
+    public ActivityShowInfo getActivityPageInfo(Integer activityId){
+        //activity
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        String activityTypeName = activity.getActivityType().getActivityTypeName();
+        Integer venueId = activity.getVenue().getVenueId();
+        String venueName = activity.getVenue().getVenueName();
+        //gallery
+        List<ActivityGallery> galleryList = galleryRepository.findByVenueActivity(activity);
+        List<ActivityGalleryDto> imgList = new ArrayList<>();
+        for(ActivityGallery img:galleryList){
+            ActivityGalleryDto dto = new ActivityGalleryDto();
+            BeanUtils.copyProperties(img,dto);
+            imgList.add(dto);
+        }
+
+        ActivityShowInfo showInfo = new ActivityShowInfo();
+        BeanUtils.copyProperties(activity,showInfo);
+        showInfo.setActivityTypeName(activityTypeName);
+        showInfo.setVenueId(venueId);
+        showInfo.setVenueName(venueName);
+        showInfo.setActivityImgList(imgList);
+        return showInfo;
+    }
+
+
 
 
 

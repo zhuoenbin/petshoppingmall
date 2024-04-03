@@ -259,4 +259,10 @@ public class ActivityController {
     public List<ActOfficialAttendeeDto> findOnePastActAttendeeList (@PathVariable Integer activityId){
         return activityService.findOneActAttendeeList(activityId,"已取消");
     }
+
+    @GetMapping("/official/activityInfo/{activityId}")
+    public ActivityShowInfo getActivityInfo(@PathVariable Integer activityId){
+        return activityService.getActivityPageInfo(activityId);
+    }
+
 }

@@ -200,6 +200,21 @@ public class ActivityService {
         newData.setVenueId(save.getVenue().getVenueId());
         return  newData;
     }
+    public ActivityCreateDto offCreateNewActivity(ActivityCreateDto createDto){
+        VenueActivity activity = new VenueActivity();
+        BeanUtils.copyProperties(createDto,activity);
+        activity.setActivityType(typeRepository.findByActivityTypeId(createDto.getActivityTypeId()));
+        activity.setVenue(venueRepository.findByVenueId(createDto.getVenueId()));
+        activity.setEmployee(employeeRepository.findByEmployeeId(createDto.getEmployeeId()));
+        VenueActivity save = activityRepository.save(activity);
+        ActivityCreateDto dto = new ActivityCreateDto();
+        BeanUtils.copyProperties(save,dto);
+        dto.setActivityTypeId(createDto.getActivityTypeId());
+        dto.setVenueId(createDto.getVenueId());
+        dto.setEmployeeId(createDto.getEmployeeId());
+        return dto;
+    }
+
     //===============新增活動照片===================
     public ActivityGallery addTitleImg(MultipartFile file,Integer activityId){
         //上傳到producutFolder裡
@@ -705,6 +720,43 @@ public class ActivityService {
         showInfo.setVenueName(venueName);
         showInfo.setActivityImgList(imgList);
         return showInfo;
+    }
+
+    //===============likedActList===============
+    public List<Integer> usersLikedActsIdList(Integer userId){
+        Users user = userRepository.findByUserId(userId);
+        List<LikedActivity> likedActivityList = likedRepository.findByUser(user);
+        List<Integer> activityIdList =new ArrayList<>();
+        if(!likedActivityList.isEmpty()){
+            for(LikedActivity act:likedActivityList){
+                Integer activityId = act.getVenueActivity().getActivityId();
+                activityIdList.add(activityId);
+            }
+            return activityIdList;
+        }else{
+            return null;
+        }
+    }
+    //===============likedOneAct===============
+    public Boolean userLikeAnAct(Integer activityId,Integer userId){
+        Users users = userRepository.findByUserId(userId);
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        LikedActivity likedActivity = new LikedActivity();
+        likedActivity.setUser(users);
+        likedActivity.setVenueActivity(activity);
+        likedRepository.save(likedActivity);
+        return true;
+    }
+
+    public Boolean userDislikedAnAct(Integer activityId,Integer userId){
+        Users users = userRepository.findByUserId(userId);
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        LikedActivity fromLiked = likedRepository.findByUserAndVenueActivity(users, activity);
+        if(fromLiked!=null){
+            likedRepository.delete(fromLiked);
+            return true;
+        }
+        return false;
     }
 
 

@@ -81,6 +81,10 @@ public class ActivityController {
     public ActivityData addNewActivity(@RequestBody ActivityData activityData){
         return activityService.addNewActivity(activityData);
     }
+    @PostMapping("/official/createActivity")
+    public ActivityCreateDto createNewActivity(@RequestBody ActivityCreateDto createDto ){
+        return activityService.offCreateNewActivity(createDto);
+    }
 
     @PostMapping("/official/addMainImg")
     public ActivityGallery addMainImg(@RequestParam Integer activityId,@RequestParam MultipartFile mainImg){
@@ -264,5 +268,21 @@ public class ActivityController {
     public ActivityShowInfo getActivityInfo(@PathVariable Integer activityId){
         return activityService.getActivityPageInfo(activityId);
     }
+
+    @GetMapping("/usersLiked/{userId}")
+    public List<Integer> getUsersLikedActIds(@PathVariable Integer userId){
+        return activityService.usersLikedActsIdList(userId);
+    }
+    @PostMapping("/userDo/like")
+    public Boolean userLikeAct(@RequestParam Integer activityId,@RequestParam Integer userId){
+        return activityService.userLikeAnAct(activityId,userId);
+    }
+
+    @PostMapping("/userDo/dislike")
+    public Boolean userDislikeAct(@RequestParam Integer activityId,@RequestParam Integer userId){
+        return activityService.userDislikedAnAct(activityId,userId);
+    }
+
+
 
 }

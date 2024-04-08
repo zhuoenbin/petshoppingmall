@@ -199,7 +199,33 @@ public class RoomServicelmpl implements RoomService {
     public List<Room> findAllroom() { return roomRepository.findAll(); }
 
     @Override
-    public List<RoomReservation> findAllRoomReservation() { return reservationRepository.findAll(); }
+    public List<RoomReservationDto> findAllRoomReservation() {
+        List<RoomReservationDto> roomReservationDtoList = new ArrayList<>();
+
+        for (RoomReservation roomReservation : reservationRepository.findAll()) {
+
+            RoomReservationDto roomReservationDto = new RoomReservationDto();
+
+            roomReservationDto.setReservationId(roomReservation.getReservationId());
+            roomReservationDto.setRoom(roomReservation.getRoom());
+            roomReservationDto.setUserId(roomReservation.getUser().getUserId());
+            roomReservationDto.setLastName(roomReservation.getUser().getLastName());
+            roomReservationDto.setDog(roomReservation.getDog());
+            roomReservationDto.setStartTime(roomReservation.getStartTime());
+            roomReservationDto.setEndTime(roomReservation.getEndTime());
+            roomReservationDto.setTotalPrice(roomReservation.getTotalPrice());
+            roomReservationDto.setReservationTime(roomReservation.getReservationTime());
+            roomReservationDto.setCancelTime(roomReservation.getCancelTime());
+            roomReservationDto.setCancelDirection(roomReservation.getCancelDirection());
+            roomReservationDto.setStar(roomReservation.getStar());
+            roomReservationDto.setConments(roomReservation.getConments());
+            roomReservationDto.setConmentsTime(roomReservation.getConmentsTime());
+
+            roomReservationDtoList.add(roomReservationDto);
+        }
+
+        return roomReservationDtoList;
+    }
 
     @Override
     public Room findByRoomId(Integer roomId) { return roomRepository.findByRoomId(roomId); }

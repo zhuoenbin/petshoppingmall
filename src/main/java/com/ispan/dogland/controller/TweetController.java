@@ -1,6 +1,8 @@
 package com.ispan.dogland.controller;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.tweet.TweetRepository;
 import com.ispan.dogland.model.dto.TweetDto;
@@ -15,10 +17,9 @@ import com.ispan.dogland.model.entity.tweet.TweetReport;
 import com.ispan.dogland.service.interfaceFile.AccountService;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -47,39 +48,10 @@ public class TweetController {
     }
 
 
-//    @GetMapping("/getAllTweet")
-//    public List<Tweet> allTweet(){
-//        return tweetService.getAllTweet();
-//    }
 
-    @GetMapping("/getAllTweet")
-    public List<Tweet> allTweet(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "6") int limit) {
-        return tweetService.getAllTweetForPage(page, limit);
-    }
 
-    @GetMapping("/getTweetById/{tweetId}")
-    public Tweet getTweetById(@PathVariable Integer tweetId) {
-        return tweetService.findTweetByTweetId(tweetId);
-    }
 
-    @GetMapping("/getUserIdByTweetId/{tweetId}")
-    public String getUserIdByTweetId(@PathVariable Integer tweetId) {
-        return tweetService.findUserByTweetId(tweetId).getUserId().toString();
-    }
 
-    @GetMapping("/getUserNameByTweetId/{tweetId}")
-    public String getUserNameByTweetId(@PathVariable Integer tweetId) {
-        return tweetService.findUserByTweetId(tweetId).getLastName();
-    }
-
-    @GetMapping("/getUserByTweetId/{tweetId}")
-    public UserDto getUserByTweetId(@PathVariable Integer tweetId) {
-        Users user = tweetService.findUserByTweetId(tweetId);
-        UserDto userDto = new UserDto();
-        userDto.setUserId(user.getUserId());
-        userDto.setLastName(user.getLastName());
-        return userDto;
-    }
 
 
     @PostMapping("/postTweetWithPhoto")
@@ -119,7 +91,6 @@ public class TweetController {
                     Tweet b2 = tweetRepository.save(b);
                 }
             }
-
             //發送通知
             tweetService.sendPostTweetNotificationToFollower(memberId, tweet1.getTweetId());
         }
@@ -151,42 +122,31 @@ public class TweetController {
 			        Tweet b2 = tweetRepository.save(b);
                 }
             }
-
             //發送通知
             tweetService.sendPostTweetNotificationToFollower(memberId, tweet1.getTweetId());
-
-
         }
         return ResponseEntity.ok("Tweet posted successfully");
     }
 
+    //找到該則tweet的所有按讚數量
+    @GetMapping("/getTweetLikesNum")
+    public ResponseEntity<TweetLikesCheckResponse> getTweetLikesNum(@RequestParam Integer tweetId, @RequestParam Integer userId) {
+        List<Users> users = tweetService.findUserLikesByTweetId(tweetId);
+        Users user = accountService.getUserDetailById(userId);
+        TweetLikesCheckResponse tweetLikesCheckResponse = new TweetLikesCheckResponse();
 
-    @GetMapping("/getImage/{fileName}")
-    public ResponseEntity<byte[]> getImage(@PathVariable String fileName) {
-        String imagePath = "D:/image/" + fileName;
+        tweetLikesCheckResponse.setTweetLikesNum(tweetService.findUserLikesByTweetId(tweetId).size());
 
-        try {
-            Path filePath = Paths.get(imagePath);
-            byte[] imageBytes = Files.readAllBytes(filePath);
-            return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageBytes);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.notFound().build();
+        if (users.contains(user)) {
+            // user 在 users 列表中
+            tweetLikesCheckResponse.setIsUserLiked(1);
+        } else {
+            // user 不在 users 列表中
+            tweetLikesCheckResponse.setIsUserLiked(0);
         }
+        return ResponseEntity.ok(tweetLikesCheckResponse);
     }
 
-
-    //取得回文的數量
-    @GetMapping("/getNumOfComment/{tweetId}")
-    public Integer getNumOfComment(@PathVariable Integer tweetId) {
-        return tweetService.getNumOfComment(tweetId).size(); // Assuming tweetService has a method to get the number of comments for a tweet
-    }
-
-    ////取得回文的內容
-    @GetMapping("/getComments/{tweetId}")
-    public List<Tweet> getComments(@PathVariable Integer tweetId) {
-        return tweetService.getNumOfComment(tweetId); // Assuming tweetService has a method to get the number of comments for a tweet
-    }
 
     //取得userId發的所有tweets，目前用在我的推文頁面
     @GetMapping("/getTweetsByUserId/{userId}")
@@ -208,43 +168,6 @@ public class TweetController {
     public List<Tweet> getUserTweetsByTweetId(@PathVariable Integer tweetId) {
         Users user = tweetService.findUserByTweetId(tweetId);
         return tweetService.findTweetsByUserId(user.getUserId());
-    }
-
-
-    //找到該則tweet的所有按讚數量
-    @GetMapping("/getTweetLikesNum")
-    public ResponseEntity<TweetLikesCheckResponse> getTweetLikesNum(@RequestParam Integer tweetId, @RequestParam Integer userId) {
-        List<Users> users = tweetService.findUserLikesByTweetId(tweetId);
-        Users user = accountService.getUserDetailById(userId);
-        TweetLikesCheckResponse tweetLikesCheckResponse = new TweetLikesCheckResponse();
-
-        tweetLikesCheckResponse.setTweetLikesNum(tweetService.findUserLikesByTweetId(tweetId).size());
-
-        if (users.contains(user)) {
-            // user 在 users 列表中
-            tweetLikesCheckResponse.setIsUserLiked(1);
-        } else {
-            // user 不在 users 列表中
-            tweetLikesCheckResponse.setIsUserLiked(0);
-        }
-
-
-        return ResponseEntity.ok(tweetLikesCheckResponse);
-    }
-
-    //取得該貼文所有按讚的用戶
-    @GetMapping("/getTweetLikesUser")
-    public ResponseEntity<List<UserDto>> getTweetLikesUser(@RequestParam Integer tweetId) {
-        List<Users> users = tweetService.findUserLikesByTweetId(tweetId);
-        List<UserDto> userDtos= new ArrayList<>();
-
-        UserDto userDto = null;
-        for (Users user : users) {
-            userDto = new UserDto();
-            userDto.setUserWithOutPassword(user);
-            userDtos.add(userDto);
-        }
-        return ResponseEntity.ok(userDtos);
     }
 
 
@@ -338,11 +261,7 @@ public class TweetController {
     }
 
 
-    @GetMapping("/getTweetDogTags/{tweetId}")
-    public List<Dog> getTweetDogTags(@PathVariable Integer tweetId) {
-        return tweetService.findTweetDogsByTweetId(tweetId);
 
-    }
 
     @GetMapping("/getMyNotify/{userId}")
     public List<TweetNotification> getMyNotify(@PathVariable Integer userId) {
@@ -413,12 +332,24 @@ public class TweetController {
         String reportCheckBox = String.valueOf(requestMap.get("reportCheckBox"));
         //檢舉人的UserId
         Integer userId = Integer.parseInt(String.valueOf(requestMap.get("reporterId")));
+        //推文內容
+        String content = tweetService.findTweetByTweetId(tweetId).getTweetContent();
 
         boolean p = tweetService.checkUserAndReportRelation(tweetId, userId);
         if(p){
             return new ResponseEntity<>("You have already reported this tweet.", HttpStatus.BAD_REQUEST);
         }else{
-            TweetReport tweetReport = tweetService.addReporyToTweet(tweetId, userId, reportText, reportCheckBox);
+            TweetReport tweetReport = tweetService.addReportToTweet(tweetId, userId, reportText, reportCheckBox);
+
+            Map<String, String> response = evaluateTweetContentByAi(content);
+            if (response != null) {
+                String sexuality = response.get("HARM_CATEGORY_SEXUALLY_EXPLICIT");
+                String hateSpeech = response.get("HARM_CATEGORY_HATE_SPEECH");
+                String harassment = response.get("HARM_CATEGORY_HARASSMENT");
+                String dangerousContent = response.get("HARM_CATEGORY_DANGEROUS_CONTENT");
+                tweetService.addAiReportToTweet(tweetReport,sexuality, hateSpeech, harassment, dangerousContent);
+            }
+
             if (tweetReport != null) {
                 return new ResponseEntity<>("Tweet reported successfully!", HttpStatus.OK);
             } else {
@@ -442,6 +373,48 @@ public class TweetController {
         UserDto userDto = new UserDto();
         userDto.setUser(tweetService.findUserByReportId(reportId));
         return userDto;
+    }
+
+
+
+    public Map<String,String> evaluateTweetContentByAi(String content) {
+        Map<String,String> map = new HashMap<>();
+        String apiKey = "AIzaSyD8L-U56UHVFpQm4eh5uPp04ySNkObpzFQ";
+        String url = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=" + apiKey;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String requestBody = "{"
+                + "\"contents\": [{"
+                + "\"parts\": [{\"text\": \"" + content + "\"}]"
+                + "}],"
+                + "\"safetySettings\": [{"
+                + "\"category\": \"HARM_CATEGORY_DANGEROUS_CONTENT\","
+                + "\"threshold\": \"BLOCK_NONE\""
+                + "}],"
+                + "\"generationConfig\": {"
+                + "\"temperature\": 1.0,"
+                + "\"maxOutputTokens\": 30,"
+                + "\"topP\": 0.8,"
+                + "\"topK\": 10"
+                + "}"
+                + "}";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, requestEntity, String.class);
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode responseJson = mapper.readTree(responseEntity.getBody());
+            for(int i =0;i<=3;i++){
+                JsonNode promptFeedbackNode = responseJson.path("promptFeedback").get("safetyRatings").get(i);
+                map.put(promptFeedbackNode.get("category").textValue(),promptFeedbackNode.get("probability").textValue());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return map;
     }
 
 

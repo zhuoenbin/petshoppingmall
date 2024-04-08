@@ -39,6 +39,11 @@ public class TweetReport {
 
     private Integer reportStatus;
 
+    private String sexuallyExplicit;
+    private String hateSpeech;
+    private String harassment;
+    private String dangerousContent;
+
     public TweetReport() {
     }
 
@@ -116,14 +121,55 @@ public class TweetReport {
         this.reportStatus = reportStatus;
     }
 
+
+    public String getSexuallyExplicit() {
+        return sexuallyExplicit;
+    }
+
+    public void setSexuallyExplicit(String sexuallyExplicit) {
+        this.sexuallyExplicit = sexuallyExplicit;
+    }
+
+    public String getHateSpeech() {
+        return hateSpeech;
+    }
+
+    public void setHateSpeech(String hateSpeech) {
+        this.hateSpeech = hateSpeech;
+    }
+
+    public String getHarassment() {
+        return harassment;
+    }
+
+    public void setHarassment(String harassment) {
+        this.harassment = harassment;
+    }
+
+    public String getDangerousContent() {
+        return dangerousContent;
+    }
+
+    public void setDangerousContent(String dangerousContent) {
+        this.dangerousContent = dangerousContent;
+    }
+
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("TweetReport{");
         sb.append("reportsId=").append(reportsId);
+        sb.append(", tweet=").append(tweet);
+        sb.append(", employee=").append(employee);
+        sb.append(", reporter=").append(reporter);
         sb.append(", reportReason='").append(reportReason).append('\'');
         sb.append(", reportDescription='").append(reportDescription).append('\'');
         sb.append(", reportDate=").append(reportDate);
         sb.append(", reportStatus=").append(reportStatus);
+        sb.append(", sexuallyExplicit='").append(sexuallyExplicit).append('\'');
+        sb.append(", hateSpeech='").append(hateSpeech).append('\'');
+        sb.append(", harassment='").append(harassment).append('\'');
+        sb.append(", dangerousContent='").append(dangerousContent).append('\'');
         sb.append('}');
         return sb.toString();
     }

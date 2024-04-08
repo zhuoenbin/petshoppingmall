@@ -136,26 +136,29 @@ public class RoomServicelmpl implements RoomService {
         List<List<String>> roomList = new ArrayList<>();
 
         for (RoomReservation roomReservations : reservationRepository.findAll()) {
-            LocalDate receiveDate = roomReservations.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            LocalDate confirmDate = roomReservations.getEndTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            // 已取消的訂單不需要傳
+            if(roomReservations.getCancelTime() == null) {
+                LocalDate receiveDate = roomReservations.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate confirmDate = roomReservations.getEndTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-            // 計算日期範圍
-            long daysBetween = ChronoUnit.DAYS.between(receiveDate, confirmDate);
+                // 計算日期範圍
+                long daysBetween = ChronoUnit.DAYS.between(receiveDate, confirmDate);
 
-            // 創建一個新的 LocalDate 對象，表示 receiveDate 後的第一天
-            LocalDate currentDay = receiveDate.plusDays(1);
-            List<String> roomTime = new ArrayList<>();
-            // 加入房間id
-            roomTime.add(roomReservations.getRoom().getRoomId().toString());
-            // 加入訂房id
-            roomTime.add(roomReservations.getReservationId().toString());
-            // 加入當天日期
-            roomTime.add(receiveDate.toString());
+                // 創建一個新的 LocalDate 對象，表示 receiveDate 後的第一天
+                LocalDate currentDay = receiveDate.plusDays(1);
+                List<String> roomTime = new ArrayList<>();
+                // 加入房間id
+                roomTime.add(roomReservations.getRoom().getRoomId().toString());
+                // 加入訂房id
+                roomTime.add(roomReservations.getReservationId().toString());
+                // 加入當天日期
+                roomTime.add(receiveDate.toString());
 
-            for (int i = 0; i < daysBetween - 1; i++) {
-                roomTime.add(currentDay.plusDays(i).toString());
+                for (int i = 0; i < daysBetween - 1; i++) {
+                    roomTime.add(currentDay.plusDays(i).toString());
+                }
+                roomList.add(roomTime);
             }
-            roomList.add(roomTime);
         }
         return roomList;
     }

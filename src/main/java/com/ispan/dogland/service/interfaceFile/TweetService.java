@@ -80,8 +80,9 @@ public interface TweetService {
 
     public boolean checkUserAndReportRelation(Integer tweetId, Integer userId);
 
-    public TweetReport addReporyToTweet(Integer tweetId, Integer userId,String reportText, String reportCheckBox);
+    public TweetReport addReportToTweet(Integer tweetId, Integer userId,String reportText, String reportCheckBox);
 
+    public TweetReport addAiReportToTweet(TweetReport tweetReport,String sexuality,String hateSpeech,String harassment,String dangerousContent);
     public Tweet saveTweet(Tweet tweet);
 
     public List<TweetReport> findAllTweetReports();

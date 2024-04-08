@@ -405,7 +405,7 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
-    public TweetReport addReporyToTweet(Integer tweetId, Integer userId,String reportText, String reportCheckBox) {
+    public TweetReport addReportToTweet(Integer tweetId, Integer userId,String reportText, String reportCheckBox) {
 
 
         TweetReport tweetReportTmp = new TweetReport();
@@ -427,6 +427,15 @@ public class TweetServiceImpl implements TweetService {
 
         return tweetReport;
 
+    }
+
+    @Override
+    public TweetReport addAiReportToTweet(TweetReport tweetReport,String sexuality, String hateSpeech, String harassment, String dangerousContent) {
+        tweetReport.setSexuallyExplicit(sexuality);
+        tweetReport.setHateSpeech(hateSpeech);
+        tweetReport.setHarassment(harassment);
+        tweetReport.setDangerousContent(dangerousContent);
+        return tweetReportRepository.save(tweetReport);
     }
 
     @Override

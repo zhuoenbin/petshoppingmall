@@ -30,7 +30,7 @@ public class AuthorityAspect {
 //    private void forActivityControllerPackage(){}
 
 
-    @Pointcut("forTweetControllerPackage() || forTweetShareControllerPackage()")
+    @Pointcut("forTweetControllerPackage() || forTweetShareControllerPackage()")// 加上||方法名(要加or)
     private void forAppFlow(){}
 
 

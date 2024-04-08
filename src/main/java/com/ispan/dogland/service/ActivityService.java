@@ -759,6 +759,92 @@ public class ActivityService {
         return false;
     }
 
+    //===============myFavoriteWall===============
+    public List<ActivityBrief> userFavoriteWall(Integer userId){
+        Users users = userRepository.findByUserId(userId);
+        List<LikedActivity> likedActivityList = likedRepository.findByUser(users);
+        List<ActivityBrief> dtoList = new ArrayList<>();
+        if(!likedActivityList.isEmpty()){
+            for(LikedActivity like:likedActivityList){
+                ActivityBrief dto = new ActivityBrief();
+                VenueActivity activity = like.getVenueActivity();
+                BeanUtils.copyProperties(activity,dto);
+                dto.setActivityTypeName(activity.getActivityType().getActivityTypeName());
+                dto.setVenueName(activity.getVenue().getVenueName());
+                ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
+                dto.setGalleryImgUrl(main.getGalleryImgUrl());
+                dtoList.add(dto);
+            }
+            return dtoList;
+        }else{
+            return null;
+        }
+    }
+
+    //===============更新主題照片===================
+    public Boolean updateTitleImg(Integer activityId,Integer galleryId, MultipartFile file)  {
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        ActivityGallery gallery = galleryRepository.findByGalleryId(galleryId);
+        if(gallery!=null){
+            try {
+                String oldPublicId = gallery.getGalleryPublicId();
+                //刪除Cloudinary中的圖片
+                Map delResult = cloudinary.uploader().destroy(oldPublicId, ObjectUtils.emptyMap());
+                System.out.println("Deleted image from Cloudinary: " + delResult);
+                //上傳新圖片
+                Map data = null;
+                data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "activityFolder"));
+                //更新資料庫
+                gallery.setGalleryImgUrl((String) data.get("url"));
+                gallery.setGalleryPublicId((String) data.get("public_id"));
+                ActivityGallery save = galleryRepository.save(gallery);
+                activity.setActivityUpdateDate(new Date());
+                activityRepository.save(activity);
+                System.out.println("update main image success " + save.getGalleryImgUrl());
+                return true;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return null;
+    }
+
+    //===============更新活動資訊===================
+    public Boolean updateMainInfo(Integer activityId,Integer venueId, String activityTitle,
+                                  Integer activityDogNumber,Date activityClosingDate,
+                                  Date activityDate,Date activityEnd, Date activityStart){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        activity.setVenue(venueRepository.findByVenueId(venueId));
+        activity.setActivityTitle(activityTitle);
+        activity.setActivityDogNumber(activityDogNumber);
+        activity.setActivityClosingDate(activityClosingDate);
+        activity.setActivityDate(activityDate);
+        activity.setActivityEnd(activityEnd);
+        activity.setActivityStart(activityStart);
+        activityRepository.save(activity);
+        return true;
+    }
+
+    //===============更新活動內文(表單)===================
+    public Boolean updateDesForm(Integer activityId,String activityProcess,String activityDescription,
+                                  String activityCostDescription,String activityNotice){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        activity.setActivityProcess(activityProcess);
+        activity.setActivityDescription(activityDescription);
+        activity.setActivityCostDescription(activityCostDescription);
+        activity.setActivityNotice(activityNotice);
+        activityRepository.save(activity);
+        return true;
+    }
+    //===============更新活動內文(表單)===================
+    public Boolean updateDesEditor(Integer activityId,String activityDescription){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        activity.setActivityDescription(activityDescription);
+        activityRepository.save(activity);
+        return true;
+    }
+
+    //===============官方在創建活動的時候應該要場地租借 官方的userId為0===================
 
 
 
@@ -767,9 +853,4 @@ public class ActivityService {
 
 
 
-
-
-
-
-
-}
+ }

@@ -213,18 +213,14 @@ public class ActivityController {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(currentDate);
 
-        // 月初第一天
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        Date startDate = calendar.getTime();
-        System.out.println("activityManager/past執行月初：" + startDate);
-
-        // 用下個月第一天來取當月最後一天
-        calendar.add(Calendar.MONTH, 1);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        calendar.add(Calendar.DATE, -1); // 月初-1為上月月末
-
+        // 今天
         Date endDate = calendar.getTime();
-        System.out.println("activityManager/past執行月末：" + endDate);
+        System.out.println("activityManager/past執行今天：" + endDate);
+
+        // 上個月的今日
+        calendar.add(Calendar.MONTH, -1);
+        Date startDate = calendar.getTime();
+        System.out.println("activityManager/past執行上個月開始：" + startDate);
         return activityService.officialActManagerByStatus(startDate,endDate);
     }
     @PostMapping("/official/activityManager/past")
@@ -238,18 +234,14 @@ public class ActivityController {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(currentDate);
 
-        // 月初第一天
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        // 今天是第一天
         Date startDate = calendar.getTime();
-        System.out.println("activityManager/now執行月初：" + startDate);
+        System.out.println("activityManager/now執行今天：" + startDate);
 
-        // 用下個月第一天來取當月最後一天
+        // 下個月的同一天
         calendar.add(Calendar.MONTH, 1);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        calendar.add(Calendar.DATE, -1); // 月初-1為上月月末
-
         Date endDate = calendar.getTime();
-        System.out.println("activityManager/now執行月末：" + endDate);
+        System.out.println("activityManager/now執行下個月的同日：" + endDate);
         return activityService.officialActManagerByStatusNot(startDate,endDate);
     }
 
@@ -282,6 +274,36 @@ public class ActivityController {
     public Boolean userDislikeAct(@RequestParam Integer activityId,@RequestParam Integer userId){
         return activityService.userDislikedAnAct(activityId,userId);
     }
+
+    @GetMapping("/likedManager/{userId}")
+    public List<ActivityBrief> userFavoriteWall(@PathVariable Integer userId){
+        return activityService.userFavoriteWall(userId);
+    }
+
+    @PostMapping("/official/updateManager/mainPic")
+    public boolean OffUpdateMainImg(@RequestParam Integer activityId,
+                                    @RequestParam Integer galleryId,
+                                    @RequestParam MultipartFile mainImg){
+        return activityService.updateTitleImg(activityId,galleryId,mainImg);
+    }
+    @PostMapping("/official/updateManager/Info")
+    public Boolean updateMainInfo(@RequestParam Integer activityId,@RequestParam Integer venueId, @RequestParam String activityTitle,
+                                     @RequestParam Integer activityDogNumber,@RequestParam Date activityClosingDate,
+                                     @RequestParam Date activityDate,@RequestParam Date activityEnd, @RequestParam Date activityStart){
+        return activityService.updateMainInfo(activityId,venueId,activityTitle,activityDogNumber,activityClosingDate,activityDate,activityEnd,activityStart);
+    }
+
+    @PostMapping("/official/updateManager/desForm")
+    public Boolean updateMainInfo(@RequestParam Integer activityId,@RequestParam String activityProcess,@RequestParam String activityDescription,
+                                  @RequestParam String activityCostDescription,@RequestParam String activityNotice){
+        return activityService.updateDesForm(activityId,activityProcess,activityDescription,activityCostDescription,activityNotice);
+    }
+    @PostMapping("/official/updateManager/desCkeditor")
+    public Boolean updateDesEditor(Integer activityId,String activityDescription){
+        return activityService.updateDesEditor(activityId,activityDescription);
+    }
+
+
 
 
 

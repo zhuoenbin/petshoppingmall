@@ -35,7 +35,7 @@ public class VenueRental {
     @DateTimeFormat(pattern = "hh:mm")
     private Date rentalEnd;
     private Integer rentalTotal;
-    @Column(columnDefinition = "VARCHAR(20) DEFAULT '已訂'")
+    @Column(columnDefinition = "VARCHAR(20) DEFAULT '已訂'")//取消 /官方預訂/官方取消
     private String rentalOrderStatus;
     @Column(columnDefinition = "INT DEFAULT 1")
     private Integer paymentStatus; //0 未付/1 已付 /2 官方

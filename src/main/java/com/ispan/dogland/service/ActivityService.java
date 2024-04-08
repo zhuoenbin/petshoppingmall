@@ -200,6 +200,21 @@ public class ActivityService {
         newData.setVenueId(save.getVenue().getVenueId());
         return  newData;
     }
+    public ActivityCreateDto offCreateNewActivity(ActivityCreateDto createDto){
+        VenueActivity activity = new VenueActivity();
+        BeanUtils.copyProperties(createDto,activity);
+        activity.setActivityType(typeRepository.findByActivityTypeId(createDto.getActivityTypeId()));
+        activity.setVenue(venueRepository.findByVenueId(createDto.getVenueId()));
+        activity.setEmployee(employeeRepository.findByEmployeeId(createDto.getEmployeeId()));
+        VenueActivity save = activityRepository.save(activity);
+        ActivityCreateDto dto = new ActivityCreateDto();
+        BeanUtils.copyProperties(save,dto);
+        dto.setActivityTypeId(createDto.getActivityTypeId());
+        dto.setVenueId(createDto.getVenueId());
+        dto.setEmployeeId(createDto.getEmployeeId());
+        return dto;
+    }
+
     //===============新增活動照片===================
     public ActivityGallery addTitleImg(MultipartFile file,Integer activityId){
         //上傳到producutFolder裡
@@ -616,6 +631,7 @@ public class ActivityService {
         return briefs;
     }
 
+    //===============以區間找現在活動===============
     public List<ActivityBrief> officialActManagerByStatusNot(Date start,Date end){
         List<VenueActivity> allEnd = activityRepository.findByActivityStatusNotAndActivityDateBetweenOrderByActivityDateAsc("活動已結束", start, end);
         List<ActivityBrief> abList = new ArrayList<>();//裝資料的
@@ -632,8 +648,9 @@ public class ActivityService {
         return abList;
     }
 
+    //===============以區間找過去活動===============
     public List<ActivityBrief> officialActManagerByStatus(Date start,Date end){
-        List<VenueActivity> allEnd = activityRepository.findByActivityStatusNotAndActivityDateBetweenOrderByActivityDateAsc("活動已結束", start, end);
+        List<VenueActivity> allEnd = activityRepository.findByActivityStatusAndActivityDateBetweenOrderByActivityDateAsc("活動已結束", start, end);
         List<ActivityBrief> abList = new ArrayList<>();//裝資料的
         for(VenueActivity one:allEnd){
             ActivityBrief brief = new ActivityBrief();
@@ -648,6 +665,186 @@ public class ActivityService {
         return abList;
     }
 
+    //===============找某個活動 過去/現在 活動所有參加者跟狗資料===============
+    public List<ActOfficialAttendeeDto> findOneActAttendeeList(Integer activityId,String joinStatus){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        List<ActivityUserJoined> userJoinedList = userJoinedRepository.findByVenueActivityAndJoinedStatusNot(activity, joinStatus);
+        List<ActOfficialAttendeeDto> dtoList=new ArrayList<>();
+        for(ActivityUserJoined userJoined:userJoinedList){
+            ActOfficialAttendeeDto dto=new ActOfficialAttendeeDto();
+            //userJoined 資料
+            BeanUtils.copyProperties(userJoined,dto);
+            //activity 資料
+            dto.setActivityId(activityId);
+            //user 資料
+            Users user = userJoined.getUser();
+            dto.setUserId(user.getUserId());
+            dto.setFirstName(user.getFirstName());
+            //dog 資料
+            List<Dog> dogList = findUserDogsAttendThisActivity(user.getUserId(), activityId);
+            List<String> dogNameList =new ArrayList<>();
+            List<String> dogProfileList =new ArrayList<>();
+            for(Dog dog:dogList){
+                String img = dog.getDogImgPathCloud();
+                String dogName = dog.getDogName();
+                dogNameList.add(dogName);
+                dogProfileList.add(img);
+            }
+            dto.setDogNameList(dogNameList);
+            dto.setDogProfileList(dogProfileList);
+            dtoList.add(dto);
+        }
+        return dtoList;
+    }
+
+    //===============activityShowPage===============
+    public ActivityShowInfo getActivityPageInfo(Integer activityId){
+        //activity
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        String activityTypeName = activity.getActivityType().getActivityTypeName();
+        Integer venueId = activity.getVenue().getVenueId();
+        String venueName = activity.getVenue().getVenueName();
+        //gallery
+        List<ActivityGallery> galleryList = galleryRepository.findByVenueActivity(activity);
+        List<ActivityGalleryDto> imgList = new ArrayList<>();
+        for(ActivityGallery img:galleryList){
+            ActivityGalleryDto dto = new ActivityGalleryDto();
+            BeanUtils.copyProperties(img,dto);
+            imgList.add(dto);
+        }
+
+        ActivityShowInfo showInfo = new ActivityShowInfo();
+        BeanUtils.copyProperties(activity,showInfo);
+        showInfo.setActivityTypeName(activityTypeName);
+        showInfo.setVenueId(venueId);
+        showInfo.setVenueName(venueName);
+        showInfo.setActivityImgList(imgList);
+        return showInfo;
+    }
+
+    //===============likedActList===============
+    public List<Integer> usersLikedActsIdList(Integer userId){
+        Users user = userRepository.findByUserId(userId);
+        List<LikedActivity> likedActivityList = likedRepository.findByUser(user);
+        List<Integer> activityIdList =new ArrayList<>();
+        if(!likedActivityList.isEmpty()){
+            for(LikedActivity act:likedActivityList){
+                Integer activityId = act.getVenueActivity().getActivityId();
+                activityIdList.add(activityId);
+            }
+            return activityIdList;
+        }else{
+            return null;
+        }
+    }
+    //===============likedOneAct===============
+    public Boolean userLikeAnAct(Integer activityId,Integer userId){
+        Users users = userRepository.findByUserId(userId);
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        LikedActivity likedActivity = new LikedActivity();
+        likedActivity.setUser(users);
+        likedActivity.setVenueActivity(activity);
+        likedRepository.save(likedActivity);
+        return true;
+    }
+
+    public Boolean userDislikedAnAct(Integer activityId,Integer userId){
+        Users users = userRepository.findByUserId(userId);
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        LikedActivity fromLiked = likedRepository.findByUserAndVenueActivity(users, activity);
+        if(fromLiked!=null){
+            likedRepository.delete(fromLiked);
+            return true;
+        }
+        return false;
+    }
+
+    //===============myFavoriteWall===============
+    public List<ActivityBrief> userFavoriteWall(Integer userId){
+        Users users = userRepository.findByUserId(userId);
+        List<LikedActivity> likedActivityList = likedRepository.findByUser(users);
+        List<ActivityBrief> dtoList = new ArrayList<>();
+        if(!likedActivityList.isEmpty()){
+            for(LikedActivity like:likedActivityList){
+                ActivityBrief dto = new ActivityBrief();
+                VenueActivity activity = like.getVenueActivity();
+                BeanUtils.copyProperties(activity,dto);
+                dto.setActivityTypeName(activity.getActivityType().getActivityTypeName());
+                dto.setVenueName(activity.getVenue().getVenueName());
+                ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
+                dto.setGalleryImgUrl(main.getGalleryImgUrl());
+                dtoList.add(dto);
+            }
+            return dtoList;
+        }else{
+            return null;
+        }
+    }
+
+    //===============更新主題照片===================
+    public Boolean updateTitleImg(Integer activityId,Integer galleryId, MultipartFile file)  {
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        ActivityGallery gallery = galleryRepository.findByGalleryId(galleryId);
+        if(gallery!=null){
+            try {
+                String oldPublicId = gallery.getGalleryPublicId();
+                //刪除Cloudinary中的圖片
+                Map delResult = cloudinary.uploader().destroy(oldPublicId, ObjectUtils.emptyMap());
+                System.out.println("Deleted image from Cloudinary: " + delResult);
+                //上傳新圖片
+                Map data = null;
+                data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "activityFolder"));
+                //更新資料庫
+                gallery.setGalleryImgUrl((String) data.get("url"));
+                gallery.setGalleryPublicId((String) data.get("public_id"));
+                ActivityGallery save = galleryRepository.save(gallery);
+                activity.setActivityUpdateDate(new Date());
+                activityRepository.save(activity);
+                System.out.println("update main image success " + save.getGalleryImgUrl());
+                return true;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return null;
+    }
+
+    //===============更新活動資訊===================
+    public Boolean updateMainInfo(Integer activityId,Integer venueId, String activityTitle,
+                                  Integer activityDogNumber,Date activityClosingDate,
+                                  Date activityDate,Date activityEnd, Date activityStart){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        activity.setVenue(venueRepository.findByVenueId(venueId));
+        activity.setActivityTitle(activityTitle);
+        activity.setActivityDogNumber(activityDogNumber);
+        activity.setActivityClosingDate(activityClosingDate);
+        activity.setActivityDate(activityDate);
+        activity.setActivityEnd(activityEnd);
+        activity.setActivityStart(activityStart);
+        activityRepository.save(activity);
+        return true;
+    }
+
+    //===============更新活動內文(表單)===================
+    public Boolean updateDesForm(Integer activityId,String activityProcess,String activityDescription,
+                                  String activityCostDescription,String activityNotice){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        activity.setActivityProcess(activityProcess);
+        activity.setActivityDescription(activityDescription);
+        activity.setActivityCostDescription(activityCostDescription);
+        activity.setActivityNotice(activityNotice);
+        activityRepository.save(activity);
+        return true;
+    }
+    //===============更新活動內文(表單)===================
+    public Boolean updateDesEditor(Integer activityId,String activityDescription){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        activity.setActivityDescription(activityDescription);
+        activityRepository.save(activity);
+        return true;
+    }
+
+    //===============官方在創建活動的時候應該要場地租借 官方的userId為0===================
 
 
 
@@ -656,7 +853,4 @@ public class ActivityService {
 
 
 
-
-
-
-}
+ }

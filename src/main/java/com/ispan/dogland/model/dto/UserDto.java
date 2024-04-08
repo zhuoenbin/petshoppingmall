@@ -133,6 +133,17 @@ public class UserDto {
         this.imgPublicId = user.getImgPublicId();
         this.userStatus = user.getUserStatus();
     }
+    public void setUserWithOutPassword(Users user){
+        this.userId = user.getUserId();
+        this.lastName = user.getLastName();
+        this.userEmail = user.getUserEmail();
+        this.userGender = user.getUserGender();
+        this.birthDate = user.getBirthDate();
+        this.userViolationCount = user.getUserViolationCount();
+        this.lastLoginTime = user.getLastLoginTime();
+        this.userImgPath = user.getUserImgPath();
+        this.userStatus = user.getUserStatus();
+    }
 
     @Override
     public String toString() {

@@ -3,6 +3,7 @@ package com.ispan.dogland.service;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.ispan.dogland.model.dao.*;
+import com.ispan.dogland.model.dto.RoomReservationDto;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.room.Room;
 import com.ispan.dogland.model.entity.room.RoomReservation;
@@ -136,33 +137,63 @@ public class RoomServicelmpl implements RoomService {
         List<List<String>> roomList = new ArrayList<>();
 
         for (RoomReservation roomReservations : reservationRepository.findAll()) {
-            LocalDate receiveDate = roomReservations.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            LocalDate confirmDate = roomReservations.getEndTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            // 已取消的訂單不需要傳
+            if(roomReservations.getCancelTime() == null) {
+                LocalDate receiveDate = roomReservations.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate confirmDate = roomReservations.getEndTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-            // 計算日期範圍
-            long daysBetween = ChronoUnit.DAYS.between(receiveDate, confirmDate);
+                // 計算日期範圍
+                long daysBetween = ChronoUnit.DAYS.between(receiveDate, confirmDate);
 
-            // 創建一個新的 LocalDate 對象，表示 receiveDate 後的第一天
-            LocalDate currentDay = receiveDate.plusDays(1);
-            List<String> roomTime = new ArrayList<>();
-            // 加入房間id
-            roomTime.add(roomReservations.getRoom().getRoomId().toString());
-            // 加入訂房id
-            roomTime.add(roomReservations.getReservationId().toString());
-            // 加入當天日期
-            roomTime.add(receiveDate.toString());
+                // 創建一個新的 LocalDate 對象，表示 receiveDate 後的第一天
+                LocalDate currentDay = receiveDate.plusDays(1);
+                List<String> roomTime = new ArrayList<>();
+                // 加入房間id
+                roomTime.add(roomReservations.getRoom().getRoomId().toString());
+                // 加入訂房id
+                roomTime.add(roomReservations.getReservationId().toString());
+                // 加入當天日期
+                roomTime.add(receiveDate.toString());
 
-            for (int i = 0; i < daysBetween - 1; i++) {
-                roomTime.add(currentDay.plusDays(i).toString());
+                for (int i = 0; i < daysBetween - 1; i++) {
+                    roomTime.add(currentDay.plusDays(i).toString());
+                }
+                roomList.add(roomTime);
             }
-            roomList.add(roomTime);
         }
         return roomList;
     }
 
     // 登入者的全部訂房明細
     @Override
-    public List<RoomReservation> findRoomReservationByUserId(Integer userId) { return reservationRepository.findByUser(usersRepository.findByUserId(userId)); }
+    public List<RoomReservationDto> findRoomReservationByUserId(Integer userId) {
+        List<RoomReservationDto> roomReservationDtoList = new ArrayList<>();
+
+        for (RoomReservation roomReservation : reservationRepository.findByUser(usersRepository.findByUserId(userId))) {
+
+            RoomReservationDto roomReservationDto = new RoomReservationDto();
+
+            roomReservationDto.setReservationId(roomReservation.getReservationId());
+            roomReservationDto.setRoom(roomReservation.getRoom());
+            roomReservationDto.setUserId(userId);
+            roomReservationDto.setLastName(roomReservation.getUser().getLastName());
+            roomReservationDto.setDog(roomReservation.getDog());
+            roomReservationDto.setStartTime(roomReservation.getStartTime());
+            roomReservationDto.setEndTime(roomReservation.getEndTime());
+            roomReservationDto.setTotalPrice(roomReservation.getTotalPrice());
+            roomReservationDto.setReservationTime(roomReservation.getReservationTime());
+            roomReservationDto.setCancelTime(roomReservation.getCancelTime());
+            roomReservationDto.setCancelDirection(roomReservation.getCancelDirection());
+            roomReservationDto.setStar(roomReservation.getStar());
+            roomReservationDto.setConments(roomReservation.getConments());
+            roomReservationDto.setConmentsTime(roomReservation.getConmentsTime());
+
+            roomReservationDtoList.add(roomReservationDto);
+        }
+
+        return roomReservationDtoList;
+    }
+
 
     @Override
     public List<Room> findAllroom() { return roomRepository.findAll(); }

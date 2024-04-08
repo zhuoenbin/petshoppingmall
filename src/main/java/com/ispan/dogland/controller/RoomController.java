@@ -1,6 +1,7 @@
 package com.ispan.dogland.controller;
 
 import com.ispan.dogland.model.dto.Passport;
+import com.ispan.dogland.model.dto.RoomReservationDto;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.room.Room;
 import com.ispan.dogland.model.entity.room.RoomReservation;
@@ -68,7 +69,7 @@ public class RoomController {
 
     // 顯示出使用者的訂房明細
     @GetMapping("/allRoomReservationByUser")
-    public List<RoomReservation> roomReservation(HttpSession session) {
+    public List<RoomReservationDto> roomReservation(HttpSession session) {
         Passport loginUser = (Passport) session.getAttribute("loginUser");
         return rService.findRoomReservationByUserId(loginUser.getUserId());
     }

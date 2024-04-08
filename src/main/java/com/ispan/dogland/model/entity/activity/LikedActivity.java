@@ -26,6 +26,7 @@ public class LikedActivity {
     private Date likedTime;
 
     ////////////////////////////
+    @PostLoad
     @PrePersist //在物件轉換到persistent狀態以前，做這個function
     public void onCreate() {
         if(likedTime==null) {

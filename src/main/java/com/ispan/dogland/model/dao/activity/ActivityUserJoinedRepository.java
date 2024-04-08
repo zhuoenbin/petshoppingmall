@@ -16,4 +16,6 @@ public interface ActivityUserJoinedRepository extends JpaRepository<ActivityUser
 
     //找出所有使用者有參加/有取消的活動
     List<ActivityUserJoined> findByUserAndJoinedStatusNot(Users user,String joinedStatus);
+
+    List<ActivityUserJoined> findByVenueActivityAndJoinedStatusNot(VenueActivity venueActivity,String joinStatus);
 }

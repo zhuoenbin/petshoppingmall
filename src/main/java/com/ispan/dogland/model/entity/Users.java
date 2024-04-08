@@ -73,9 +73,6 @@ public class Users {
                 cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TweetReport> tweetReports;
 
-
-
-
     @OneToMany(mappedBy = "user",
             fetch = FetchType.LAZY ,
             cascade = {CascadeType.ALL})
@@ -197,16 +194,6 @@ public class Users {
     }
 
 
-    public void addDog(Dog dog) {
-        if(this.dogs == null) {
-            this.dogs = new ArrayList<>();
-        }
-        this.dogs.add(dog);
-        dog.setUser(this);
-    }
-
-
-
     public List<Tweet> getTweets() {
         return tweets;
     }
@@ -260,6 +247,22 @@ public class Users {
         }
         tweetReports.add(tweetReport);
         tweetReport.setReporter(this);
+    }
+
+    public void addDog(Dog dog) {
+        if(this.dogs == null) {
+            this.dogs = new ArrayList<>();
+        }
+        this.dogs.add(dog);
+        dog.setUser(this);
+    }
+
+    public void addTweet(Tweet tweet) {
+        if(this.tweets == null) {
+            this.tweets = new ArrayList<>();
+        }
+        this.tweets.add(tweet);
+        tweet.setUser(this);
     }
 
     public List<ShoppingCart> getShoppingCarts() {

@@ -2,6 +2,7 @@ package com.ispan.dogland;
 
 import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
+import com.ispan.dogland.model.dao.RoomReservationRepository;
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dao.product.ProductRepository;
 import com.ispan.dogland.model.dao.tweet.*;
@@ -10,6 +11,8 @@ import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductGallery;
+import com.ispan.dogland.model.entity.room.Room;
+import com.ispan.dogland.model.entity.room.RoomReservation;
 import com.ispan.dogland.model.entity.tweet.*;
 import com.ispan.dogland.service.interfaceFile.AccountService;
 import com.ispan.dogland.service.interfaceFile.TweetService;
@@ -18,6 +21,7 @@ import jakarta.persistence.PersistenceContext;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +39,6 @@ public class DoglandApplication {
 
 	//測試方法
 	@Bean
-	@Transactional
 	public CommandLineRunner commandLineRunner(UserRepository userRepository,
 											   DogRepository dogRepository,
 											   EmployeeRepository employeeRepository,
@@ -46,9 +49,9 @@ public class DoglandApplication {
 											   TweetFollowListRepository tweetFollowListRepository,
 											   TweetNotificationRepository tweetNotificationRepository,
 											   AccountService accountService,
-											   TweetReportRepository tweetReportRepository) {
+											   TweetReportRepository tweetReportRepository,
+											   RoomReservationRepository roomReservationRepository) {
 		return runner -> {
-
 		};
 
 

@@ -37,6 +37,7 @@ public class OrderService {
     public List<OrderDetail> findDetailByOrderId(Integer orderId){
         return orderDetailRepository.findByOrderId(orderId);
     }
+
     public List<ProductDto> getProductsFromOrderDetails(List<Integer> productIds){
         List<Product> pList = new ArrayList<>();
         List<ProductDto> pDtoList = new ArrayList<>();
@@ -49,7 +50,7 @@ public class OrderService {
             for(ProductGallery pgs:productGalleryRepository.findByProductId(i)){
                 imgUrls.add(pgs.getImgPath());
             }
-            p = productRepository.findByProductId(i);
+            p = productRepository.findSingleByProductId(i);
             pList.add(p);
         }
         for(Product pTmp:pList) {

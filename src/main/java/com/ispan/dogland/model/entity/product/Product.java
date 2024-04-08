@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import com.ispan.dogland.model.entity.Collection;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.OrderDetail;
 import com.ispan.dogland.model.entity.ShoppingCart;
@@ -76,6 +77,8 @@ public class Product {
 
     @OneToMany(mappedBy = "product")
     private List<ShoppingCart> shoppingCarts;
+    @OneToMany(mappedBy = "product")
+    private List<Collection> collections;
 
     //暫時不設關聯
 //    @OneToMany(mappedBy = "productId")
@@ -216,7 +219,15 @@ public class Product {
         this.shoppingCarts = shoppingCarts;
     }
 
-//    public List<OrderDetail> getOrderDetails() {
+    public List<Collection> getCollections() {
+        return collections;
+    }
+
+    public void setCollections(List<Collection> collections) {
+        this.collections = collections;
+    }
+
+    //    public List<OrderDetail> getOrderDetails() {
 //        return orderDetails;
 //    }
 //

@@ -3,33 +3,20 @@ package com.ispan.dogland.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ispan.dogland.model.dao.OrderDetailRepository;
-import com.ispan.dogland.model.dao.OrdersRepository;
-import com.ispan.dogland.model.dao.product.ProductRepository;
-import com.ispan.dogland.model.dto.OderDto;
-import com.ispan.dogland.model.dto.Passport;
-import com.ispan.dogland.model.dto.ProductDto;
-import com.ispan.dogland.model.dto.ShoppingCartDto;
-import com.ispan.dogland.model.entity.OrderDetail;
+import com.ispan.dogland.model.dto.*;
 import com.ispan.dogland.model.entity.Orders;
 import com.ispan.dogland.model.entity.ShoppingCart;
-import com.ispan.dogland.model.entity.Users;
-import com.ispan.dogland.model.entity.product.Product;
-import com.ispan.dogland.model.entity.product.ProductCategory;
-import com.ispan.dogland.model.entity.product.ProductGallery;
+import com.ispan.dogland.model.entity.Collection;
 import com.ispan.dogland.model.vo.*;
 import com.ispan.dogland.service.ShopService;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -39,12 +26,6 @@ public class ShopController {
     private String allTransactionId;  //用在linepay的transactionId
     @Autowired
     private ShopService shopService;
-    @Autowired
-    private OrdersRepository ordersRepository;
-    @Autowired
-    private OrderDetailRepository orderDetailRepository;
-    @Autowired
-    private ProductRepository productRepository;
 
     //商品列表與商品分頁(增加搜尋功能)
     @GetMapping("/products-keyword/{pageNumber}")
@@ -113,20 +94,73 @@ public class ShopController {
         return shopService.deleteCartByUser(loggedInMember.getUserId());
     }
 
-    //加入訂單
-    @PostMapping("/order")
-    public void getCartData(@RequestBody List<OderDto> oderDtos, HttpSession session) {
+    //加入訂單及訂單明細
+    @PostMapping("/order/{totalCartPrice}")
+    public void getCartData(@RequestBody List<OderDto> oderDtos,
+                            @PathVariable Integer totalCartPrice,
+                            HttpSession session) {
         Passport loggedInMember = (Passport) session.getAttribute("loginUser");
-        Orders order = shopService.addOrder(loggedInMember.getUserId());
-
-        for (OderDto oderDto : oderDtos) {
-            OrderDetail orderDetail = new OrderDetail();
-            orderDetail.setOrders(order);
-            BeanUtils.copyProperties(oderDto, orderDetail);
-            orderDetailRepository.save(orderDetail);
-        }
+        Orders order = shopService.addOrder(loggedInMember.getUserId(), oderDtos,totalCartPrice);
     }
 
+    //實作加入收藏愛心
+    @RequestMapping("/addCollect/{productId}")
+    public Collection AddToCollect(@PathVariable Integer productId, HttpSession session){
+        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+        if(loggedInMember == null){
+            throw new RuntimeException("未登入錯誤");
+        }
+        return shopService.addToCollect(loggedInMember.getUserId(),productId);
+    }
+
+    //實作刪除收藏愛心
+    @RequestMapping("/deleteCollect/{productId}")
+    public void DeleteToCollect(@PathVariable Integer productId, HttpSession session){
+        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+        if(loggedInMember == null){
+            throw new RuntimeException("未登入錯誤");
+        }
+        shopService.deleteCollection(loggedInMember.getUserId(),productId);
+    }
+
+    //實作檢查愛心
+    @RequestMapping("/checkCollect/{productId}")
+    public int checkCollect(@PathVariable Integer productId, HttpSession session) {
+        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+        if(loggedInMember == null){
+            throw new RuntimeException("未登入錯誤");
+        }
+        return shopService.checkByCollection(loggedInMember.getUserId(),productId);
+    }
+
+    //拿到收藏的商品(原版)
+//    @RequestMapping("/collection")
+//    public List<CollectionDto> getCollectByMemberId( HttpSession session){
+//        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+//        if(loggedInMember == null){
+//            throw new RuntimeException("未登入錯誤");
+//        }
+//        List<CollectionDto> collects = shopService.findCollectionByUserId(loggedInMember.getUserId());
+//        return collects;
+//    }
+    //拿到收藏的商品
+    @GetMapping("/collection/{pageNumber}")
+    public Page<CollectionDto> getCollectByMemberId(HttpSession session,@PathVariable Integer pageNumber){
+        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+        if(loggedInMember == null){
+            throw new RuntimeException("未登入錯誤");
+        }
+        Page<CollectionDto> collects = shopService.findCollectionByUserId(loggedInMember.getUserId(),pageNumber);
+        return collects;
+    }
+
+    //實作銷售數量
+    @GetMapping("/orderDetail/total")
+    public List<Object[]> sumQuantityByProductId() {
+        return shopService.sumQuantityByProductId();
+    }
+
+    //-----------------------------LinePay----------------------------------
     @PostMapping("/linepay/{totalPrice}")
     public String sendlinepay(@PathVariable String totalPrice) {
         CheckoutPaymentRequestForm form = new CheckoutPaymentRequestForm();

@@ -1,6 +1,6 @@
 package com.ispan.dogland.service;
 
-<<<<<<< HEAD
+
 import com.cloudinary.Cloudinary;
 import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
@@ -8,8 +8,6 @@ import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.entity.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-=======
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.product.ProductCategoryRepository;
 import com.ispan.dogland.model.dao.product.ProductGalleryRepository;
@@ -20,10 +18,8 @@ import com.ispan.dogland.model.entity.product.ProductCategory;
 import com.ispan.dogland.model.entity.product.ProductGallery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Date;
->>>>>>> origin/yu
 import java.util.List;
 
 @Service

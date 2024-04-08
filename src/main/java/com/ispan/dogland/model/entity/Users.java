@@ -50,6 +50,9 @@ public class Users {
     private List<ShoppingCart> shoppingCarts;
 
     @OneToMany(mappedBy = "users")
+    private List<Collection> collections;
+
+    @OneToMany(mappedBy = "users")
     private List<Orders> orders;
 
 //    @OneToMany(fetch = FetchType.LAZY,
@@ -273,6 +276,14 @@ public class Users {
 
     public void setOrders(List<Orders> orders) {
         this.orders = orders;
+    }
+
+    public List<Collection> getCollections() {
+        return collections;
+    }
+
+    public void setCollections(List<Collection> collections) {
+        this.collections = collections;
     }
 
     @Override

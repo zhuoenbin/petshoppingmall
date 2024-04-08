@@ -734,7 +734,7 @@ public class ActivityService {
             }
             return activityIdList;
         }else{
-            return null;
+            return activityIdList;
         }
     }
     //===============likedOneAct===============

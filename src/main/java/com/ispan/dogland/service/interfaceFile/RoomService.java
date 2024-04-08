@@ -30,7 +30,7 @@ public interface RoomService {
 
     public List<Room> findAllroom();
 
-    public List<RoomReservation> findAllRoomReservation();
+    public List<RoomReservationDto> findAllRoomReservation();
 
     public Room findByRoomId(Integer roomId);
 

@@ -1,6 +1,7 @@
 package com.ispan.dogland.controller;
 
 import com.ispan.dogland.model.dto.Passport;
+import com.ispan.dogland.model.dto.RoomReservationDto;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.room.Room;
 import com.ispan.dogland.model.entity.room.RoomReservation;
@@ -26,7 +27,7 @@ public class EmployeeController {
 
 
     @GetMapping("/roomReservation")
-    public List<RoomReservation> reservation(){
+    public List<RoomReservationDto> reservation(){
         return rService.findAllRoomReservation();
     }
 

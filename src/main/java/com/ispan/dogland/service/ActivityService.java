@@ -792,8 +792,7 @@ public class ActivityService {
                 Map delResult = cloudinary.uploader().destroy(oldPublicId, ObjectUtils.emptyMap());
                 System.out.println("Deleted image from Cloudinary: " + delResult);
                 //上傳新圖片
-                Map data = null;
-                data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "activityFolder"));
+                Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "activityFolder"));
                 //更新資料庫
                 gallery.setGalleryImgUrl((String) data.get("url"));
                 gallery.setGalleryPublicId((String) data.get("public_id"));
@@ -842,6 +841,67 @@ public class ActivityService {
         activity.setActivityDescription(activityDescription);
         activityRepository.save(activity);
         return true;
+    }
+
+    //===============刪除sidePic===================
+    public Boolean deleteSideImg(Integer activityId,Integer[] galleryIdList){
+        if(galleryIdList.length>0){
+            Integer count=0;
+            for(Integer galleryId : galleryIdList){
+                ActivityGallery gallery = galleryRepository.findByGalleryId(galleryId);
+                if (gallery!=null){
+                    String publicId = gallery.getGalleryPublicId();
+                    try {
+                        //刪除Cloudinary中的圖片
+                        Map delResult = cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+                        System.out.println("Deleted SideImage from Cloudinary: " + delResult);
+                        //刪除db的資料
+                        galleryRepository.delete(gallery);
+                        System.out.println("delete sideImg from db success");
+                        count ++;
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+            System.out.println("總共刪除: "+count+"張sidePic");
+            return true;
+        }else{
+            return false;
+        }
+    }
+    //===============增加sidePic===================
+    public Boolean addSidePic(Integer activityId,MultipartFile file){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        if(activity!=null){
+            try {
+                //上傳新圖片
+                Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "activityFolder"));
+                ActivityGallery gallery = new ActivityGallery();
+                //更新資料庫
+                gallery.setVenueActivity(activity);
+                gallery.setGalleryImgUrl((String) data.get("url"));
+                gallery.setGalleryPublicId((String) data.get("public_id"));
+                galleryRepository.save(gallery);
+                return true;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return false;
+    }
+    public String addSidePicList(Integer activityId,MultipartFile[] fileList){
+        if (fileList.length>0){
+            Integer success=0;
+            for(MultipartFile file:fileList){
+                Boolean result = addSidePic(activityId, file);
+                if(result){
+                    success++;
+                }
+            }
+            return "成功上傳"+success+"張sidePic!";
+        }
+        return "根本沒有東西 真是謝囉";
     }
 
     //===============官方在創建活動的時候應該要場地租借 官方的userId為0===================

@@ -71,6 +71,8 @@ public interface TweetService {
 
     //把該user的主推文與回文都找出來
     public List<Tweet> findTweetsAndCommentsByUserId(Integer userId);
+
+    public List<Tweet> findAllTweetsOnly();
     
     public TweetNotification findTweetNotificationByNotifiId(Integer id);
 

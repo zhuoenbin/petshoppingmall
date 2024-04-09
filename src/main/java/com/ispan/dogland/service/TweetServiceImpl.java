@@ -379,6 +379,11 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
+    public List<Tweet> findAllTweetsOnly() {
+        return tweetRepository.findAllTweetsOnly();
+    }
+
+    @Override
     public TweetNotification findTweetNotificationByNotifiId(Integer id) {
         return tweetNotificationRepository.findByTweetNotiId(id);
     }

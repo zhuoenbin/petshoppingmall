@@ -33,6 +33,15 @@ public class ActivityBrief {
 
     private Integer currentUserNumber;
     private String galleryImgUrl;
+    private Integer likedTime;
+
+    public Integer getLikedTime() {
+        return likedTime;
+    }
+
+    public void setLikedTime(Integer likedTime) {
+        this.likedTime = likedTime;
+    }
 
     public Integer getActivityId() {
         return activityId;

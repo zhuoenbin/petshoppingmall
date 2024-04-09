@@ -303,6 +303,16 @@ public class ActivityController {
         return activityService.updateDesEditor(activityId,activityDescription);
     }
 
+    @PostMapping("/official/updateManager/sidePic/delete")
+    public Boolean deleteSidePic(Integer activityId,Integer[] delGalleryIdList){
+       return activityService.deleteSideImg(activityId,delGalleryIdList);
+    }
+
+    @PostMapping("/official/updateManager/sidePic/add")
+    public String addSidePic(Integer activityId,MultipartFile[] addSidePicList){
+        return activityService.addSidePicList(activityId,addSidePicList);
+    }
+
 
 
 

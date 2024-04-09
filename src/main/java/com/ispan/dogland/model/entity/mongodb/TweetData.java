@@ -4,6 +4,7 @@ package com.ispan.dogland.model.entity.mongodb;
 import jakarta.persistence.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
 import java.util.Map;
 
 @Document(collection = "tweet_data")
@@ -14,14 +15,9 @@ public class TweetData {
 
     private Map<String, Integer> words;
 
-    private String timestamp;
+    private Date timestamp;
 
     public TweetData() {
-    }
-
-    public TweetData(Map<String, Integer> words, String timestamp) {
-        this.words = words;
-        this.timestamp = timestamp;
     }
 
     public String getId() {
@@ -40,11 +36,11 @@ public class TweetData {
         this.words = words;
     }
 
-    public String getTimestamp() {
+    public Date getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -53,7 +49,7 @@ public class TweetData {
         final StringBuffer sb = new StringBuffer("TweetData{");
         sb.append("id='").append(id).append('\'');
         sb.append(", words=").append(words);
-        sb.append(", timestamp='").append(timestamp).append('\'');
+        sb.append(", timestamp=").append(timestamp);
         sb.append('}');
         return sb.toString();
     }

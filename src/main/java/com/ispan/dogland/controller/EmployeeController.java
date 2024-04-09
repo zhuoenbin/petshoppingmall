@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ispan.dogland.model.dto.Passport;
 import com.ispan.dogland.model.dto.RoomReservationDto;
 import com.ispan.dogland.model.entity.Employee;
+import com.ispan.dogland.model.entity.mongodb.TweetData;
 import com.ispan.dogland.model.entity.room.Room;
 import com.ispan.dogland.model.entity.room.RoomReservation;
 import com.ispan.dogland.model.entity.tweet.Tweet;
@@ -87,26 +88,22 @@ public class EmployeeController {
 
 
 
-    @GetMapping("/send-to-flask")
+    @GetMapping("/sendTweetContentsToFlask")
     @Async
     public String sendToFlask() {
         // Flask 應用程式的 URL
         String flaskUrl = "http://localhost:5000/api/process_sentence";
-
         // 設置headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
         // 準備請求內容
         List<Tweet> tweets = tweetService.findAllTweetsOnly();
         List<String> sentences = new ArrayList<>();
         for (Tweet tweet : tweets) {
             sentences.add(tweet.getTweetContent());
         }
-
         // 創建 ObjectMapper 實例
         ObjectMapper objectMapper = new ObjectMapper();
-
         // 將 sentences 轉換為 JSON 字符串
         String sentencesJson;
         try {
@@ -116,19 +113,21 @@ public class EmployeeController {
             // 處理序列化時的異常
             return "Error occurred during JSON serialization";
         }
-
         String requestBody = "{\n" +
                 "    \"sentences\": " + sentencesJson + "\n" +
                 "}";
-
         // 發送 POST 請求到 Flask 應用程式
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
         String result = restTemplate.postForObject(flaskUrl, requestEntity, String.class);
-
         // 回傳 Flask 的回應
         return result;
     }
 
+
+    @GetMapping("/getTweetData")
+    public TweetData getTweetData() {
+        return tweetService.getLastTweetData();
+    }
 }
 
 

@@ -1,5 +1,6 @@
 package com.ispan.dogland;
 
+import com.ispan.dogland.controller.TweetController;
 import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.RoomReservationRepository;
@@ -54,12 +55,10 @@ public class DoglandApplication {
 											   TweetReportRepository tweetReportRepository,
 											   RoomReservationRepository roomReservationRepository,
 											   RoomService roomService,
-											   TweetDataRepository tweetDataRepository) {
+											   TweetDataRepository tweetDataRepository,
+											   TweetController tweetController) {
 		return runner -> {
-			List<TweetData> tweetData = tweetDataRepository.findAll();
-			for(TweetData t : tweetData){
-				System.out.println(t.getTimestamp());
-			}
+
 		};
 
 

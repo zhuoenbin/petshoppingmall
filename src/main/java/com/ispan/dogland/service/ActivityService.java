@@ -940,10 +940,43 @@ public class ActivityService {
     }
 
     //================使用者有評論過的activityIDList=============
-//    public List<Integer> userCommentActivityIdList(Integer userId){
-//        Users user = userRepository.findByUserId(userId);
-//        List<VenueActivity> co = commentRepository.findV
-//    }
+    public List<Integer> userCommentActivityIdList(Integer userId){
+        Users user = userRepository.findByUserId(userId);
+        List<Integer> activityIdList=new ArrayList<>();
+        List<CommentActivity> venueActivityList = commentRepository.findByUser(user);
+        for (CommentActivity comment:venueActivityList){
+            Integer activityId = comment.getVenueActivity().getActivityId();
+            activityIdList.add(activityId);
+        }
+        return activityIdList;
+    }
+
+    //================使用者個別查看自己寫的內容=============
+    public CommentActivity getMyOneComment(Integer userId,Integer activityId){
+        Users users = userRepository.findByUserId(userId);
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        return commentRepository.findByUserAndVenueActivity(users,activity);
+    }
+
+    //================使用者個別撰寫評論=============
+    public CommentActivity writeOneActivityComment(Integer activityId,Integer userId,String commentText,Integer score){
+        Users users = userRepository.findByUserId(userId);
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        CommentActivity commentActivity = new CommentActivity();
+        commentActivity.setVenueActivity(activity);
+        commentActivity.setUser(users);
+        commentActivity.setCommentText(commentText);
+        commentActivity.setScore(score);
+        return commentRepository.save(commentActivity);
+    }
+
+    //================使用者個別撰寫評論=============
+    public CommentActivity updateOneActivityComment(Integer commentId,String commentText,Integer score){
+        CommentActivity comment = commentRepository.findByCommentId(commentId);
+        comment.setCommentText(commentText);
+        comment.setScore(score);
+        return commentRepository.save(comment);
+    }
 
 
 

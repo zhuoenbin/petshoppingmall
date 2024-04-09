@@ -9,9 +9,8 @@ import java.util.List;
 
 public interface CommentActivityRepository extends JpaRepository<CommentActivity,Integer> {
     List<CommentActivity> findByVenueActivity(VenueActivity venueActivity);
-
+    CommentActivity findByCommentId(Integer commentId);
     List<CommentActivity> findByUser(Users users);
-
     CommentActivity findByUserAndVenueActivity(Users user,VenueActivity venueActivity);
 
 

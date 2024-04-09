@@ -313,6 +313,31 @@ public class ActivityController {
         return activityService.addSidePicList(activityId,addSidePicList);
     }
 
+    //得到哪些活動評論過
+    @GetMapping("/activityManager/get/{userId}/commentList")
+    public List<Integer> getMyCommentedList(@PathVariable Integer userId){
+        return activityService.userCommentActivityIdList(userId);
+    }
+    //使用者個別查看自己寫的內容
+    @GetMapping("/activityManager/get/{userId}/comment/{activityId}")
+    public CommentActivity getMyOneComment(@PathVariable Integer userId,@PathVariable Integer activityId){
+        return activityService.getMyOneComment(userId,activityId);
+    }
+
+    //上傳自己的評論
+    @PostMapping("/activityManager/doComment")
+    public CommentActivity writeActivityComment(@RequestParam Integer activityId,@RequestParam Integer userId,
+                                                @RequestParam String commentText,@RequestParam Integer score){
+        return activityService.writeOneActivityComment(activityId, userId, commentText, score);
+    }
+    //修改自己的評論
+    @PostMapping("/activityManager/doComment/update")
+    public CommentActivity updateActivityComment(@RequestParam Integer commentId,@RequestParam String commentText,
+                                                 @RequestParam Integer score){
+        return activityService.updateOneActivityComment(commentId, commentText, score);
+    }
+
+
 
 
 

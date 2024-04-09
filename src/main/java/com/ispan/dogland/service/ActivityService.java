@@ -46,6 +46,8 @@ public class ActivityService {
     @Autowired
     private LikedActivityRepository likedRepository;
     @Autowired
+    private CommentActivityRepository commentRepository;
+    @Autowired
     private ActivityTypeRepository typeRepository;
     @Autowired
     private ActivityGalleryRepository galleryRepository;
@@ -937,9 +939,11 @@ public class ActivityService {
         return "根本沒有東西 真是謝囉";
     }
 
-    //===============官方在創建活動的時候應該要場地租借 官方的userId為0===================
-
-
+    //================使用者有評論過的activityIDList=============
+//    public List<Integer> userCommentActivityIdList(Integer userId){
+//        Users user = userRepository.findByUserId(userId);
+//        List<VenueActivity> co = commentRepository.findV
+//    }
 
 
 

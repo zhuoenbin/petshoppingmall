@@ -11,6 +11,8 @@ public interface LikedActivityRepository extends JpaRepository<LikedActivity,Int
     LikedActivity findByLikedActivityId(Integer likedActivityId);
     List<LikedActivity> findByUser(Users user);
 
+    List<VenueActivity> findVenueActivityByUser(Users user);
+
     LikedActivity findByUserAndVenueActivity(Users users, VenueActivity venueActivity);
 
     List<LikedActivity> findByVenueActivity(VenueActivity venueActivity);

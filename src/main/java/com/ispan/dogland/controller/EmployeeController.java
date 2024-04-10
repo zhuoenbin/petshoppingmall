@@ -4,6 +4,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.ispan.dogland.model.dto.ProductDto;
 import com.ispan.dogland.model.entity.Employee;
+import com.ispan.dogland.model.entity.OrderCancel;
 import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductCategory;
 import com.ispan.dogland.model.entity.product.ProductGalleryCloud;
@@ -113,5 +114,10 @@ public class EmployeeController {
             throw new RuntimeException(e);
 
         }
+    }
+
+    @GetMapping("/showOrderCase")
+    public List<OrderCancel> getCase(){
+        return es.findOrderCases();
     }
 }

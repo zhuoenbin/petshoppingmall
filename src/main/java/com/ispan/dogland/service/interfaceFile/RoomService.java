@@ -36,4 +36,6 @@ public interface RoomService {
 
     public RoomReservation findByRoomReservationId(Integer roomReservationId);
 
+    public RoomReservationDto findDtoByRoomReservationId(Integer roomReservationId);
+
 }

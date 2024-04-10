@@ -208,7 +208,7 @@ public class ActivityController {
 
     //===============官方管理頁面===============
     @GetMapping("/official/activityManager/past")
-    public List<ActivityBrief> findPastActivityInThisPeriod(){
+    public List<ActivityPastBrief> findPastActivityInThisPeriod(){
         Date currentDate = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(currentDate);
@@ -224,7 +224,7 @@ public class ActivityController {
         return activityService.officialActManagerByStatus(startDate,endDate);
     }
     @PostMapping("/official/activityManager/past")
-    public List<ActivityBrief> findPastActivityInThisPeriod(@RequestParam Date startDate,@RequestParam Date endDate){
+    public List<ActivityPastBrief> findPastActivityInThisPeriod(@RequestParam Date startDate,@RequestParam Date endDate){
         return activityService.officialActManagerByStatus(startDate,endDate);
     }
 
@@ -337,9 +337,15 @@ public class ActivityController {
         return activityService.updateOneActivityComment(commentId, commentText, score);
     }
 
+    //官方找出某活動使用者們的所有評論
+    @GetMapping("official/activityManager/past/commentList/{activityId}")
+    public List<ActCommentDto> getOneActAllComments(@PathVariable Integer activityId){
+        return activityService.getOneActAllComments(activityId);
+    }
 
-
-
-
+    @GetMapping("official/activityManager/past/{userId}/allComment")
+    public List<ActCommentDto> findOneUserAllComment(@PathVariable Integer userId){
+        return activityService.findOneUserAllComment(userId);
+    }
 
 }

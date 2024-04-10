@@ -673,16 +673,19 @@ public class ActivityService {
     }
 
     //===============以區間找過去活動===============
-    public List<ActivityBrief> officialActManagerByStatus(Date start,Date end){
+    public List<ActivityPastBrief> officialActManagerByStatus(Date start,Date end){
         List<VenueActivity> allEnd = activityRepository.findByActivityStatusAndActivityDateBetweenOrderByActivityDateAsc("活動已結束", start, end);
-        List<ActivityBrief> abList = new ArrayList<>();//裝資料的
+        List<ActivityPastBrief> abList = new ArrayList<>();//裝資料的
         for(VenueActivity one:allEnd){
-            ActivityBrief brief = new ActivityBrief();
+            ActivityPastBrief brief = new ActivityPastBrief();
 
             BeanUtils.copyProperties(one,brief);//venueActivity
             List<LikedActivity> likeList = likedRepository.findByVenueActivity(one);
             Integer likedTime = likeList.size();
             brief.setLikedTime(likedTime);
+            List<CommentActivity> commentList=commentRepository.findByVenueActivity(one);
+            Integer commentTime = commentList.size();
+            brief.setCommentedTime(commentTime);
             brief.setVenueName(one.getVenue().getVenueName());
             brief.setActivityTypeName(one.getActivityType().getActivityTypeName());
             ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(one, "main");
@@ -976,6 +979,39 @@ public class ActivityService {
         comment.setCommentText(commentText);
         comment.setScore(score);
         return commentRepository.save(comment);
+    }
+
+    //================官方找出某活動使用者們的所有評論=============
+    public List<ActCommentDto> getOneActAllComments(Integer activityId){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        List<CommentActivity> commentList = commentRepository.findByVenueActivity(activity);
+        List<ActCommentDto> dtoList=new ArrayList<>();
+        for(CommentActivity comment:commentList){
+            Users user = comment.getUser();
+            ActCommentDto dto = new ActCommentDto();
+            BeanUtils.copyProperties(comment,dto);
+            BeanUtils.copyProperties(activity,dto);
+            BeanUtils.copyProperties(user,dto);
+            dtoList.add(dto);
+        }
+        return dtoList;
+    }
+
+    //================官方找出單個使用者的所有評論=============
+    public List<ActCommentDto> findOneUserAllComment(Integer userId){
+        Users users = userRepository.findByUserId(userId);
+        List<CommentActivity> commentList = commentRepository.findByUser(users);
+        List<ActCommentDto> dtoList=new ArrayList<>();
+        for(CommentActivity comment:commentList){
+            VenueActivity activity = comment.getVenueActivity();
+            Users user = comment.getUser();
+            ActCommentDto dto = new ActCommentDto();
+            BeanUtils.copyProperties(comment,dto);
+            BeanUtils.copyProperties(activity,dto);
+            BeanUtils.copyProperties(user,dto);
+            dtoList.add(dto);
+        }
+        return dtoList;
     }
 
 

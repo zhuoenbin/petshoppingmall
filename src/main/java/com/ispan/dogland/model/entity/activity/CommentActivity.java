@@ -11,7 +11,7 @@ import java.util.Date;
 public class CommentActivity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int commentId;
+    private Integer commentId;
 
     @ManyToOne
     @JoinColumn(name = "activity_id")
@@ -42,11 +42,11 @@ public class CommentActivity {
     }
 
     //////////////////////////////////
-    public int getCommentId() {
+    public Integer getCommentId() {
         return commentId;
     }
 
-    public void setCommentId(int commentId) {
+    public void setCommentId(Integer commentId) {
         this.commentId = commentId;
     }
 

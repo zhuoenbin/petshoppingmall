@@ -233,4 +233,25 @@ public class RoomServicelmpl implements RoomService {
     @Override
     public RoomReservation findByRoomReservationId(Integer roomReservationId) { return reservationRepository.findByReservationId(roomReservationId); }
 
+    @Override
+    public RoomReservationDto findDtoByRoomReservationId(Integer roomReservationId) {
+        RoomReservationDto roomReservationDto = new RoomReservationDto();
+        RoomReservation roomReservation = reservationRepository.findByReservationId(roomReservationId);
+        roomReservationDto.setReservationId(roomReservation.getReservationId());
+        roomReservationDto.setRoom(roomReservation.getRoom());
+        roomReservationDto.setUserId(roomReservation.getUser().getUserId());
+        roomReservationDto.setLastName(roomReservation.getUser().getLastName());
+        roomReservationDto.setDog(roomReservation.getDog());
+        roomReservationDto.setStartTime(roomReservation.getStartTime());
+        roomReservationDto.setEndTime(roomReservation.getEndTime());
+        roomReservationDto.setTotalPrice(roomReservation.getTotalPrice());
+        roomReservationDto.setReservationTime(roomReservation.getReservationTime());
+        roomReservationDto.setCancelTime(roomReservation.getCancelTime());
+        roomReservationDto.setCancelDirection(roomReservation.getCancelDirection());
+        roomReservationDto.setStar(roomReservation.getStar());
+        roomReservationDto.setConments(roomReservation.getConments());
+        roomReservationDto.setConmentsTime(roomReservation.getConmentsTime());
+
+        return roomReservationDto;
+    }
 }

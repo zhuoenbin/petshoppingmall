@@ -89,8 +89,8 @@ public class RoomController {
 
     // 修改訂單時段(顯示需要修改的訂單明細)
     @GetMapping("/showUpdateRoom")
-    public RoomReservation updateRoom(@RequestParam Integer roomReservationId) {
-        return rService.findByRoomReservationId(roomReservationId);
+    public RoomReservationDto updateRoom(@RequestParam Integer roomReservationId) {
+        return rService.findDtoByRoomReservationId(roomReservationId);
     }
 
 }

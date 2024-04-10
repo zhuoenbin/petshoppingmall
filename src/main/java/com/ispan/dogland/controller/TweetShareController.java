@@ -15,10 +15,7 @@ import com.ispan.dogland.service.interfaceFile.RoomService;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 
@@ -64,8 +61,9 @@ public class TweetShareController {
 
 
 
-    @GetMapping("/postTweetForRoomShare")
-    public String postTweetForRoomShare(@RequestParam("reservationId") Integer reservationId, HttpSession session){
+    @PostMapping("/postTweetForRoomShare")
+    public String postTweetForRoomShare(@RequestParam("reservationId") Integer reservationId){
+        System.out.println(reservationId);
         RoomReservation roomReservation = roomService.findByRoomReservationId(reservationId);
 
         //房間名稱

@@ -387,17 +387,17 @@ public class TweetController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
+        String contentPrompt =content+"。以上句子若包含仇恨言論、騷擾、露骨的性行為、危險內容嗎?若有請回傳其中可能性最高的一個，若沒有請不要回傳任何值，請用道德高標";
         String requestBody = "{"
                 + "\"contents\": [{"
-                + "\"parts\": [{\"text\": \"" + content + "\"}]"
+                + "\"parts\": [{\"text\": \"" + contentPrompt + "\"}]"
                 + "}],"
-                + "\"safetySettings\": [{"
-                + "\"category\": \"HARM_CATEGORY_DANGEROUS_CONTENT\","
-                + "\"threshold\": \"BLOCK_NONE\""
-                + "}],"
+//                + "\"safetySettings\": [{"
+//                + "\"category\": \"HARM_CATEGORY_DANGEROUS_CONTENT\","
+//                + "\"threshold\": \"BLOCK_NONE\""
+//                + "}],"
                 + "\"generationConfig\": {"
-                + "\"temperature\": 1.0,"
+                + "\"temperature\": 0.1,"
                 + "\"maxOutputTokens\": 30,"
                 + "\"topP\": 0.8,"
                 + "\"topK\": 10"
@@ -407,7 +407,6 @@ public class TweetController {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
         ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, requestEntity, String.class);
-        System.out.println(responseEntity.getBody());
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode responseJson = mapper.readTree(responseEntity.getBody());

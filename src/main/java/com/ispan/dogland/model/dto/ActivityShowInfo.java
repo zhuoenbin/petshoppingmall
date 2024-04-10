@@ -48,6 +48,15 @@ public class ActivityShowInfo {
     private String contactInfo;
     private String contactMail;
     private String contactPhone;
+    private Integer likedTime;
+
+    public Integer getLikedTime() {
+        return likedTime;
+    }
+
+    public void setLikedTime(Integer likedTime) {
+        this.likedTime = likedTime;
+    }
 
     public String getActivityTypeName() {
         return activityTypeName;

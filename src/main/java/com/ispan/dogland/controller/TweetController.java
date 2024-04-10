@@ -17,6 +17,7 @@ import com.ispan.dogland.model.entity.tweet.TweetReport;
 import com.ispan.dogland.service.interfaceFile.AccountService;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -40,6 +41,9 @@ public class TweetController {
     private TweetService tweetService;
 
     private AccountService accountService;
+
+    @Value("${gemini_apiKey}")
+    private String apiKey;
 
     @Autowired
     public TweetController(TweetService tweetService, AccountService accountService) {
@@ -379,7 +383,6 @@ public class TweetController {
 
     public Map<String,String> evaluateTweetContentByAi(String content) {
         Map<String,String> map = new HashMap<>();
-        String apiKey = "AIzaSyD8L-U56UHVFpQm4eh5uPp04ySNkObpzFQ";
         String url = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=" + apiKey;
 
         HttpHeaders headers = new HttpHeaders();
@@ -404,11 +407,12 @@ public class TweetController {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
         ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, requestEntity, String.class);
+        System.out.println(responseEntity.getBody());
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode responseJson = mapper.readTree(responseEntity.getBody());
             for(int i =0;i<=3;i++){
-                JsonNode promptFeedbackNode = responseJson.path("promptFeedback").get("safetyRatings").get(i);
+                JsonNode promptFeedbackNode = responseJson.path("candidates").get(0).get("safetyRatings").get(i);
                 map.put(promptFeedbackNode.get("category").textValue(),promptFeedbackNode.get("probability").textValue());
             }
         }catch (Exception e){

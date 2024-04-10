@@ -46,6 +46,8 @@ public class ActivityService {
     @Autowired
     private LikedActivityRepository likedRepository;
     @Autowired
+    private CommentActivityRepository commentRepository;
+    @Autowired
     private ActivityTypeRepository typeRepository;
     @Autowired
     private ActivityGalleryRepository galleryRepository;
@@ -275,6 +277,10 @@ public class ActivityService {
             ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
             ab.setGalleryImgUrl(main.getGalleryImgUrl());
 
+            List<LikedActivity> likeList = likedRepository.findByVenueActivity(activity);
+            Integer likedTime = likeList.size();
+            ab.setLikedTime(likedTime);
+
             ab.setActivityTypeName(a.getActivityType().getActivityTypeName());
             ab.setVenueName(a.getVenue().getVenueName());
             return ab;
@@ -297,6 +303,9 @@ public class ActivityService {
             VenueActivity activity = activityRepository.findByActivityId(activityId);
             ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
 
+            List<LikedActivity> likeList = likedRepository.findByVenueActivity(activity);
+            Integer likedTime = likeList.size();
+            brief.setLikedTime(likedTime);
             brief.setGalleryImgUrl(main.getGalleryImgUrl());
             return brief;
         });
@@ -562,6 +571,9 @@ public class ActivityService {
             VenueActivity activity = activityRepository.findByActivityId(activityId);
             ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
             ab.setGalleryImgUrl(main.getGalleryImgUrl());
+            List<LikedActivity> likeList = likedRepository.findByVenueActivity(activity);
+            Integer likedTime = likeList.size();
+            ab.setLikedTime(likedTime);
 
             ab.setActivityTypeName(a.getActivityType().getActivityTypeName());
             ab.setVenueName(a.getVenue().getVenueName());
@@ -583,6 +595,9 @@ public class ActivityService {
             VenueActivity activity = activityRepository.findByActivityId(activityId);
             ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
             ab.setGalleryImgUrl(main.getGalleryImgUrl());
+            List<LikedActivity> likeList = likedRepository.findByVenueActivity(activity);
+            Integer likedTime = likeList.size();
+            ab.setLikedTime(likedTime);
 
             ab.setActivityTypeName(a.getActivityType().getActivityTypeName());
             ab.setVenueName(a.getVenue().getVenueName());
@@ -602,6 +617,9 @@ public class ActivityService {
             VenueActivity activity = activityRepository.findByActivityId(activityId);
             ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
             ab.setGalleryImgUrl(main.getGalleryImgUrl());
+            List<LikedActivity> likeList = likedRepository.findByVenueActivity(activity);
+            Integer likedTime = likeList.size();
+            ab.setLikedTime(likedTime);
 
             ab.setActivityTypeName(a.getActivityType().getActivityTypeName());
             ab.setVenueName(a.getVenue().getVenueName());
@@ -623,6 +641,9 @@ public class ActivityService {
             VenueActivity activity = activityRepository.findByActivityId(activityId);
             ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
             ab.setGalleryImgUrl(main.getGalleryImgUrl());
+            List<LikedActivity> likeList = likedRepository.findByVenueActivity(activity);
+            Integer likedTime = likeList.size();
+            ab.setLikedTime(likedTime);
 
             ab.setActivityTypeName(a.getActivityType().getActivityTypeName());
             ab.setVenueName(a.getVenue().getVenueName());
@@ -639,6 +660,9 @@ public class ActivityService {
             ActivityBrief brief = new ActivityBrief();
 
             BeanUtils.copyProperties(one,brief);//venueActivity
+            List<LikedActivity> likeList = likedRepository.findByVenueActivity(one);
+            Integer likedTime = likeList.size();
+            brief.setLikedTime(likedTime);
             brief.setVenueName(one.getVenue().getVenueName());
             brief.setActivityTypeName(one.getActivityType().getActivityTypeName());
             ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(one, "main");
@@ -656,6 +680,9 @@ public class ActivityService {
             ActivityBrief brief = new ActivityBrief();
 
             BeanUtils.copyProperties(one,brief);//venueActivity
+            List<LikedActivity> likeList = likedRepository.findByVenueActivity(one);
+            Integer likedTime = likeList.size();
+            brief.setLikedTime(likedTime);
             brief.setVenueName(one.getVenue().getVenueName());
             brief.setActivityTypeName(one.getActivityType().getActivityTypeName());
             ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(one, "main");
@@ -704,6 +731,9 @@ public class ActivityService {
         String activityTypeName = activity.getActivityType().getActivityTypeName();
         Integer venueId = activity.getVenue().getVenueId();
         String venueName = activity.getVenue().getVenueName();
+        //like
+        List<LikedActivity> liked = likedRepository.findByVenueActivity(activity);
+        Integer likedTime = liked.size();
         //gallery
         List<ActivityGallery> galleryList = galleryRepository.findByVenueActivity(activity);
         List<ActivityGalleryDto> imgList = new ArrayList<>();
@@ -718,6 +748,7 @@ public class ActivityService {
         showInfo.setActivityTypeName(activityTypeName);
         showInfo.setVenueId(venueId);
         showInfo.setVenueName(venueName);
+        showInfo.setLikedTime(likedTime);
         showInfo.setActivityImgList(imgList);
         return showInfo;
     }
@@ -768,7 +799,11 @@ public class ActivityService {
             for(LikedActivity like:likedActivityList){
                 ActivityBrief dto = new ActivityBrief();
                 VenueActivity activity = like.getVenueActivity();
+                List<LikedActivity> likeList = likedRepository.findByVenueActivity(activity);
+                Integer likedTime = likeList.size();
+
                 BeanUtils.copyProperties(activity,dto);
+                dto.setLikedTime(likedTime);
                 dto.setActivityTypeName(activity.getActivityType().getActivityTypeName());
                 dto.setVenueName(activity.getVenue().getVenueName());
                 ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
@@ -792,8 +827,7 @@ public class ActivityService {
                 Map delResult = cloudinary.uploader().destroy(oldPublicId, ObjectUtils.emptyMap());
                 System.out.println("Deleted image from Cloudinary: " + delResult);
                 //上傳新圖片
-                Map data = null;
-                data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "activityFolder"));
+                Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "activityFolder"));
                 //更新資料庫
                 gallery.setGalleryImgUrl((String) data.get("url"));
                 gallery.setGalleryPublicId((String) data.get("public_id"));
@@ -844,9 +878,72 @@ public class ActivityService {
         return true;
     }
 
-    //===============官方在創建活動的時候應該要場地租借 官方的userId為0===================
+    //===============刪除sidePic===================
+    public Boolean deleteSideImg(Integer activityId,Integer[] galleryIdList){
+        if(galleryIdList.length>0){
+            Integer count=0;
+            for(Integer galleryId : galleryIdList){
+                ActivityGallery gallery = galleryRepository.findByGalleryId(galleryId);
+                if (gallery!=null){
+                    String publicId = gallery.getGalleryPublicId();
+                    try {
+                        //刪除Cloudinary中的圖片
+                        Map delResult = cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+                        System.out.println("Deleted SideImage from Cloudinary: " + delResult);
+                        //刪除db的資料
+                        galleryRepository.delete(gallery);
+                        System.out.println("delete sideImg from db success");
+                        count ++;
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+            System.out.println("總共刪除: "+count+"張sidePic");
+            return true;
+        }else{
+            return false;
+        }
+    }
+    //===============增加sidePic===================
+    public Boolean addSidePic(Integer activityId,MultipartFile file){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        if(activity!=null){
+            try {
+                //上傳新圖片
+                Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "activityFolder"));
+                ActivityGallery gallery = new ActivityGallery();
+                //更新資料庫
+                gallery.setVenueActivity(activity);
+                gallery.setGalleryImgUrl((String) data.get("url"));
+                gallery.setGalleryPublicId((String) data.get("public_id"));
+                galleryRepository.save(gallery);
+                return true;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return false;
+    }
+    public String addSidePicList(Integer activityId,MultipartFile[] fileList){
+        if (fileList.length>0){
+            Integer success=0;
+            for(MultipartFile file:fileList){
+                Boolean result = addSidePic(activityId, file);
+                if(result){
+                    success++;
+                }
+            }
+            return "成功上傳"+success+"張sidePic!";
+        }
+        return "根本沒有東西 真是謝囉";
+    }
 
-
+    //================使用者有評論過的activityIDList=============
+//    public List<Integer> userCommentActivityIdList(Integer userId){
+//        Users user = userRepository.findByUserId(userId);
+//        List<VenueActivity> co = commentRepository.findV
+//    }
 
 
 

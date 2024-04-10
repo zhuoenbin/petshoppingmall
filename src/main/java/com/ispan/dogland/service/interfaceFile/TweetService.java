@@ -3,6 +3,7 @@ package com.ispan.dogland.service.interfaceFile;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
+import com.ispan.dogland.model.entity.mongodb.TweetData;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import com.ispan.dogland.model.entity.tweet.TweetFollowList;
 import com.ispan.dogland.model.entity.tweet.TweetNotification;
@@ -71,6 +72,8 @@ public interface TweetService {
 
     //把該user的主推文與回文都找出來
     public List<Tweet> findTweetsAndCommentsByUserId(Integer userId);
+
+    public List<Tweet> findAllTweetsOnly();
     
     public TweetNotification findTweetNotificationByNotifiId(Integer id);
 
@@ -99,4 +102,6 @@ public interface TweetService {
     Employee findEmployeeByReportId(Integer reportId);
 
     Tweet postTweetForShare(Integer userId, String content, String imgUrl);
+
+    TweetData getLastTweetData();
 }

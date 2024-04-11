@@ -4,10 +4,7 @@ import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.mongodb.TweetData;
-import com.ispan.dogland.model.entity.tweet.Tweet;
-import com.ispan.dogland.model.entity.tweet.TweetFollowList;
-import com.ispan.dogland.model.entity.tweet.TweetNotification;
-import com.ispan.dogland.model.entity.tweet.TweetReport;
+import com.ispan.dogland.model.entity.tweet.*;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -104,4 +101,16 @@ public interface TweetService {
     Tweet postTweetForShare(Integer userId, String content, String imgUrl);
 
     TweetData getLastTweetData();
+
+    public String uploadOfficialImg(MultipartFile file);
+
+    public TweetOfficial saveOfficialTweet(TweetOfficial tweetOfficial);
+
+    public List<TweetOfficial> findAllOfficialTweet();
+
+    public TweetOfficial updateOfficialTweetContent(Integer tweetId, String newContent);
+
+    public TweetOfficial findOfficialTweetByTweetId(Integer tweetId);
+
+    public TweetOfficial saveTweetOfficial(TweetOfficial tweetOfficial);
 }

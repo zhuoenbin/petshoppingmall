@@ -27,16 +27,10 @@ public class TweetScheduler {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Scheduled(cron = "0 0 1 * * *")
+    @Scheduled(cron = "0 0 2 * * *", zone="Asia/Taipei")
     public void sendTweetToFlask() {
         String result = sendToFlask();
         System.out.println("Tweet sent to Flask at: " + LocalDateTime.now());
-    }
-
-    @Scheduled(cron = "0 0 2 * * *")
-    public void sendTweetContentsToFlask() {
-        String result = sendToFlask();
-        System.out.println("Tweet contents sent to Flask at: " + LocalDateTime.now());
     }
 
     // 此處放置你的方法

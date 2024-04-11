@@ -10,10 +10,7 @@ import com.ispan.dogland.model.dto.TweetLikesCheckResponse;
 import com.ispan.dogland.model.dto.UserDto;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Users;
-import com.ispan.dogland.model.entity.tweet.Tweet;
-import com.ispan.dogland.model.entity.tweet.TweetGallery;
-import com.ispan.dogland.model.entity.tweet.TweetNotification;
-import com.ispan.dogland.model.entity.tweet.TweetReport;
+import com.ispan.dogland.model.entity.tweet.*;
 import com.ispan.dogland.service.interfaceFile.AccountService;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,6 +129,57 @@ public class TweetController {
         return ResponseEntity.ok("Tweet posted successfully");
     }
 
+    //官方發文+本地圖片
+    @PostMapping("/postTweetWithPhotoByOfficial")
+    public ResponseEntity<String> postTweetWithPhotoByOfficial(@RequestParam Integer memberId,
+                                            @RequestParam String tweetContent,
+                                            @RequestParam("image") MultipartFile file,
+                                            @RequestParam String htmlLink) {
+        TweetOfficial tweetOfficial = new TweetOfficial();
+        tweetOfficial.setEmployeeId(memberId);
+        tweetOfficial.setPreNode(0);
+        tweetOfficial.setPostDate(new Date());
+        tweetOfficial.setTweetStatus(1);
+        tweetOfficial.setNumReport(0);
+        if (tweetContent != null) {
+            tweetOfficial.setTweetContent(tweetContent);
+        }
+        if(htmlLink != null){
+            tweetOfficial.setTweetLink(htmlLink);
+        }
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Image file is empty");
+        }
+        //把圖片存到雲端
+        String imgFileName = tweetService.uploadOfficialImg(file);
+        tweetOfficial.setImgPathCloud(imgFileName);
+        TweetOfficial tweetOfficial1 = tweetService.saveOfficialTweet(tweetOfficial);
+        System.out.println(tweetOfficial1.toString());
+        return ResponseEntity.ok("Tweet posted successfully");
+    }
+
+    //官方發文+本地圖片
+    @PostMapping("/postTweetWithOutPhotoByOfficial")
+    public ResponseEntity<String> postTweetOnlyTextByOfficial(@RequestParam Integer memberId,
+                                                              @RequestParam String tweetContent,
+                                                              @RequestParam String htmlLink) {
+        TweetOfficial tweetOfficial = new TweetOfficial();
+        tweetOfficial.setEmployeeId(memberId);
+        tweetOfficial.setPreNode(0);
+        tweetOfficial.setPostDate(new Date());
+        tweetOfficial.setTweetStatus(1);
+        tweetOfficial.setNumReport(0);
+        if (tweetContent != null) {
+            tweetOfficial.setTweetContent(tweetContent);
+        }
+        if(htmlLink != null){
+            tweetOfficial.setTweetLink(htmlLink);
+        }
+        TweetOfficial tweetOfficial1 = tweetService.saveOfficialTweet(tweetOfficial);
+        System.out.println(tweetOfficial1.toString());
+        return ResponseEntity.ok("Tweet posted successfully");
+    }
+
     //找到該則tweet的所有按讚數量
     @GetMapping("/getTweetLikesNum")
     public ResponseEntity<TweetLikesCheckResponse> getTweetLikesNum(@RequestParam Integer tweetId, @RequestParam Integer userId) {
@@ -149,6 +197,25 @@ public class TweetController {
             tweetLikesCheckResponse.setIsUserLiked(0);
         }
         return ResponseEntity.ok(tweetLikesCheckResponse);
+    }
+
+
+    @GetMapping("/getAllTweetOfficial")
+    public List<TweetOfficial> getAllTweetOfficial() {
+        return tweetService.findAllOfficialTweet();
+    }
+
+    @PostMapping("/updateOfficialTweetContent")
+    public String saveEditedOfficialTweet(@RequestBody Map<String, Object> request) {
+
+        String editTweetContentTmp = (String) request.get("editTweetContentTmp");
+        Integer tweetId = Integer.parseInt(String.valueOf(request.get("tweetId")));
+
+        TweetOfficial t1 = tweetService.updateOfficialTweetContent(tweetId, editTweetContentTmp);
+        if(t1 == null) {
+            return "fail";
+        }
+        return t1.getTweetContent();
     }
 
 
@@ -324,6 +391,14 @@ public class TweetController {
         Tweet t1 = tweetService.findTweetByTweetId(tweetId);
         t1.setTweetStatus(0);
         return tweetService.saveTweet(t1);
+    }
+
+    @PostMapping("/removeOfficialTweetContent")
+    public TweetOfficial removeOfficialTweetContent(@RequestBody Map<String, Object> request) {
+        Integer tweetId = Integer.parseInt(String.valueOf(request.get("tweetId")));
+        TweetOfficial t1 = tweetService.findOfficialTweetByTweetId(tweetId);
+        t1.setTweetStatus(0);
+        return tweetService.saveOfficialTweet(t1);
     }
 
     @PostMapping("/reportTweet")

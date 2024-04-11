@@ -23,7 +23,7 @@ public interface TweetRepository extends JpaRepository<Tweet, Integer> {
     List<Tweet> findAllTweetsWithGallery();
 
 
-    @Query("FROM Tweet t  WHERE t.preNode = 0")
+    @Query("FROM Tweet t ")
     List<Tweet> findAllTweetsOnly();
 
     @Query("SELECT t FROM Tweet t LEFT JOIN t.tweetGalleries WHERE t.preNode = ?1 AND t.tweetStatus = 1")

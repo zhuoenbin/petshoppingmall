@@ -1,5 +1,7 @@
 package com.ispan.dogland.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
@@ -52,6 +54,8 @@ public class TweetServiceImpl implements TweetService {
     private TweetReportRepository tweetReportRepository;
     private EmployeeRepository employeeRepository;
     private TweetDataRepository tweetDataRepository;
+    private Cloudinary cloudinary;
+    private TweetOfficialRepository tweetOfficialRepository;
 
     @Autowired
     public TweetServiceImpl(TweetRepository tweetRepository,
@@ -63,7 +67,9 @@ public class TweetServiceImpl implements TweetService {
                             TweetNotificationRepository tweetNotificationRepository,
                             TweetReportRepository tweetReportRepository,
                             EmployeeRepository employeeRepository,
-                            TweetDataRepository tweetDataRepository) {
+                            TweetDataRepository tweetDataRepository,
+                            Cloudinary cloudinary,
+                            TweetOfficialRepository tweetOfficialRepository) {
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
         this.tweetGalleryRepository = tweetGalleryRepository;
@@ -74,6 +80,8 @@ public class TweetServiceImpl implements TweetService {
         this.tweetReportRepository = tweetReportRepository;
         this.employeeRepository = employeeRepository;
         this.tweetDataRepository = tweetDataRepository;
+        this.cloudinary = cloudinary;
+        this.tweetOfficialRepository = tweetOfficialRepository;
     }
 
     @Override
@@ -515,6 +523,47 @@ public class TweetServiceImpl implements TweetService {
         List<TweetData> tweetData = tweetDataRepository.findAllByOrderByTimestampDesc();
         return tweetData.get(0);
 
+    }
+
+    @Override
+    public String uploadOfficialImg(MultipartFile file) {
+        try{
+            Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "tweetOfficialFolder"));
+            return (String) data.get("url");
+        }catch (IOException e){
+            throw new RuntimeException("Image uploading fail !!");
+        }
+    }
+
+    @Override
+    public TweetOfficial saveOfficialTweet(TweetOfficial tweetOfficial) {
+        return tweetOfficialRepository.save(tweetOfficial);
+    }
+
+    @Override
+    public List<TweetOfficial> findAllOfficialTweet() {
+        return tweetOfficialRepository.findAllOfficialTweetWhereStatusIs1();
+    }
+
+    @Override
+    public TweetOfficial updateOfficialTweetContent(Integer tweetId, String newContent) {
+
+        TweetOfficial t1 = tweetOfficialRepository.findByTweetId(tweetId);
+        if(t1 == null){
+            return null;
+        }
+        t1.setTweetContent(newContent);
+        return tweetOfficialRepository.save(t1);
+    }
+
+    @Override
+    public TweetOfficial findOfficialTweetByTweetId(Integer tweetId) {
+        return tweetOfficialRepository.findByTweetId(tweetId);
+    }
+
+    @Override
+    public TweetOfficial saveTweetOfficial(TweetOfficial tweetOfficial) {
+        return tweetOfficialRepository.save(tweetOfficial);
     }
 
 

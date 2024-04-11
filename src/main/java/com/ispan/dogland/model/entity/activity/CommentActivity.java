@@ -11,7 +11,7 @@ import java.util.Date;
 public class CommentActivity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int commentId;
+    private Integer commentId;
 
     @ManyToOne
     @JoinColumn(name = "activity_id")
@@ -25,6 +25,8 @@ public class CommentActivity {
 
     private Integer score;
 
+    private String checkResult;
+
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private Date commentTime;
@@ -35,18 +37,24 @@ public class CommentActivity {
         if(commentTime==null) {
             commentTime=new Date();
         }
+        if(checkResult==null){
+            checkResult="其他";
+        }
     }
     @PreUpdate
     public void onUpdate(){
         commentTime=new Date();
+        if(checkResult==null){
+            checkResult="其他";
+        }
     }
 
     //////////////////////////////////
-    public int getCommentId() {
+    public Integer getCommentId() {
         return commentId;
     }
 
-    public void setCommentId(int commentId) {
+    public void setCommentId(Integer commentId) {
         this.commentId = commentId;
     }
 
@@ -88,5 +96,13 @@ public class CommentActivity {
 
     public void setCommentTime(Date commentTime) {
         this.commentTime = commentTime;
+    }
+
+    public String getCheckResult() {
+        return checkResult;
+    }
+
+    public void setCheckResult(String checkResult) {
+        this.checkResult = checkResult;
     }
 }

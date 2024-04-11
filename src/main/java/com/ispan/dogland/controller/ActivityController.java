@@ -208,7 +208,7 @@ public class ActivityController {
 
     //===============官方管理頁面===============
     @GetMapping("/official/activityManager/past")
-    public List<ActivityBrief> findPastActivityInThisPeriod(){
+    public List<ActivityPastBrief> findPastActivityInThisPeriod(){
         Date currentDate = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(currentDate);
@@ -224,7 +224,7 @@ public class ActivityController {
         return activityService.officialActManagerByStatus(startDate,endDate);
     }
     @PostMapping("/official/activityManager/past")
-    public List<ActivityBrief> findPastActivityInThisPeriod(@RequestParam Date startDate,@RequestParam Date endDate){
+    public List<ActivityPastBrief> findPastActivityInThisPeriod(@RequestParam Date startDate,@RequestParam Date endDate){
         return activityService.officialActManagerByStatus(startDate,endDate);
     }
 
@@ -313,8 +313,39 @@ public class ActivityController {
         return activityService.addSidePicList(activityId,addSidePicList);
     }
 
+    //得到哪些活動評論過
+    @GetMapping("/activityManager/get/{userId}/commentList")
+    public List<Integer> getMyCommentedList(@PathVariable Integer userId){
+        return activityService.userCommentActivityIdList(userId);
+    }
+    //使用者個別查看自己寫的內容
+    @GetMapping("/activityManager/get/{userId}/comment/{activityId}")
+    public CommentActivity getMyOneComment(@PathVariable Integer userId,@PathVariable Integer activityId){
+        return activityService.getMyOneComment(userId,activityId);
+    }
 
+    //上傳自己的評論
+    @PostMapping("/activityManager/doComment")
+    public CommentActivity writeActivityComment(@RequestParam Integer activityId,@RequestParam Integer userId,
+                                                @RequestParam String commentText,@RequestParam Integer score){
+        return activityService.writeOneActivityComment(activityId, userId, commentText, score);
+    }
+    //修改自己的評論
+    @PostMapping("/activityManager/doComment/update")
+    public CommentActivity updateActivityComment(@RequestParam Integer commentId,@RequestParam String commentText,
+                                                 @RequestParam Integer score){
+        return activityService.updateOneActivityComment(commentId, commentText, score);
+    }
 
-
+    //官方找出某活動使用者們的所有評論
+    @GetMapping("official/activityManager/past/commentList/{activityId}")
+    public List<ActCommentDto> getOneActAllComments(@PathVariable Integer activityId){
+        return activityService.getOneActAllComments(activityId);
+    }
+    //官方找出某使用者的所有評論
+    @GetMapping("official/activityManager/past/{userId}/allComment")
+    public List<ActCommentDto> findOneUserAllComment(@PathVariable Integer userId){
+        return activityService.findOneUserAllComment(userId);
+    }
 
 }

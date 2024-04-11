@@ -342,7 +342,7 @@ public class ActivityController {
     public List<ActCommentDto> getOneActAllComments(@PathVariable Integer activityId){
         return activityService.getOneActAllComments(activityId);
     }
-
+    //官方找出某使用者的所有評論
     @GetMapping("official/activityManager/past/{userId}/allComment")
     public List<ActCommentDto> findOneUserAllComment(@PathVariable Integer userId){
         return activityService.findOneUserAllComment(userId);

@@ -37,7 +37,6 @@ public class ActivityPastBrief {
     private Date activityClosingDate;
     private Integer activityDogNumber;
     private Integer currentDogNumber;
-
     private Integer currentUserNumber;
 
     public Integer getActivityId() {

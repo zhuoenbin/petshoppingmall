@@ -7,6 +7,7 @@ public class ActCommentDto {
     private Integer commentId;
     private String commentText;
     private Integer score;
+    private String checkResult;
     private Date commentTime;
     //activity
     private Integer activityId;
@@ -17,6 +18,14 @@ public class ActCommentDto {
 
     public Integer getCommentId() {
         return commentId;
+    }
+
+    public String getCheckResult() {
+        return checkResult;
+    }
+
+    public void setCheckResult(String checkResult) {
+        this.checkResult = checkResult;
     }
 
     public void setCommentId(Integer commentId) {

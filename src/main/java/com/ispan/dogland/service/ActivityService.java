@@ -2,6 +2,8 @@ package com.ispan.dogland.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
@@ -12,23 +14,31 @@ import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.activity.*;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Transactional
 public class ActivityService {
+    @Value("${gemini_apiKey}")
+    private String apiKey;
     @Autowired
     private Cloudinary cloudinary;
     @Autowired
@@ -960,6 +970,49 @@ public class ActivityService {
         VenueActivity activity = activityRepository.findByActivityId(activityId);
         return commentRepository.findByUserAndVenueActivity(users,activity);
     }
+    //================gemini check==================
+    public String geminiCheckComment(String content) {
+        Map<String,String> map = new HashMap<>();
+        String url = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=" + apiKey;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String contentPrompt =content+"。以上是一句客戶參加我公司所辦理的寵物活動評論，請幫我把句子分類，種類有:正面服務、負面服務、正面場地、負面場地、正面活動、負面活動。若句子為空的，請歸類為無評論。若無法判斷評論是否與活動相關，請歸類為無相關分類。請回傳一個最相關的，若沒有請不要回傳任何值，請用道德高標";
+        String requestBody = "{"
+                + "\"contents\": [{"
+                + "\"parts\": [{\"text\": \"" + contentPrompt + "\"}]"
+                + "}],"
+                + "\"generationConfig\": {"
+                + "\"temperature\": 0.1,"
+                + "\"topP\": 0.8,"
+                + "\"topK\": 10"
+                + "}"
+                + "}";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, requestEntity, String.class);
+        String responseBody = responseEntity.getBody();
+//        System.out.println(responseBody);
+        try {
+            JSONObject jsonObject = new JSONObject(responseBody);
+            JSONArray candidates = jsonObject.getJSONArray("candidates");
+            if (candidates.length() > 0) {
+                JSONObject candidate = candidates.getJSONObject(0);
+                JSONObject rsContent = candidate.getJSONObject("content");
+                JSONArray parts = rsContent.getJSONArray("parts");
+                if (parts.length() > 0) {
+                    JSONObject part = parts.getJSONObject(0);
+                    System.out.println(part.getString("text"));
+                    return part.getString("text");
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     //================使用者個別撰寫評論=============
     public CommentActivity writeOneActivityComment(Integer activityId,Integer userId,String commentText,Integer score){
@@ -970,14 +1023,18 @@ public class ActivityService {
         commentActivity.setUser(users);
         commentActivity.setCommentText(commentText);
         commentActivity.setScore(score);
+        String gemini = geminiCheckComment(commentText);
+        commentActivity.setCheckResult(gemini);
         return commentRepository.save(commentActivity);
     }
 
-    //================使用者個別撰寫評論=============
+    //================使用者個別更新撰寫評論=============
     public CommentActivity updateOneActivityComment(Integer commentId,String commentText,Integer score){
         CommentActivity comment = commentRepository.findByCommentId(commentId);
         comment.setCommentText(commentText);
         comment.setScore(score);
+        String gemini = geminiCheckComment(commentText);
+        comment.setCheckResult(gemini);
         return commentRepository.save(comment);
     }
 

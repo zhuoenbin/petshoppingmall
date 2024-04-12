@@ -1,11 +1,13 @@
 package com.ispan.dogland.service;
 
+import com.ispan.dogland.model.dao.OrderCancelRepository;
 import com.ispan.dogland.model.dao.OrderDetailRepository;
 import com.ispan.dogland.model.dao.OrdersRepository;
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dao.product.ProductGalleryRepository;
 import com.ispan.dogland.model.dao.product.ProductRepository;
 import com.ispan.dogland.model.dto.ProductDto;
+import com.ispan.dogland.model.entity.OrderCancel;
 import com.ispan.dogland.model.entity.OrderDetail;
 import com.ispan.dogland.model.entity.Orders;
 import com.ispan.dogland.model.entity.product.Product;
@@ -33,6 +35,8 @@ public class OrderService {
     private ProductRepository productRepository;
     @Autowired
     private ProductGalleryRepository productGalleryRepository;
+    @Autowired
+    private OrderCancelRepository orderCancelRepository;
 
     public List<OrderDetail> findDetailByOrderId(Integer orderId){
         return orderDetailRepository.findByOrderId(orderId);
@@ -66,6 +70,14 @@ public class OrderService {
 
     public List<Orders> findOrdersByUserId (Integer userId){
         return ordersRepository.findOrdersByUserId(userId);
+    }
+
+    public void addOrderCancelCase(Integer orderId){
+        OrderCancel oc = new OrderCancel();
+        oc.setIsRead(0);
+        OrderCancel oc2 = orderCancelRepository.save(oc);
+        oc2.setOrders(ordersRepository.findByOrderId(orderId));
+        orderCancelRepository.save(oc2);
     }
 
 }

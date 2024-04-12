@@ -25,4 +25,6 @@ public interface OrdersRepository extends JpaRepository<Orders,Integer> {
     // 根據用戶ID查詢訂單
     @Query("SELECT o FROM Orders o JOIN o.users u ON u.userId = :userId")
     List<Orders> findOrdersByUserId(Integer userId);
+
+    Orders findByOrderId(Integer orderId);
 }

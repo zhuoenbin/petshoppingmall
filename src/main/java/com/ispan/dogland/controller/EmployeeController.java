@@ -8,6 +8,7 @@ import com.ispan.dogland.model.dto.Passport;
 import com.ispan.dogland.model.dto.RoomReservationDto;
 import com.ispan.dogland.model.entity.Employee;
 //import com.ispan.dogland.model.entity.mongodb.TweetData;
+import com.ispan.dogland.model.entity.mongodb.TweetData;
 import com.ispan.dogland.model.entity.room.Room;
 import com.ispan.dogland.model.entity.room.RoomReservation;
 import com.ispan.dogland.model.entity.tweet.Tweet;
@@ -124,10 +125,10 @@ public class EmployeeController {
     }
 
 
-//    @GetMapping("/getTweetData")
-//    public TweetData getTweetData() {
-//        return tweetService.getLastTweetData();
-//    }
+    @GetMapping("/getTweetData")
+    public TweetData getTweetData() {
+        return tweetService.getLastTweetData();
+    }
 }
 
 

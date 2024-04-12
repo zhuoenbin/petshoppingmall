@@ -72,6 +72,7 @@ public class AccountServiceImpl implements AccountService {
             user.setUserPassword(encodePassword);
         }
         user.setLastLoginTime(new Date());
+        user.setUserStatus("Action");
         return usersRepository.save(user);
     }
 

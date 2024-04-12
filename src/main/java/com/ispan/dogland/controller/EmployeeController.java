@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ispan.dogland.model.dto.Passport;
 import com.ispan.dogland.model.dto.RoomReservationDto;
+import com.ispan.dogland.model.dto.ScoreDto;
 import com.ispan.dogland.model.entity.Employee;
 //import com.ispan.dogland.model.entity.mongodb.TweetData;
 import com.ispan.dogland.model.entity.room.Room;
@@ -44,6 +45,11 @@ public class EmployeeController {
     @GetMapping("/roomReservation")
     public List<RoomReservationDto> reservation(){
         return rService.findAllRoomReservation();
+    }
+
+    @GetMapping("/score")
+    public List<ScoreDto> score(){
+        return rService.findAllScore();
     }
 
     @PostMapping("/addRoomImg")

@@ -22,15 +22,15 @@ public class AuthorityAspect {
     private void forTweetControllerPackage(){}
     @Pointcut("execution(* com.ispan.dogland.controller.TweetShareController.*(..))")
     private void forTweetShareControllerPackage(){}
-//    @Pointcut("execution(* com.ispan.dogland.controller..*(..))")
-//    private void forRoomControllerPackage(){}
+    @Pointcut("execution(* com.ispan.dogland.controller.RoomController.*(..))")
+    private void forRoomControllerPackage(){}
 //    @Pointcut("execution(* com.ispan.dogland.controller..*(..))")
 //    private void forShopControllerPackage(){}
 //    @Pointcut("execution(* com.ispan.dogland.controller..*(..))")
 //    private void forActivityControllerPackage(){}
 
 
-    @Pointcut("forTweetControllerPackage() || forTweetShareControllerPackage()")// 加上||方法名(要加or)
+    @Pointcut("forTweetControllerPackage() || forTweetShareControllerPackage() || forRoomControllerPackage()")// 加上||方法名(要加or)
     private void forAppFlow(){}
 
 

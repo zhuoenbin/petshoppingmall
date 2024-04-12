@@ -4,6 +4,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.ispan.dogland.model.dao.*;
 import com.ispan.dogland.model.dto.RoomReservationDto;
+import com.ispan.dogland.model.dto.ScoreDto;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.room.Room;
 import com.ispan.dogland.model.entity.room.RoomReservation;
@@ -188,6 +189,12 @@ public class RoomServicelmpl implements RoomService {
             roomReservationDto.setConments(roomReservation.getConments());
             roomReservationDto.setConmentsTime(roomReservation.getConmentsTime());
 
+//            System.out.println("impl" + roomReservation.getReservationId());
+//            System.out.println("impl" + roomReservation.getCancelTime());
+//            System.out.println("=================================================");
+//            System.out.println("impl" + roomReservationDto.getReservationId());
+//            System.out.println("impl" + roomReservationDto.getCancelTime());
+//            System.out.println("=================================================");
             roomReservationDtoList.add(roomReservationDto);
         }
 
@@ -225,6 +232,31 @@ public class RoomServicelmpl implements RoomService {
         }
 
         return roomReservationDtoList;
+    }
+
+    @Override
+    public List<ScoreDto> findAllScore() {
+        List<ScoreDto> scoreDtoList = new ArrayList<>();
+
+        for (RoomReservation roomReservation : reservationRepository.findAll()) {
+
+            ScoreDto scoreDto = new ScoreDto();
+
+            scoreDto.setReservationId(roomReservation.getReservationId());
+            scoreDto.setRoom(roomReservation.getRoom());
+            scoreDto.setUserId(roomReservation.getUser().getUserId());
+            scoreDto.setLastName(roomReservation.getUser().getLastName());
+            scoreDto.setStartTime(roomReservation.getStartTime());
+            scoreDto.setEndTime(roomReservation.getEndTime());
+            scoreDto.setReservationTime(roomReservation.getReservationTime());
+            scoreDto.setStar(roomReservation.getStar());
+            scoreDto.setConments(roomReservation.getConments());
+            scoreDto.setConmentsTime(roomReservation.getConmentsTime());
+
+            scoreDtoList.add(scoreDto);
+        }
+
+        return scoreDtoList;
     }
 
     @Override

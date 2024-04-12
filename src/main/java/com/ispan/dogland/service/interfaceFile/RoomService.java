@@ -1,6 +1,7 @@
 package com.ispan.dogland.service.interfaceFile;
 
 import com.ispan.dogland.model.dto.RoomReservationDto;
+import com.ispan.dogland.model.dto.ScoreDto;
 import com.ispan.dogland.model.entity.room.Room;
 import com.ispan.dogland.model.entity.room.RoomReservation;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,6 +32,8 @@ public interface RoomService {
     public List<Room> findAllroom();
 
     public List<RoomReservationDto> findAllRoomReservation();
+
+    public List<ScoreDto> findAllScore();
 
     public Room findByRoomId(Integer roomId);
 

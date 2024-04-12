@@ -39,6 +39,8 @@ public class DogController {
 
     @PostMapping("/addDogImg")
     public String addDogImg(Integer dogId, @RequestParam MultipartFile dogImgPathCloud) {
+//        System.out.println(dogId);
+//        System.out.println(dogImgPathCloud);
         return dogService.uploadImg(dogId, dogImgPathCloud);
     }
 

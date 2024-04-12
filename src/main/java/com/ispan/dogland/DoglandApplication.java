@@ -10,7 +10,7 @@ import com.ispan.dogland.model.dao.tweet.*;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
-import com.ispan.dogland.model.entity.mongodb.TweetData;
+//import com.ispan.dogland.model.entity.mongodb.TweetData;
 import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductGallery;
 import com.ispan.dogland.model.entity.room.Room;
@@ -55,7 +55,6 @@ public class DoglandApplication {
 											   TweetReportRepository tweetReportRepository,
 											   RoomReservationRepository roomReservationRepository,
 											   RoomService roomService,
-											   TweetDataRepository tweetDataRepository,
 											   TweetController tweetController) {
 		return runner -> {
 

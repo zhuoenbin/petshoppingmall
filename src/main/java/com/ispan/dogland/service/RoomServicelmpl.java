@@ -9,9 +9,18 @@ import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.room.Room;
 import com.ispan.dogland.model.entity.room.RoomReservation;
 import com.ispan.dogland.service.interfaceFile.RoomService;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -24,6 +33,8 @@ import java.util.*;
 @Service
 public class RoomServicelmpl implements RoomService {
 
+    @Value("${gemini_apiKey}")
+    private String apiKey;
     private RoomRepository roomRepository;
     private RoomReservationRepository reservationRepository;
     private UserRepository usersRepository;
@@ -285,5 +296,47 @@ public class RoomServicelmpl implements RoomService {
         roomReservationDto.setConmentsTime(roomReservation.getConmentsTime());
 
         return roomReservationDto;
+    }
+
+    public String geminiCheckComment(String content) {
+        Map<String,String> map = new HashMap<>();
+        String url = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=" + apiKey;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String contentPrompt =content+"。以上是一句客戶的狗在我公司住宿的評論，請幫我把句子分類，種類有:正面服務、負面服務、正面房間、負面房間、正面體驗、負面體驗。若句子為空的，請歸類為無評論。若無法判斷評論是否與住宿相關，請歸類為無相關分類。請回傳一個最相關的，若沒有請不要回傳任何值，請用道德高標";
+        String requestBody = "{"
+                + "\"contents\": [{"
+                + "\"parts\": [{\"text\": \"" + contentPrompt + "\"}]"
+                + "}],"
+                + "\"generationConfig\": {"
+                + "\"temperature\": 0.1,"
+                + "\"topP\": 0.8,"
+                + "\"topK\": 10"
+                + "}"
+                + "}";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, requestEntity, String.class);
+        String responseBody = responseEntity.getBody();
+//        System.out.println(responseBody);
+        try {
+            JSONObject jsonObject = new JSONObject(responseBody);
+            JSONArray candidates = jsonObject.getJSONArray("candidates");
+            if (candidates.length() > 0) {
+                JSONObject candidate = candidates.getJSONObject(0);
+                JSONObject rsContent = candidate.getJSONObject("content");
+                JSONArray parts = rsContent.getJSONArray("parts");
+                if (parts.length() > 0) {
+                    JSONObject part = parts.getJSONObject(0);
+                    System.out.println(part.getString("text"));
+                    return part.getString("text");
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

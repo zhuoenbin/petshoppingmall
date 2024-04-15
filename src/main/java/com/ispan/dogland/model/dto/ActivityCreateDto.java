@@ -37,6 +37,7 @@ public class ActivityCreateDto {
     private Integer currentDogNumber;
     private Integer currentUserNumber;
     private Integer activityCost;
+    private String activityCostDescription;
     private String contactInfo;
     private String contactMail;
     private String contactPhone;
@@ -83,6 +84,14 @@ public class ActivityCreateDto {
         this.contactInfo = contactInfo;
         this.contactMail = contactMail;
         this.contactPhone = contactPhone;
+    }
+
+    public String getActivityCostDescription() {
+        return activityCostDescription;
+    }
+
+    public void setActivityCostDescription(String activityCostDescription) {
+        this.activityCostDescription = activityCostDescription;
     }
 
     public Integer getActivityId() {

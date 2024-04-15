@@ -1,14 +1,10 @@
 package com.ispan.dogland.service;
 
-import com.ispan.dogland.model.dao.CollectionRepository;
-import com.ispan.dogland.model.dao.OrderDetailRepository;
-import com.ispan.dogland.model.dao.OrdersRepository;
-import com.ispan.dogland.model.dao.ShoppingCartRepository;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import com.ispan.dogland.model.dao.*;
 import com.ispan.dogland.model.dao.product.ProductRepository;
-import com.ispan.dogland.model.dto.CollectionDto;
-import com.ispan.dogland.model.dto.OderDto;
-import com.ispan.dogland.model.dto.ProductDto;
-import com.ispan.dogland.model.dto.ShoppingCartDto;
+import com.ispan.dogland.model.dto.*;
 import com.ispan.dogland.model.entity.*;
 import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductGallery;
@@ -21,32 +17,38 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 public class ShopService {
 
     @Autowired
+    private Cloudinary cloudinary;
+    @Autowired
     private ShoppingCartRepository shoppingCartRepository;
     @Autowired
     private ProductRepository productRepository;
     @Autowired
-    OrdersRepository ordersRepository;
+    private OrdersRepository ordersRepository;
     @Autowired
-    OrderDetailRepository orderDetailRepository;
+    private OrderDetailRepository orderDetailRepository;
     @Autowired
     private CollectionRepository collectionRepository;
+    @Autowired
+    private CommentRepository commentRepository;
 
     // 根據頁碼搜尋商品(增加搜尋功能)
     public Page<ProductDto> findProductByPageWithKeyword(Integer pageNumber, String keyword) {
         Page<Product> products;
         if (keyword != null && !keyword.isEmpty()) {
-            products = productRepository.findAllByProductNameContaining(PageRequest.of(pageNumber, 6), keyword);
+            products = productRepository.findAllByProductNameContaining(PageRequest.of(pageNumber, 8), keyword);
         } else {
-            products = productRepository.findAll(PageRequest.of(pageNumber, 6));
+            products = productRepository.findAll(PageRequest.of(pageNumber, 8));
         }
         Page<ProductDto> productDtos = products.map(p -> {
             ProductDto pto = new ProductDto();
@@ -64,7 +66,7 @@ public class ShopService {
 
     //根據類別搜尋商品
     public Page<ProductDto> findByCategoryId(Integer pageNumber,Integer categoryId){
-        Pageable pageable = PageRequest.of(pageNumber, 6);
+        Pageable pageable = PageRequest.of(pageNumber, 8);
         Page<Product> products = productRepository.findByCategoryId(pageable, categoryId);
         Page<ProductDto> productDtos = products.map(p -> {
             ProductDto pto = new ProductDto();
@@ -179,7 +181,8 @@ public class ShopService {
         Orders order = new Orders();
         order.setUsers(user);
         order.setTotalPrice(totalCartPrice);
-        order.setPaymentStatus(1);
+        order.setPaymentStatus(1); //1是已付款
+        order.setPaymentMethod(0); //0是信用卡
         order = ordersRepository.save(order);
 
         for (OderDto oderDto : oderDtos) {
@@ -191,16 +194,6 @@ public class ShopService {
         return order;
     }
 
-    //實作加入收藏愛心(原版)
-//    public Collection addToCollect(Integer userId, Integer productId) {
-//        Users user = new Users(userId);
-//        Product product = new Product(productId);
-//        Collection collection = new Collection();
-//        collection.setUsers(user);
-//        collection.setProduct(product);
-//        collection.setCollect(1);
-//        return collectionRepository.save(collection);
-//    }
     //實作加入收藏愛心
     public Collection addToCollect(Integer userId, Integer productId) {
         Users user = new Users(userId);
@@ -214,6 +207,7 @@ public class ShopService {
             collection.setProduct(product);
             collection.setCollect(1);
             return collectionRepository.save(collection);
+        //返回是2的話，代表已經有加過了，下面這個其實可以不用，已經用前端判斷處理
         } else {
             Collection newCollection = new Collection();
             newCollection.setUsers(user);
@@ -223,12 +217,6 @@ public class ShopService {
         }
     }
 
-    //實作刪除收藏愛心(原版)
-//    public void deleteCollection(Integer userId, Integer productId) {
-//        Users user = new Users(userId);
-//        Product product = new Product(productId);
-//        collectionRepository.deleteByUsersAndProduct(user, product);
-//    }
     //實作刪除收藏愛心
     public void deleteCollection(Integer userId, Integer productId) {
         Users user = new Users(userId);
@@ -237,6 +225,7 @@ public class ShopService {
         Collection existingCollection = collectionRepository.findByUsersAndProduct(user, product);
         if(existingCollection!=null) {
             collectionRepository.deleteByUsersAndProduct(user, product);
+        //返回一個RuntimeException，下面這個其實可以不用，已經用前端判斷處理
         }else {
             throw new RuntimeException("沒有可刪除的收藏");
         }
@@ -278,6 +267,45 @@ public class ShopService {
     public List<Object[]> sumQuantityByProductId() {
         return orderDetailRepository.sumQuantityByProductId();
     }
+
+    //實作新增照片(評論)
+    public Comment addComment(Integer userId,Integer productId,String messageText,Integer ratingValue, MultipartFile file) {
+        try {
+            Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "activityFolder"));
+            Users user = new Users(userId);
+            Product product = new Product(productId);
+
+            Comment comment = new Comment();
+            comment.setUsers(user);
+            comment.setProduct(product);
+            comment.setStar(ratingValue);
+            comment.setCommentary(messageText);
+            comment.setPhotoPath((String) data.get("url"));
+            comment.setStatus("已評論");
+
+            return commentRepository.save(comment);
+        } catch (IOException e) {
+            throw new RuntimeException("Image uploading fail !!");
+        }
+    }
+
+    //實作找尋評論(商品內頁)沒有使用者名字
+    public List<Object[]> findAllCommentByProductId(Integer productId) {
+        return commentRepository.findCommentWithUserByProductId(productId);
+    }
+
+    //這個沒有實作成功
+//        public CommentDto findAllCommentByProductId(Integer productId){
+//        CommentDto commentDto = new CommentDto();
+//        Product product = new Product(productId);
+//        Users user = new Users();
+//        commentDto.setFirstName(user.getFirstName());
+//        commentDto.setLastName(user.getLastName());
+//
+//         Comment comment = commentRepository.findByProduct(product);
+//         BeanUtils.copyProperties(comment, commentDto);
+//         return commentDto;
+//    }
 
     //------------------------LinePay------------------------
     //Hmac 簽章

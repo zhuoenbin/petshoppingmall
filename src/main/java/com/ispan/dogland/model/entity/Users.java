@@ -4,10 +4,8 @@ package com.ispan.dogland.model.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ispan.dogland.model.entity.room.RoomReservation;
 import com.ispan.dogland.model.entity.tweet.Tweet;
-import com.ispan.dogland.model.entity.tweet.TweetNotification;
 import com.ispan.dogland.model.entity.tweet.TweetReport;
 import jakarta.persistence.*;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -51,6 +49,9 @@ public class Users {
 
     @OneToMany(mappedBy = "users")
     private List<Collection> collections;
+
+    @OneToMany(mappedBy = "users")
+    private List<Comment> comments;
 
     @OneToMany(mappedBy = "users")
     private List<Orders> orders;
@@ -287,6 +288,14 @@ public class Users {
 
     public void setCollections(List<Collection> collections) {
         this.collections = collections;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 
     @Override

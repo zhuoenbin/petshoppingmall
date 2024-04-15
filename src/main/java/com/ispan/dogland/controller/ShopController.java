@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ispan.dogland.model.dto.*;
+import com.ispan.dogland.model.entity.Comment;
 import com.ispan.dogland.model.entity.Orders;
 import com.ispan.dogland.model.entity.ShoppingCart;
 import com.ispan.dogland.model.entity.Collection;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -133,16 +135,6 @@ public class ShopController {
         return shopService.checkByCollection(loggedInMember.getUserId(),productId);
     }
 
-    //拿到收藏的商品(原版)
-//    @RequestMapping("/collection")
-//    public List<CollectionDto> getCollectByMemberId( HttpSession session){
-//        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
-//        if(loggedInMember == null){
-//            throw new RuntimeException("未登入錯誤");
-//        }
-//        List<CollectionDto> collects = shopService.findCollectionByUserId(loggedInMember.getUserId());
-//        return collects;
-//    }
     //拿到收藏的商品
     @GetMapping("/collection/{pageNumber}")
     public Page<CollectionDto> getCollectByMemberId(HttpSession session,@PathVariable Integer pageNumber){
@@ -155,9 +147,29 @@ public class ShopController {
     }
 
     //實作銷售數量
-    @GetMapping("/orderDetail/total")
+    @GetMapping("/orderDetail/salesVolume")
     public List<Object[]> sumQuantityByProductId() {
         return shopService.sumQuantityByProductId();
+    }
+
+    //實作新增照片(評論)
+    @PostMapping("/addComment")
+    public Comment addProduct(HttpSession session,
+                              @RequestParam("productId") Integer productId,
+                              @RequestParam("messageText") String messageText,
+                              @RequestParam("ratingValue") Integer ratingValue,
+                              @RequestParam("productImage") MultipartFile productImage) {
+        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+        if(loggedInMember == null){
+            throw new RuntimeException("未登入錯誤");
+        }
+        return shopService.addComment(loggedInMember.getUserId(),productId,messageText,ratingValue,productImage);
+    }
+
+    //實作找尋評論(商品內頁)
+    @GetMapping("/findAllComment/{productId}")
+    public List<Object[]> findAllCommentByProductId(@PathVariable Integer productId) {
+        return shopService.findAllCommentByProductId(productId);
     }
 
     //-----------------------------LinePay----------------------------------

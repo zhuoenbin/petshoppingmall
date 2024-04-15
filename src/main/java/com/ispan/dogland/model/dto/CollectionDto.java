@@ -1,16 +1,14 @@
 package com.ispan.dogland.model.dto;
 
-import com.ispan.dogland.model.entity.product.Product;
 import java.util.List;
 
-public class OderDto {
+public class CollectionDto {
 
     private Integer productId;
     private String productName;
-    private Integer quantity;
     private Integer unitPrice;
-    private Integer totalPrice;
-//    private List<String> imgPath;
+    private Integer quantity;
+    private List<String> imgPath;
 
     public Integer getProductId() {
         return productId;
@@ -28,14 +26,6 @@ public class OderDto {
         this.productName = productName;
     }
 
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
     public Integer getUnitPrice() {
         return unitPrice;
     }
@@ -44,20 +34,20 @@ public class OderDto {
         this.unitPrice = unitPrice;
     }
 
-    public Integer getTotalPrice() {
-        return totalPrice;
+    public Integer getQuantity() {
+        return quantity;
     }
 
-    public void setTotalPrice(Integer totalPrice) {
-        this.totalPrice = totalPrice;
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
-    //    public List<String> getImgPath() {
-//        return imgPath;
-//    }
-//
-//    public void setImgPath(List<String> imgPath) {
-//        this.imgPath = imgPath;
-//    }
+    public List<String> getImgPath() {
+        return imgPath;
+    }
+
+    public void setImgPath(List<String> imgPath) {
+        this.imgPath = imgPath;
+    }
 
 }

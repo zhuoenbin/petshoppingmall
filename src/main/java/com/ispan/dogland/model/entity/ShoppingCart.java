@@ -33,6 +33,7 @@ public class ShoppingCart {
 
 
     public ShoppingCart() {
+        this.createdTime = new Date();
     }
 
     public Integer getShoppingCartId() {

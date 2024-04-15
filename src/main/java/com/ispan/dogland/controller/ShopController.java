@@ -3,36 +3,22 @@ package com.ispan.dogland.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ispan.dogland.model.dao.OrderDetailRepository;
-import com.ispan.dogland.model.dao.OrdersRepository;
-import com.ispan.dogland.model.dao.product.ProductRepository;
-import com.ispan.dogland.model.dto.OderDto;
-import com.ispan.dogland.model.dto.Passport;
-import com.ispan.dogland.model.dto.ProductDto;
-import com.ispan.dogland.model.dto.ShoppingCartDto;
-import com.ispan.dogland.model.entity.OrderDetail;
+import com.ispan.dogland.model.dto.*;
+import com.ispan.dogland.model.entity.Comment;
 import com.ispan.dogland.model.entity.Orders;
 import com.ispan.dogland.model.entity.ShoppingCart;
-import com.ispan.dogland.model.entity.Users;
-import com.ispan.dogland.model.entity.product.Product;
-import com.ispan.dogland.model.entity.product.ProductCategory;
-import com.ispan.dogland.model.entity.product.ProductGallery;
-import com.ispan.dogland.model.vo.CheckoutPaymentRequestForm;
-import com.ispan.dogland.model.vo.ProductForm;
-import com.ispan.dogland.model.vo.ProductPackageForm;
-import com.ispan.dogland.model.vo.RedirectUrls;
+import com.ispan.dogland.model.entity.Collection;
+import com.ispan.dogland.model.vo.*;
 import com.ispan.dogland.service.ShopService;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-
+import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -42,19 +28,6 @@ public class ShopController {
     private String allTransactionId;  //用在linepay的transactionId
     @Autowired
     private ShopService shopService;
-    @Autowired
-    private OrdersRepository ordersRepository;
-    @Autowired
-    private OrderDetailRepository orderDetailRepository;
-    @Autowired
-    private ProductRepository productRepository;
-
-    //商品列表與商品分頁(沒有加關鍵字查詢)目前沒用到
-    @GetMapping("/products/{pageNumber}")
-    public Page<ProductDto> findProductByPage(@PathVariable Integer pageNumber){
-        Page<ProductDto> productDtos = shopService.findProductByPage(pageNumber);
-        return productDtos;
-    }
 
     //商品列表與商品分頁(增加搜尋功能)
     @GetMapping("/products-keyword/{pageNumber}")
@@ -78,28 +51,6 @@ public class ShopController {
         List<ProductDto> productDtos = shopService.findByProductPage(productId);
         return productDtos;
     }
-    
-    //加入購物車(ShopPage)
-//    @RequestMapping("/product/add/{productId}")
-//    public ShoppingCart addOneProductToCart(@PathVariable Integer productId, HttpSession session){
-//        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
-//        if(loggedInMember == null){
-//            throw new RuntimeException("未登入錯誤");
-//        }
-//        return shopService.addOneProductToCart(loggedInMember.getUserId(),productId);
-//    }
-
-//    //加入購物車(ProductPage)
-//    @RequestMapping("/productPage/add/{productId}/{quantity}")
-//    public ShoppingCart pageAddToCart(@PathVariable Integer productId,
-//                                      @PathVariable Integer quantity,
-//                                      HttpSession session){
-//        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
-//        if(loggedInMember == null){
-//            throw new RuntimeException("未登入錯誤");
-//        }
-//        return shopService.pageAddToCart(loggedInMember.getUserId(),productId,quantity);
-//    }
 
     ///加入購物車(totalAddToCart)
     @RequestMapping("/totalAddToCart/add/{productId}")
@@ -135,20 +86,93 @@ public class ShopController {
         return shopService.deleteProductFromCart(loggedInMember.getUserId(),productId);
     }
 
-    //加入訂單
-    @PostMapping("/order")
-    public void getCartData(@RequestBody List<OderDto> oderDtos, HttpSession session) {
+    //結帳後刪除購物車(依照會員ID)
+    @RequestMapping("/product/deleteByUser")
+    public List<ShoppingCart> deleteCartByUser(HttpSession session){
         Passport loggedInMember = (Passport) session.getAttribute("loginUser");
-        Orders order = shopService.addorder(loggedInMember.getUserId());
-
-        for (OderDto oderDto : oderDtos) {
-            OrderDetail orderDetail = new OrderDetail();
-            orderDetail.setOrders(order);
-            BeanUtils.copyProperties(oderDto, orderDetail);
-            orderDetailRepository.save(orderDetail);
+        if(loggedInMember == null){
+            throw new RuntimeException("未登入錯誤");
         }
+        return shopService.deleteCartByUser(loggedInMember.getUserId());
     }
 
+    //加入訂單及訂單明細
+    @PostMapping("/order/{totalCartPrice}")
+    public void getCartData(@RequestBody List<OderDto> oderDtos,
+                            @PathVariable Integer totalCartPrice,
+                            HttpSession session) {
+        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+        Orders order = shopService.addOrder(loggedInMember.getUserId(), oderDtos,totalCartPrice);
+    }
+
+    //實作加入收藏愛心
+    @RequestMapping("/addCollect/{productId}")
+    public Collection AddToCollect(@PathVariable Integer productId, HttpSession session){
+        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+        if(loggedInMember == null){
+            throw new RuntimeException("未登入錯誤");
+        }
+        return shopService.addToCollect(loggedInMember.getUserId(),productId);
+    }
+
+    //實作刪除收藏愛心
+    @RequestMapping("/deleteCollect/{productId}")
+    public void DeleteToCollect(@PathVariable Integer productId, HttpSession session){
+        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+        if(loggedInMember == null){
+            throw new RuntimeException("未登入錯誤");
+        }
+        shopService.deleteCollection(loggedInMember.getUserId(),productId);
+    }
+
+    //實作檢查愛心
+    @RequestMapping("/checkCollect/{productId}")
+    public int checkCollect(@PathVariable Integer productId, HttpSession session) {
+        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+        if(loggedInMember == null){
+            throw new RuntimeException("未登入錯誤");
+        }
+        return shopService.checkByCollection(loggedInMember.getUserId(),productId);
+    }
+
+    //拿到收藏的商品
+    @GetMapping("/collection/{pageNumber}")
+    public Page<CollectionDto> getCollectByMemberId(HttpSession session,@PathVariable Integer pageNumber){
+        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+        if(loggedInMember == null){
+            throw new RuntimeException("未登入錯誤");
+        }
+        Page<CollectionDto> collects = shopService.findCollectionByUserId(loggedInMember.getUserId(),pageNumber);
+        return collects;
+    }
+
+    //實作銷售數量
+    @GetMapping("/orderDetail/salesVolume")
+    public List<Object[]> sumQuantityByProductId() {
+        return shopService.sumQuantityByProductId();
+    }
+
+    //實作新增照片(評論)
+    @PostMapping("/addComment")
+    public Comment addProduct(HttpSession session,
+                              @RequestParam("productId") Integer productId,
+                              @RequestParam("messageText") String messageText,
+                              @RequestParam("ratingValue") Integer ratingValue,
+                              @RequestParam("productImage") MultipartFile productImage) {
+        Passport loggedInMember = (Passport) session.getAttribute("loginUser");
+        if(loggedInMember == null){
+            throw new RuntimeException("未登入錯誤");
+        }
+        return shopService.addComment(loggedInMember.getUserId(),productId,messageText,ratingValue,productImage);
+    }
+
+    //實作找尋評論(商品內頁)
+    @GetMapping("/findAllComment/{productId}")
+    public List<Object[]> findAllCommentByProductId(@PathVariable Integer productId) {
+        return shopService.findAllCommentByProductId(productId);
+    }
+
+    //-----------------------------LinePay----------------------------------
     @PostMapping("/linepay/{totalPrice}")
     public String sendlinepay(@PathVariable String totalPrice) {
         CheckoutPaymentRequestForm form = new CheckoutPaymentRequestForm();
@@ -206,6 +230,42 @@ public class ShopController {
             System.out.println("transactionId =>" + transactionId);
 
             return paymentUrl;  // 轉址到獲取的 URL
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null; // 如果發生異常，返回 null 或者其他適當的值
+    }
+
+    @PostMapping("/confirm/{totalPrice}")
+    public String sendconfirm(@PathVariable String totalPrice) {
+        //ConfirmAPI
+        String ChannelId="2003912658";  //這個要用自己的
+        String ChannelSecret = "b852dee8fbe5117039966646d0ff44e5";  //這個要用自己的
+        String requestBody;
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            ConfirmData confirmData =new ConfirmData();
+            confirmData.setAmount(new BigDecimal(totalPrice));
+            confirmData.setCurrency("TWD");
+            String confirmNonce = UUID.randomUUID().toString();
+            String confirmUrl ="/v3/payments/" + allTransactionId + "/confirm";
+            requestBody = objectMapper.writeValueAsString(confirmData);
+
+            String confirmSignature = ShopService.encrypt(ChannelSecret, ChannelSecret + confirmUrl + requestBody + confirmNonce);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-LINE-ChannelId", ChannelId);
+            headers.set("X-LINE-Authorization-Nonce", confirmNonce);
+            headers.set("X-LINE-Authorization", confirmSignature);
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+            String linePayApiUrl = "https://sandbox-api-pay.line.me/v3/payments/" + allTransactionId + "/confirm"; //transactionId
+            String response = restTemplate.postForObject(linePayApiUrl, requestEntity, String.class);
+
+            return "sellerok";
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

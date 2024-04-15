@@ -93,6 +93,8 @@ public class Orders {
 //    }
 
     public Orders() {
+        // 初始化日期欄位
+        this.orderDate = new Date(); // 設定訂單日期為當前日期和時間
     }
 
     public Integer getOrderId() {

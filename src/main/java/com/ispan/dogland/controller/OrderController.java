@@ -41,7 +41,7 @@ public class OrderController {
         String aioCheckOutALLForm = os.ecpayCheckout(price, url);
 
         return aioCheckOutALLForm;
-        }
+    }
 
     @GetMapping("/{orderId}/orderDetails")
     public List<OrderDetail> getDetailsByOrderId(@PathVariable Integer orderId, HttpSession session){

@@ -63,12 +63,12 @@ public class EmployeeController {
 
 
     @GetMapping("/roomReservation")
-    public List<RoomReservationDto> reservation(){
+    public List<RoomReservationDto> reservation() {
         return rService.findAllRoomReservation();
     }
 
     @GetMapping("/score")
-    public List<ScoreDto> score(){
+    public List<ScoreDto> score() {
         return rService.findAllScore();
     }
 
@@ -92,18 +92,18 @@ public class EmployeeController {
         Tweet tweet = tweetService.banTweet(tweetId);
         //送通知
         Integer userId = tweet.getUser().getUserId();
-        tweetService.sendBanTweetNotificationToUser(userId,tweet);
+        tweetService.sendBanTweetNotificationToUser(userId, tweet);
         //檢舉單號加入員工
-        Passport emp = (Passport)session.getAttribute("loginUser");
-        tweetService.addEmployeeToReport(reportsId,emp.getUserId());
+        Passport emp = (Passport) session.getAttribute("loginUser");
+        tweetService.addEmployeeToReport(reportsId, emp.getUserId());
         return emp.getUsername();
     }
 
     @GetMapping("/noBanTweet/{tweetId}/{reportsId}")
     public String noBanTweet(@PathVariable Integer tweetId, @PathVariable Integer reportsId, HttpSession session) {
         //檢舉單號加入員工
-        Passport emp = (Passport)session.getAttribute("loginUser");
-        tweetService.addEmployeeToReport(reportsId,emp.getUserId());
+        Passport emp = (Passport) session.getAttribute("loginUser");
+        tweetService.addEmployeeToReport(reportsId, emp.getUserId());
         return emp.getUsername();
     }
 
@@ -111,8 +111,9 @@ public class EmployeeController {
     public Employee getEmpByReportId(@PathVariable Integer reportId) {
         return tweetService.findEmployeeByReportId(reportId);
     }
+
     @GetMapping("/getCategory")
-    public List<ProductCategory> getCategory(){
+    public List<ProductCategory> getCategory() {
         return es.findCategories();
     }
 
@@ -124,17 +125,19 @@ public class EmployeeController {
                                              @RequestParam("productDescription") String productDescription,
                                              @RequestParam("stock") Integer stock,
                                              @RequestParam("productImage") MultipartFile productImage,
-                                             HttpSession hsession){
+                                             HttpSession hsession) {
+        //新增商品
         try {
-            Map cloudData = this.cloudinary.uploader().upload(productImage.getBytes(), ObjectUtils.asMap("folder","product"));
+            Map cloudData = this.cloudinary.uploader().upload(productImage.getBytes(), ObjectUtils.asMap("folder", "product"));
             String url = (String) cloudData.get("url");
 
-            es.addNewProduct(productName,categoryId,unitPrices,productDescription,stock,url);
+            es.addNewProduct(productName, categoryId, unitPrices, productDescription, stock, url);
 
             return ResponseEntity.ok("Product上架成功");
         } catch (IOException e) {
             throw new RuntimeException(e);
-
+        }
+    }
 
 
     @GetMapping("/sendTweetContentsToFlask")
@@ -172,16 +175,13 @@ public class EmployeeController {
         return result;
     }
 
-
     @GetMapping("/getTweetData")
     public TweetData getTweetData() {
         return tweetService.getLastTweetData();
     }
 
-
     @GetMapping("/showOrderCase")
-    public List<OrderCancel> getCase(){
+    public List<OrderCancel> getCase() {
         return es.findOrderCases();
     }
-
 }

@@ -47,10 +47,12 @@ public class RoomReservation {
 
     private Date conmentsTime;
 
+    private String conmentsClass;
+
     public RoomReservation() {
     }
 
-    public RoomReservation(Integer reservationId, Room room, Users user, Dog dog, Date startTime, Date endTime, Integer totalPrice, Date reservationTime, Date cancelTime, String cancelDirection, String paymentMethod, String paymentStatus, Integer star, String conments, Date conmentsTime) {
+    public RoomReservation(Integer reservationId, Room room, Users user, Dog dog, Date startTime, Date endTime, Integer totalPrice, Date reservationTime, Date cancelTime, String cancelDirection, String paymentMethod, String paymentStatus, Integer star, String conments, Date conmentsTime, String conmentsClass) {
         this.reservationId = reservationId;
         this.room = room;
         this.user = user;
@@ -66,6 +68,7 @@ public class RoomReservation {
         this.star = star;
         this.conments = conments;
         this.conmentsTime = conmentsTime;
+        this.conmentsClass = conmentsClass;
     }
 
     public Integer getReservationId() {
@@ -188,6 +191,14 @@ public class RoomReservation {
         this.conmentsTime = conmentsTime;
     }
 
+    public String getConmentsClass() {
+        return conmentsClass;
+    }
+
+    public void setConmentsClass(String conmentsClass) {
+        this.conmentsClass = conmentsClass;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("RoomReservation{");
@@ -206,6 +217,7 @@ public class RoomReservation {
         sb.append(", star=").append(star);
         sb.append(", conments='").append(conments).append('\'');
         sb.append(", conmentsTime=").append(conmentsTime);
+        sb.append(", conmentsClass='").append(conmentsClass).append('\'');
         sb.append('}');
         return sb.toString();
     }

@@ -16,6 +16,7 @@ import com.ispan.dogland.model.entity.product.ProductGallery;
 import com.ispan.dogland.model.entity.room.Room;
 import com.ispan.dogland.model.entity.room.RoomReservation;
 import com.ispan.dogland.model.entity.tweet.*;
+import com.ispan.dogland.service.ActivityService;
 import com.ispan.dogland.service.interfaceFile.AccountService;
 import com.ispan.dogland.service.interfaceFile.RoomService;
 import com.ispan.dogland.service.interfaceFile.TweetService;
@@ -24,8 +25,10 @@ import jakarta.persistence.PersistenceContext;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -38,8 +41,6 @@ public class DoglandApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(DoglandApplication.class, args);
 	}
-
-
 	//測試方法
 	@Bean
 	public CommandLineRunner commandLineRunner(UserRepository userRepository,

@@ -14,23 +14,31 @@ import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.activity.*;
 
+import freemarker.template.TemplateException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -39,6 +47,10 @@ import java.util.*;
 public class ActivityService {
     @Value("${gemini_apiKey}")
     private String apiKey;
+    @Autowired
+    private JavaMailSender mailSender;
+    @Autowired
+    freemarker.template.Configuration freemarkerConfig;
     @Autowired
     private Cloudinary cloudinary;
     @Autowired
@@ -1070,6 +1082,43 @@ public class ActivityService {
         }
         return dtoList;
     }
+
+    //===========官方寄送參加成功模板信件============
+    public void sendJoinSuccessTemplateMail(Integer userId, Integer activityId)  {
+
+        Users user= userRepository.findByUserId(userId);
+        String userEmail = user.getUserEmail();
+        String firstName = user.getFirstName();
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        String activityTitle = activity.getActivityTitle();
+        ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
+        String imgUrl = main.getGalleryImgUrl();
+
+
+            System.out.println("hi");
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            try {
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+                helper.setFrom("ispaneeit80@gmail.com");
+                helper.setTo(userEmail);
+                helper.setSubject("Doggy Paradise活動參加成功通知信件");
+
+                Map<String, Object> model = new HashMap<>();
+                model.put("userName",firstName);
+                model.put("activityTitle",activityTitle);
+                model.put("activityId",Integer.toString(activityId));
+                model.put("imgUrl",imgUrl);
+                String welcomeMail = FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerConfig.getTemplate("ActivityJoinSuccess.html"), model);
+
+                helper.setText(welcomeMail, true);
+
+                mailSender.send(mimeMessage);
+            } catch (MessagingException | IOException | TemplateException e) {
+                throw new RuntimeException(e);
+            }
+
+    }
+
 
 
 

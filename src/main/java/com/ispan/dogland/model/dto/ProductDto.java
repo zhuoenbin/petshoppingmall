@@ -10,6 +10,7 @@ public class ProductDto {
     private Integer categoryId;
     private Integer stock;
     private String mainImgPath;
+    private String productDescription;
     private List<String> imgPath;
 
     public Integer getProductId() {
@@ -66,6 +67,14 @@ public class ProductDto {
 
     public void setImgPath(List<String> imgPath) {
         this.imgPath = imgPath;
+    }
+
+    public String getProductDescription() {
+        return productDescription;
+    }
+
+    public void setProductDescription(String productDescription) {
+        this.productDescription = productDescription;
     }
 
     public String getMainImgPath() {

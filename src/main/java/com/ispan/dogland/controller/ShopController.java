@@ -172,6 +172,12 @@ public class ShopController {
         return shopService.findAllCommentByProductId(productId);
     }
 
+    @GetMapping("/findAllCommentAndStar/{productId}/{star}")
+    public List<Object[]> findCommentWithUserByProductIdAndStar(@PathVariable Integer productId,
+                                                                @PathVariable Integer star) {
+        return shopService.findCommentWithUserByProductIdAndStar(productId,star);
+    }
+
     //-----------------------------LinePay----------------------------------
     @PostMapping("/linepay/{totalPrice}")
     public String sendlinepay(@PathVariable String totalPrice) {

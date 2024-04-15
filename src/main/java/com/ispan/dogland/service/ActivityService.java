@@ -2,6 +2,8 @@ package com.ispan.dogland.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
@@ -12,23 +14,43 @@ import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.activity.*;
 
+import freemarker.template.TemplateException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Transactional
 public class ActivityService {
+    @Value("${gemini_apiKey}")
+    private String apiKey;
+    @Autowired
+    private JavaMailSender mailSender;
+    @Autowired
+    freemarker.template.Configuration freemarkerConfig;
     @Autowired
     private Cloudinary cloudinary;
     @Autowired
@@ -45,6 +67,8 @@ public class ActivityService {
     private VenueActivityRepository activityRepository;
     @Autowired
     private LikedActivityRepository likedRepository;
+    @Autowired
+    private CommentActivityRepository commentRepository;
     @Autowired
     private ActivityTypeRepository typeRepository;
     @Autowired
@@ -200,6 +224,21 @@ public class ActivityService {
         newData.setVenueId(save.getVenue().getVenueId());
         return  newData;
     }
+    public ActivityCreateDto offCreateNewActivity(ActivityCreateDto createDto){
+        VenueActivity activity = new VenueActivity();
+        BeanUtils.copyProperties(createDto,activity);
+        activity.setActivityType(typeRepository.findByActivityTypeId(createDto.getActivityTypeId()));
+        activity.setVenue(venueRepository.findByVenueId(createDto.getVenueId()));
+        activity.setEmployee(employeeRepository.findByEmployeeId(createDto.getEmployeeId()));
+        VenueActivity save = activityRepository.save(activity);
+        ActivityCreateDto dto = new ActivityCreateDto();
+        BeanUtils.copyProperties(save,dto);
+        dto.setActivityTypeId(createDto.getActivityTypeId());
+        dto.setVenueId(createDto.getVenueId());
+        dto.setEmployeeId(createDto.getEmployeeId());
+        return dto;
+    }
+
     //===============新增活動照片===================
     public ActivityGallery addTitleImg(MultipartFile file,Integer activityId){
         //上傳到producutFolder裡
@@ -260,6 +299,10 @@ public class ActivityService {
             ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
             ab.setGalleryImgUrl(main.getGalleryImgUrl());
 
+            List<LikedActivity> likeList = likedRepository.findByVenueActivity(activity);
+            Integer likedTime = likeList.size();
+            ab.setLikedTime(likedTime);
+
             ab.setActivityTypeName(a.getActivityType().getActivityTypeName());
             ab.setVenueName(a.getVenue().getVenueName());
             return ab;
@@ -282,6 +325,9 @@ public class ActivityService {
             VenueActivity activity = activityRepository.findByActivityId(activityId);
             ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
 
+            List<LikedActivity> likeList = likedRepository.findByVenueActivity(activity);
+            Integer likedTime = likeList.size();
+            brief.setLikedTime(likedTime);
             brief.setGalleryImgUrl(main.getGalleryImgUrl());
             return brief;
         });
@@ -547,6 +593,9 @@ public class ActivityService {
             VenueActivity activity = activityRepository.findByActivityId(activityId);
             ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
             ab.setGalleryImgUrl(main.getGalleryImgUrl());
+            List<LikedActivity> likeList = likedRepository.findByVenueActivity(activity);
+            Integer likedTime = likeList.size();
+            ab.setLikedTime(likedTime);
 
             ab.setActivityTypeName(a.getActivityType().getActivityTypeName());
             ab.setVenueName(a.getVenue().getVenueName());
@@ -568,6 +617,9 @@ public class ActivityService {
             VenueActivity activity = activityRepository.findByActivityId(activityId);
             ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
             ab.setGalleryImgUrl(main.getGalleryImgUrl());
+            List<LikedActivity> likeList = likedRepository.findByVenueActivity(activity);
+            Integer likedTime = likeList.size();
+            ab.setLikedTime(likedTime);
 
             ab.setActivityTypeName(a.getActivityType().getActivityTypeName());
             ab.setVenueName(a.getVenue().getVenueName());
@@ -587,6 +639,9 @@ public class ActivityService {
             VenueActivity activity = activityRepository.findByActivityId(activityId);
             ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
             ab.setGalleryImgUrl(main.getGalleryImgUrl());
+            List<LikedActivity> likeList = likedRepository.findByVenueActivity(activity);
+            Integer likedTime = likeList.size();
+            ab.setLikedTime(likedTime);
 
             ab.setActivityTypeName(a.getActivityType().getActivityTypeName());
             ab.setVenueName(a.getVenue().getVenueName());
@@ -608,6 +663,9 @@ public class ActivityService {
             VenueActivity activity = activityRepository.findByActivityId(activityId);
             ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
             ab.setGalleryImgUrl(main.getGalleryImgUrl());
+            List<LikedActivity> likeList = likedRepository.findByVenueActivity(activity);
+            Integer likedTime = likeList.size();
+            ab.setLikedTime(likedTime);
 
             ab.setActivityTypeName(a.getActivityType().getActivityTypeName());
             ab.setVenueName(a.getVenue().getVenueName());
@@ -616,6 +674,7 @@ public class ActivityService {
         return briefs;
     }
 
+    //===============以區間找現在活動===============
     public List<ActivityBrief> officialActManagerByStatusNot(Date start,Date end){
         List<VenueActivity> allEnd = activityRepository.findByActivityStatusNotAndActivityDateBetweenOrderByActivityDateAsc("活動已結束", start, end);
         List<ActivityBrief> abList = new ArrayList<>();//裝資料的
@@ -623,6 +682,9 @@ public class ActivityService {
             ActivityBrief brief = new ActivityBrief();
 
             BeanUtils.copyProperties(one,brief);//venueActivity
+            List<LikedActivity> likeList = likedRepository.findByVenueActivity(one);
+            Integer likedTime = likeList.size();
+            brief.setLikedTime(likedTime);
             brief.setVenueName(one.getVenue().getVenueName());
             brief.setActivityTypeName(one.getActivityType().getActivityTypeName());
             ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(one, "main");
@@ -632,13 +694,20 @@ public class ActivityService {
         return abList;
     }
 
-    public List<ActivityBrief> officialActManagerByStatus(Date start,Date end){
-        List<VenueActivity> allEnd = activityRepository.findByActivityStatusNotAndActivityDateBetweenOrderByActivityDateAsc("活動已結束", start, end);
-        List<ActivityBrief> abList = new ArrayList<>();//裝資料的
+    //===============以區間找過去活動===============
+    public List<ActivityPastBrief> officialActManagerByStatus(Date start,Date end){
+        List<VenueActivity> allEnd = activityRepository.findByActivityStatusAndActivityDateBetweenOrderByActivityDateAsc("活動已結束", start, end);
+        List<ActivityPastBrief> abList = new ArrayList<>();//裝資料的
         for(VenueActivity one:allEnd){
-            ActivityBrief brief = new ActivityBrief();
+            ActivityPastBrief brief = new ActivityPastBrief();
 
             BeanUtils.copyProperties(one,brief);//venueActivity
+            List<LikedActivity> likeList = likedRepository.findByVenueActivity(one);
+            Integer likedTime = likeList.size();
+            brief.setLikedTime(likedTime);
+            List<CommentActivity> commentList=commentRepository.findByVenueActivity(one);
+            Integer commentTime = commentList.size();
+            brief.setCommentedTime(commentTime);
             brief.setVenueName(one.getVenue().getVenueName());
             brief.setActivityTypeName(one.getActivityType().getActivityTypeName());
             ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(one, "main");
@@ -648,6 +717,407 @@ public class ActivityService {
         return abList;
     }
 
+    //===============找某個活動 過去/現在 活動所有參加者跟狗資料===============
+    public List<ActOfficialAttendeeDto> findOneActAttendeeList(Integer activityId,String joinStatus){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        List<ActivityUserJoined> userJoinedList = userJoinedRepository.findByVenueActivityAndJoinedStatusNot(activity, joinStatus);
+        List<ActOfficialAttendeeDto> dtoList=new ArrayList<>();
+        for(ActivityUserJoined userJoined:userJoinedList){
+            ActOfficialAttendeeDto dto=new ActOfficialAttendeeDto();
+            //userJoined 資料
+            BeanUtils.copyProperties(userJoined,dto);
+            //activity 資料
+            dto.setActivityId(activityId);
+            //user 資料
+            Users user = userJoined.getUser();
+            dto.setUserId(user.getUserId());
+            dto.setFirstName(user.getFirstName());
+            //dog 資料
+            List<Dog> dogList = findUserDogsAttendThisActivity(user.getUserId(), activityId);
+            List<String> dogNameList =new ArrayList<>();
+            List<String> dogProfileList =new ArrayList<>();
+            for(Dog dog:dogList){
+                String img = dog.getDogImgPathCloud();
+                String dogName = dog.getDogName();
+                dogNameList.add(dogName);
+                dogProfileList.add(img);
+            }
+            dto.setDogNameList(dogNameList);
+            dto.setDogProfileList(dogProfileList);
+            dtoList.add(dto);
+        }
+        return dtoList;
+    }
+
+    //===============activityShowPage===============
+    public ActivityShowInfo getActivityPageInfo(Integer activityId){
+        //activity
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        String activityTypeName = activity.getActivityType().getActivityTypeName();
+        Integer venueId = activity.getVenue().getVenueId();
+        String venueName = activity.getVenue().getVenueName();
+        //like
+        List<LikedActivity> liked = likedRepository.findByVenueActivity(activity);
+        Integer likedTime = liked.size();
+        //gallery
+        List<ActivityGallery> galleryList = galleryRepository.findByVenueActivity(activity);
+        List<ActivityGalleryDto> imgList = new ArrayList<>();
+        for(ActivityGallery img:galleryList){
+            ActivityGalleryDto dto = new ActivityGalleryDto();
+            BeanUtils.copyProperties(img,dto);
+            imgList.add(dto);
+        }
+
+        ActivityShowInfo showInfo = new ActivityShowInfo();
+        BeanUtils.copyProperties(activity,showInfo);
+        showInfo.setActivityTypeName(activityTypeName);
+        showInfo.setVenueId(venueId);
+        showInfo.setVenueName(venueName);
+        showInfo.setLikedTime(likedTime);
+        showInfo.setActivityImgList(imgList);
+        return showInfo;
+    }
+
+    //===============likedActList===============
+    public List<Integer> usersLikedActsIdList(Integer userId){
+        Users user = userRepository.findByUserId(userId);
+        List<LikedActivity> likedActivityList = likedRepository.findByUser(user);
+        List<Integer> activityIdList =new ArrayList<>();
+        if(!likedActivityList.isEmpty()){
+            for(LikedActivity act:likedActivityList){
+                Integer activityId = act.getVenueActivity().getActivityId();
+                activityIdList.add(activityId);
+            }
+            return activityIdList;
+        }else{
+            return activityIdList;
+        }
+    }
+    //===============likedOneAct===============
+    public Boolean userLikeAnAct(Integer activityId,Integer userId){
+        Users users = userRepository.findByUserId(userId);
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        LikedActivity likedActivity = new LikedActivity();
+        likedActivity.setUser(users);
+        likedActivity.setVenueActivity(activity);
+        likedRepository.save(likedActivity);
+        return true;
+    }
+
+    public Boolean userDislikedAnAct(Integer activityId,Integer userId){
+        Users users = userRepository.findByUserId(userId);
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        LikedActivity fromLiked = likedRepository.findByUserAndVenueActivity(users, activity);
+        if(fromLiked!=null){
+            likedRepository.delete(fromLiked);
+            return true;
+        }
+        return false;
+    }
+
+    //===============myFavoriteWall===============
+    public List<ActivityBrief> userFavoriteWall(Integer userId){
+        Users users = userRepository.findByUserId(userId);
+        List<LikedActivity> likedActivityList = likedRepository.findByUser(users);
+        List<ActivityBrief> dtoList = new ArrayList<>();
+        if(!likedActivityList.isEmpty()){
+            for(LikedActivity like:likedActivityList){
+                ActivityBrief dto = new ActivityBrief();
+                VenueActivity activity = like.getVenueActivity();
+                List<LikedActivity> likeList = likedRepository.findByVenueActivity(activity);
+                Integer likedTime = likeList.size();
+
+                BeanUtils.copyProperties(activity,dto);
+                dto.setLikedTime(likedTime);
+                dto.setActivityTypeName(activity.getActivityType().getActivityTypeName());
+                dto.setVenueName(activity.getVenue().getVenueName());
+                ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
+                dto.setGalleryImgUrl(main.getGalleryImgUrl());
+                dtoList.add(dto);
+            }
+            return dtoList;
+        }else{
+            return null;
+        }
+    }
+
+    //===============更新主題照片===================
+    public Boolean updateTitleImg(Integer activityId,Integer galleryId, MultipartFile file)  {
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        ActivityGallery gallery = galleryRepository.findByGalleryId(galleryId);
+        if(gallery!=null){
+            try {
+                String oldPublicId = gallery.getGalleryPublicId();
+                //刪除Cloudinary中的圖片
+                Map delResult = cloudinary.uploader().destroy(oldPublicId, ObjectUtils.emptyMap());
+                System.out.println("Deleted image from Cloudinary: " + delResult);
+                //上傳新圖片
+                Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "activityFolder"));
+                //更新資料庫
+                gallery.setGalleryImgUrl((String) data.get("url"));
+                gallery.setGalleryPublicId((String) data.get("public_id"));
+                ActivityGallery save = galleryRepository.save(gallery);
+                activity.setActivityUpdateDate(new Date());
+                activityRepository.save(activity);
+                System.out.println("update main image success " + save.getGalleryImgUrl());
+                return true;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return null;
+    }
+
+    //===============更新活動資訊===================
+    public Boolean updateMainInfo(Integer activityId,Integer venueId, String activityTitle,
+                                  Integer activityDogNumber,Date activityClosingDate,
+                                  Date activityDate,Date activityEnd, Date activityStart){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        activity.setVenue(venueRepository.findByVenueId(venueId));
+        activity.setActivityTitle(activityTitle);
+        activity.setActivityDogNumber(activityDogNumber);
+        activity.setActivityClosingDate(activityClosingDate);
+        activity.setActivityDate(activityDate);
+        activity.setActivityEnd(activityEnd);
+        activity.setActivityStart(activityStart);
+        activityRepository.save(activity);
+        return true;
+    }
+
+    //===============更新活動內文(表單)===================
+    public Boolean updateDesForm(Integer activityId,String activityProcess,String activityDescription,
+                                  String activityCostDescription,String activityNotice){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        activity.setActivityProcess(activityProcess);
+        activity.setActivityDescription(activityDescription);
+        activity.setActivityCostDescription(activityCostDescription);
+        activity.setActivityNotice(activityNotice);
+        activityRepository.save(activity);
+        return true;
+    }
+    //===============更新活動內文(表單)===================
+    public Boolean updateDesEditor(Integer activityId,String activityDescription){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        activity.setActivityDescription(activityDescription);
+        activityRepository.save(activity);
+        return true;
+    }
+
+    //===============刪除sidePic===================
+    public Boolean deleteSideImg(Integer activityId,Integer[] galleryIdList){
+        if(galleryIdList.length>0){
+            Integer count=0;
+            for(Integer galleryId : galleryIdList){
+                ActivityGallery gallery = galleryRepository.findByGalleryId(galleryId);
+                if (gallery!=null){
+                    String publicId = gallery.getGalleryPublicId();
+                    try {
+                        //刪除Cloudinary中的圖片
+                        Map delResult = cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+                        System.out.println("Deleted SideImage from Cloudinary: " + delResult);
+                        //刪除db的資料
+                        galleryRepository.delete(gallery);
+                        System.out.println("delete sideImg from db success");
+                        count ++;
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+            System.out.println("總共刪除: "+count+"張sidePic");
+            return true;
+        }else{
+            return false;
+        }
+    }
+    //===============增加sidePic===================
+    public Boolean addSidePic(Integer activityId,MultipartFile file){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        if(activity!=null){
+            try {
+                //上傳新圖片
+                Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "activityFolder"));
+                ActivityGallery gallery = new ActivityGallery();
+                //更新資料庫
+                gallery.setVenueActivity(activity);
+                gallery.setGalleryImgUrl((String) data.get("url"));
+                gallery.setGalleryPublicId((String) data.get("public_id"));
+                galleryRepository.save(gallery);
+                return true;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return false;
+    }
+    public String addSidePicList(Integer activityId,MultipartFile[] fileList){
+        if (fileList.length>0){
+            Integer success=0;
+            for(MultipartFile file:fileList){
+                Boolean result = addSidePic(activityId, file);
+                if(result){
+                    success++;
+                }
+            }
+            return "成功上傳"+success+"張sidePic!";
+        }
+        return "根本沒有東西 真是謝囉";
+    }
+
+    //================使用者有評論過的activityIDList=============
+    public List<Integer> userCommentActivityIdList(Integer userId){
+        Users user = userRepository.findByUserId(userId);
+        List<Integer> activityIdList=new ArrayList<>();
+        List<CommentActivity> venueActivityList = commentRepository.findByUser(user);
+        for (CommentActivity comment:venueActivityList){
+            Integer activityId = comment.getVenueActivity().getActivityId();
+            activityIdList.add(activityId);
+        }
+        return activityIdList;
+    }
+
+    //================使用者個別查看自己寫的內容=============
+    public CommentActivity getMyOneComment(Integer userId,Integer activityId){
+        Users users = userRepository.findByUserId(userId);
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        return commentRepository.findByUserAndVenueActivity(users,activity);
+    }
+    //================gemini check==================
+    public String geminiCheckComment(String content) {
+        Map<String,String> map = new HashMap<>();
+        String url = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=" + apiKey;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String contentPrompt =content+"。以上是一句客戶參加我公司所辦理的寵物活動評論，請幫我把句子分類，種類有:正面服務、負面服務、正面場地、負面場地、正面活動、負面活動。若句子為空的，請歸類為無評論。若無法判斷評論是否與活動相關，請歸類為無相關分類。請回傳一個最相關的，若沒有請不要回傳任何值，請用道德高標";
+        String requestBody = "{"
+                + "\"contents\": [{"
+                + "\"parts\": [{\"text\": \"" + contentPrompt + "\"}]"
+                + "}],"
+                + "\"generationConfig\": {"
+                + "\"temperature\": 0.1,"
+                + "\"topP\": 0.8,"
+                + "\"topK\": 10"
+                + "}"
+                + "}";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, requestEntity, String.class);
+        String responseBody = responseEntity.getBody();
+//        System.out.println(responseBody);
+        try {
+            JSONObject jsonObject = new JSONObject(responseBody);
+            JSONArray candidates = jsonObject.getJSONArray("candidates");
+            if (candidates.length() > 0) {
+                JSONObject candidate = candidates.getJSONObject(0);
+                JSONObject rsContent = candidate.getJSONObject("content");
+                JSONArray parts = rsContent.getJSONArray("parts");
+                if (parts.length() > 0) {
+                    JSONObject part = parts.getJSONObject(0);
+                    System.out.println(part.getString("text"));
+                    return part.getString("text");
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    //================使用者個別撰寫評論=============
+    public CommentActivity writeOneActivityComment(Integer activityId,Integer userId,String commentText,Integer score){
+        Users users = userRepository.findByUserId(userId);
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        CommentActivity commentActivity = new CommentActivity();
+        commentActivity.setVenueActivity(activity);
+        commentActivity.setUser(users);
+        commentActivity.setCommentText(commentText);
+        commentActivity.setScore(score);
+        String gemini = geminiCheckComment(commentText);
+        commentActivity.setCheckResult(gemini);
+        return commentRepository.save(commentActivity);
+    }
+
+    //================使用者個別更新撰寫評論=============
+    public CommentActivity updateOneActivityComment(Integer commentId,String commentText,Integer score){
+        CommentActivity comment = commentRepository.findByCommentId(commentId);
+        comment.setCommentText(commentText);
+        comment.setScore(score);
+        String gemini = geminiCheckComment(commentText);
+        comment.setCheckResult(gemini);
+        return commentRepository.save(comment);
+    }
+
+    //================官方找出某活動使用者們的所有評論=============
+    public List<ActCommentDto> getOneActAllComments(Integer activityId){
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        List<CommentActivity> commentList = commentRepository.findByVenueActivity(activity);
+        List<ActCommentDto> dtoList=new ArrayList<>();
+        for(CommentActivity comment:commentList){
+            Users user = comment.getUser();
+            ActCommentDto dto = new ActCommentDto();
+            BeanUtils.copyProperties(comment,dto);
+            BeanUtils.copyProperties(activity,dto);
+            BeanUtils.copyProperties(user,dto);
+            dtoList.add(dto);
+        }
+        return dtoList;
+    }
+
+    //================官方找出單個使用者的所有評論=============
+    public List<ActCommentDto> findOneUserAllComment(Integer userId){
+        Users users = userRepository.findByUserId(userId);
+        List<CommentActivity> commentList = commentRepository.findByUser(users);
+        List<ActCommentDto> dtoList=new ArrayList<>();
+        for(CommentActivity comment:commentList){
+            VenueActivity activity = comment.getVenueActivity();
+            Users user = comment.getUser();
+            ActCommentDto dto = new ActCommentDto();
+            BeanUtils.copyProperties(comment,dto);
+            BeanUtils.copyProperties(activity,dto);
+            BeanUtils.copyProperties(user,dto);
+            dtoList.add(dto);
+        }
+        return dtoList;
+    }
+
+    //===========官方寄送參加成功模板信件============
+    public void sendJoinSuccessTemplateMail(Integer userId, Integer activityId)  {
+
+        Users user= userRepository.findByUserId(userId);
+        String userEmail = user.getUserEmail();
+        String firstName = user.getFirstName();
+        VenueActivity activity = activityRepository.findByActivityId(activityId);
+        String activityTitle = activity.getActivityTitle();
+        ActivityGallery main = galleryRepository.findByVenueActivityAndGalleryImgType(activity, "main");
+        String imgUrl = main.getGalleryImgUrl();
+
+
+            System.out.println("hi");
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            try {
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+                helper.setFrom("ispaneeit80@gmail.com");
+                helper.setTo(userEmail);
+                helper.setSubject("Doggy Paradise活動參加成功通知信件");
+
+                Map<String, Object> model = new HashMap<>();
+                model.put("userName",firstName);
+                model.put("activityTitle",activityTitle);
+                model.put("activityId",Integer.toString(activityId));
+                model.put("imgUrl",imgUrl);
+                String welcomeMail = FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerConfig.getTemplate("ActivityJoinSuccess.html"), model);
+
+                helper.setText(welcomeMail, true);
+
+                mailSender.send(mimeMessage);
+            } catch (MessagingException | IOException | TemplateException e) {
+                throw new RuntimeException(e);
+            }
+
+    }
 
 
 
@@ -655,8 +1125,4 @@ public class ActivityService {
 
 
 
-
-
-
-
-}
+ }

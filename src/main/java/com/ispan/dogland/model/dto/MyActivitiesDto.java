@@ -21,6 +21,7 @@ public class MyActivitiesDto {
     ///activity////
     private Integer activityId;
     private String activityTitle;
+    private Integer activityCost;
     private String activityStatus;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy/MM/dd")
@@ -35,6 +36,14 @@ public class MyActivitiesDto {
     private Integer currentDogNumber;
     ///dogName///
     private List<String> dogList;
+
+    public Integer getActivityCost() {
+        return activityCost;
+    }
+
+    public void setActivityCost(Integer activityCost) {
+        this.activityCost = activityCost;
+    }
 
     /////////////////////
     public Integer getUserJoinedId() {

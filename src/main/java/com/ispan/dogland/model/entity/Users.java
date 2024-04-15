@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ispan.dogland.model.entity.room.RoomReservation;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import com.ispan.dogland.model.entity.tweet.TweetNotification;
+import com.ispan.dogland.model.entity.tweet.TweetOfficial;
 import com.ispan.dogland.model.entity.tweet.TweetReport;
 import jakarta.persistence.*;
 
@@ -60,6 +61,7 @@ public class Users {
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Tweet> tweets;
 
+
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE,
                                                     CascadeType.DETACH, CascadeType.REFRESH})
     @JoinTable(name="tweet_like", joinColumns = @JoinColumn(name="user_id"),
@@ -69,9 +71,6 @@ public class Users {
     @OneToMany(mappedBy = "reporter",
                 cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TweetReport> tweetReports;
-
-
-
 
     @OneToMany(mappedBy = "user",
             fetch = FetchType.LAZY ,
@@ -194,16 +193,6 @@ public class Users {
     }
 
 
-    public void addDog(Dog dog) {
-        if(this.dogs == null) {
-            this.dogs = new ArrayList<>();
-        }
-        this.dogs.add(dog);
-        dog.setUser(this);
-    }
-
-
-
     public List<Tweet> getTweets() {
         return tweets;
     }
@@ -257,6 +246,22 @@ public class Users {
         }
         tweetReports.add(tweetReport);
         tweetReport.setReporter(this);
+    }
+
+    public void addDog(Dog dog) {
+        if(this.dogs == null) {
+            this.dogs = new ArrayList<>();
+        }
+        this.dogs.add(dog);
+        dog.setUser(this);
+    }
+
+    public void addTweet(Tweet tweet) {
+        if(this.tweets == null) {
+            this.tweets = new ArrayList<>();
+        }
+        this.tweets.add(tweet);
+        tweet.setUser(this);
     }
 
     public List<ShoppingCart> getShoppingCarts() {

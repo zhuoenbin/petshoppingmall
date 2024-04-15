@@ -11,4 +11,7 @@ public interface TweetOfficialRepository extends JpaRepository<TweetOfficial, In
     List<TweetOfficial> findAllOfficialTweetWhereStatusIs1();
     TweetOfficial findByTweetId(Integer tweetOfficialId);
 
+    @Query("select t from TweetOfficial t  order by t.tweetId desc limit 3")
+    List<TweetOfficial> findLast3();
+
 }

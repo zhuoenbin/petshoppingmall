@@ -3,10 +3,8 @@ package com.ispan.dogland.service.interfaceFile;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
-import com.ispan.dogland.model.entity.tweet.Tweet;
-import com.ispan.dogland.model.entity.tweet.TweetFollowList;
-import com.ispan.dogland.model.entity.tweet.TweetNotification;
-import com.ispan.dogland.model.entity.tweet.TweetReport;
+import com.ispan.dogland.model.entity.mongodb.TweetData;
+import com.ispan.dogland.model.entity.tweet.*;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +23,7 @@ public interface TweetService {
     public Tweet postNewTweet(Tweet tweet, Integer userId);
 
     public String saveTweetImgToLocal(MultipartFile file);
+
 
     public List<Tweet> getNumOfComment(Integer tweetId);
 
@@ -70,6 +69,8 @@ public interface TweetService {
 
     //把該user的主推文與回文都找出來
     public List<Tweet> findTweetsAndCommentsByUserId(Integer userId);
+
+    public List<Tweet> findAllTweetsOnly();
     
     public TweetNotification findTweetNotificationByNotifiId(Integer id);
 
@@ -79,8 +80,9 @@ public interface TweetService {
 
     public boolean checkUserAndReportRelation(Integer tweetId, Integer userId);
 
-    public TweetReport addReporyToTweet(Integer tweetId, Integer userId,String reportText, String reportCheckBox);
+    public TweetReport addReportToTweet(Integer tweetId, Integer userId,String reportText, String reportCheckBox);
 
+    public TweetReport addAiReportToTweet(TweetReport tweetReport,String sexuality,String hateSpeech,String harassment,String dangerousContent);
     public Tweet saveTweet(Tweet tweet);
 
     public List<TweetReport> findAllTweetReports();
@@ -95,4 +97,22 @@ public interface TweetService {
     public String addEmployeeToReport(Integer reportsId, Integer empId);
 
     Employee findEmployeeByReportId(Integer reportId);
+
+    Tweet postTweetForShare(Integer userId, String content, String imgUrl);
+
+    TweetData getLastTweetData();
+
+    public String uploadOfficialImg(MultipartFile file);
+
+    public TweetOfficial saveOfficialTweet(TweetOfficial tweetOfficial);
+
+    public List<TweetOfficial> findAllOfficialTweet();
+
+    public TweetOfficial updateOfficialTweetContent(Integer tweetId, String newContent);
+
+    public TweetOfficial findOfficialTweetByTweetId(Integer tweetId);
+
+    public TweetOfficial saveTweetOfficial(TweetOfficial tweetOfficial);
+
+    public List<TweetOfficial> findLast3TweetOfficial();
 }

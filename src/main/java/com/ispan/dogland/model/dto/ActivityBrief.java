@@ -32,7 +32,18 @@ public class ActivityBrief {
     private Integer currentDogNumber;
 
     private Integer currentUserNumber;
+    private Integer activityCost;
+    private String activityCostDescription;
     private String galleryImgUrl;
+    private Integer likedTime;
+
+    public Integer getLikedTime() {
+        return likedTime;
+    }
+
+    public void setLikedTime(Integer likedTime) {
+        this.likedTime = likedTime;
+    }
 
     public Integer getActivityId() {
         return activityId;
@@ -144,5 +155,21 @@ public class ActivityBrief {
 
     public void setActivityDogNumber(Integer activityDogNumber) {
         this.activityDogNumber = activityDogNumber;
+    }
+
+    public Integer getActivityCost() {
+        return activityCost;
+    }
+
+    public void setActivityCost(Integer activityCost) {
+        this.activityCost = activityCost;
+    }
+
+    public String getActivityCostDescription() {
+        return activityCostDescription;
+    }
+
+    public void setActivityCostDescription(String activityCostDescription) {
+        this.activityCostDescription = activityCostDescription;
     }
 }

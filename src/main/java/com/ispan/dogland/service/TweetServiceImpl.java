@@ -1,5 +1,7 @@
 package com.ispan.dogland.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
@@ -7,18 +9,24 @@ import com.ispan.dogland.model.dao.tweet.*;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
+import com.ispan.dogland.model.entity.mongodb.TweetData;
 import com.ispan.dogland.model.entity.tweet.*;
 import com.ispan.dogland.service.interfaceFile.TweetService;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,6 +34,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.*;
 
 @Service
@@ -33,6 +42,7 @@ public class TweetServiceImpl implements TweetService {
 
     @Value("${imagepath}")
     private String uploadDir;
+    private static final long MAX_FILE_SIZE_BYTES = 3 * 1024 * 1024; // 3MB
 
     private TweetRepository tweetRepository;
     private UserRepository userRepository;
@@ -43,6 +53,9 @@ public class TweetServiceImpl implements TweetService {
     private TweetNotificationRepository tweetNotificationRepository;
     private TweetReportRepository tweetReportRepository;
     private EmployeeRepository employeeRepository;
+    private TweetDataRepository tweetDataRepository;
+    private Cloudinary cloudinary;
+    private TweetOfficialRepository tweetOfficialRepository;
 
     @Autowired
     public TweetServiceImpl(TweetRepository tweetRepository,
@@ -53,7 +66,10 @@ public class TweetServiceImpl implements TweetService {
                             DogRepository dogRepository,
                             TweetNotificationRepository tweetNotificationRepository,
                             TweetReportRepository tweetReportRepository,
-                            EmployeeRepository employeeRepository) {
+                            EmployeeRepository employeeRepository,
+                            TweetDataRepository tweetDataRepository,
+                            Cloudinary cloudinary,
+                            TweetOfficialRepository tweetOfficialRepository) {
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
         this.tweetGalleryRepository = tweetGalleryRepository;
@@ -63,6 +79,9 @@ public class TweetServiceImpl implements TweetService {
         this.tweetNotificationRepository = tweetNotificationRepository;
         this.tweetReportRepository = tweetReportRepository;
         this.employeeRepository = employeeRepository;
+        this.tweetDataRepository = tweetDataRepository;
+        this.cloudinary = cloudinary;
+        this.tweetOfficialRepository = tweetOfficialRepository;
     }
 
     @Override
@@ -109,23 +128,63 @@ public class TweetServiceImpl implements TweetService {
         return null;
     }
 
-    @Override
     public String saveTweetImgToLocal(MultipartFile file) {
-        String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
-        String timeStamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        String fileName = timeStamp + "_" + originalFileName;
-        File uploadPath = new File(uploadDir);
-        if (!uploadPath.exists()) {
-            uploadPath.mkdirs();
-        }
-        Path filePath = Paths.get(uploadDir, fileName);
         try {
-            Files.copy(file.getInputStream(), filePath);
+            String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
+            String timeStamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+            String fileName = timeStamp + "_" + originalFileName;
+            File uploadPath = new File(uploadDir);
+            if (!uploadPath.exists()) {
+                uploadPath.mkdirs();
+            }
+            Path filePath = Paths.get(uploadDir, fileName);
+
+            // 如果大於3MB就壓縮
+            if (file.getSize() > MAX_FILE_SIZE_BYTES) {
+                BufferedImage originalImage = ImageIO.read(file.getInputStream());
+                BufferedImage resizedImage = resizeImage(originalImage);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(resizedImage, "jpg", baos);
+                ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+                FileUtils.copyInputStreamToFile(bais, filePath.toFile());
+            } else {
+                Files.copy(file.getInputStream(), filePath);
+            }
+
             return fileName;
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+
+    private BufferedImage resizeImage(BufferedImage originalImage) {
+        System.out.println("壓縮圖片...........");
+        int targetWidth = originalImage.getWidth();
+        int targetHeight = originalImage.getHeight();
+        while (calculateSize(originalImage) > MAX_FILE_SIZE_BYTES) {
+            targetWidth *= 0.9;
+            targetHeight *= 0.9;
+        }
+
+        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = resizedImage.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+        g.dispose();
+
+        return resizedImage;
+    }
+
+    private long calculateSize(BufferedImage image) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(image, "jpg", baos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return baos.toByteArray().length;
     }
 
     @Override
@@ -246,7 +305,6 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public void sendPostTweetNotificationToFollower(Integer userId, Integer tweetId) {
-        List<TweetNotification> res = new ArrayList<>();
         Users user = userRepository.findByUserId(userId);
         String userName = user.getLastName();
 
@@ -319,21 +377,22 @@ public class TweetServiceImpl implements TweetService {
         Collections.sort(notifications, new Comparator<TweetNotification>() {
             @Override
             public int compare(TweetNotification notification1, TweetNotification notification2) {
-                // 按照 postTime 属性进行升序排序
+                // postTime 排序
                 return notification2.getPostTime().compareTo(notification1.getPostTime());
             }
         });
         List<TweetNotification> top15Notifications = notifications.subList(0, Math.min(5, notifications.size()));
-
         return top15Notifications;
-
-
-//        return tweetNotificationRepository.findByUserId(userId);
     }
 
     @Override
     public List<Tweet> findTweetsAndCommentsByUserId(Integer userId) {
         return tweetRepository.findTweetsAndCommentsByUserId(userId);
+    }
+
+    @Override
+    public List<Tweet> findAllTweetsOnly() {
+        return tweetRepository.findAllTweetsOnly();
     }
 
     @Override
@@ -363,7 +422,7 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
-    public TweetReport addReporyToTweet(Integer tweetId, Integer userId,String reportText, String reportCheckBox) {
+    public TweetReport addReportToTweet(Integer tweetId, Integer userId,String reportText, String reportCheckBox) {
 
 
         TweetReport tweetReportTmp = new TweetReport();
@@ -385,6 +444,15 @@ public class TweetServiceImpl implements TweetService {
 
         return tweetReport;
 
+    }
+
+    @Override
+    public TweetReport addAiReportToTweet(TweetReport tweetReport,String sexuality, String hateSpeech, String harassment, String dangerousContent) {
+        tweetReport.setSexuallyExplicit(sexuality);
+        tweetReport.setHateSpeech(hateSpeech);
+        tweetReport.setHarassment(harassment);
+        tweetReport.setDangerousContent(dangerousContent);
+        return tweetReportRepository.save(tweetReport);
     }
 
     @Override
@@ -431,6 +499,76 @@ public class TweetServiceImpl implements TweetService {
     @Override
     public Employee findEmployeeByReportId(Integer reportId) {
         return employeeRepository.findEmployeeByTweetReportId(reportId);
+    }
+
+    @Override
+    public Tweet postTweetForShare(Integer userId,String content, String imgUrl) {
+        //tweet
+        TweetGallery tweetGallery = new TweetGallery();
+        tweetGallery.setImgPath(imgUrl);
+        Tweet tweet = new Tweet();
+        tweet.setTweetContent(content);
+        tweet.setPreNode(0);
+        tweet.setPostDate(new Date());
+        tweet.setTweetStatus(1);
+        tweet.setNumReport(0);
+        tweet.addTweetGallery(tweetGallery);
+        Tweet tweetInDb = tweetRepository.save(tweet);
+        Tweet tweetForReturn = this.postNewTweet(tweetInDb, userId);
+        return tweetForReturn;
+    }
+
+    @Override
+    public TweetData getLastTweetData() {
+        List<TweetData> tweetData = tweetDataRepository.findAllByOrderByTimestampDesc();
+        return tweetData.get(0);
+
+    }
+
+    @Override
+    public String uploadOfficialImg(MultipartFile file) {
+        try{
+            Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "tweetOfficialFolder"));
+            return (String) data.get("url");
+        }catch (IOException e){
+            throw new RuntimeException("Image uploading fail !!");
+        }
+    }
+
+    @Override
+    public TweetOfficial saveOfficialTweet(TweetOfficial tweetOfficial) {
+        return tweetOfficialRepository.save(tweetOfficial);
+    }
+
+    @Override
+    public List<TweetOfficial> findAllOfficialTweet() {
+        return tweetOfficialRepository.findAllOfficialTweetWhereStatusIs1();
+    }
+
+    @Override
+    public TweetOfficial updateOfficialTweetContent(Integer tweetId, String newContent) {
+
+        TweetOfficial t1 = tweetOfficialRepository.findByTweetId(tweetId);
+        if(t1 == null){
+            return null;
+        }
+        t1.setTweetContent(newContent);
+        return tweetOfficialRepository.save(t1);
+    }
+
+    @Override
+    public TweetOfficial findOfficialTweetByTweetId(Integer tweetId) {
+        return tweetOfficialRepository.findByTweetId(tweetId);
+    }
+
+    @Override
+    public TweetOfficial saveTweetOfficial(TweetOfficial tweetOfficial) {
+        return tweetOfficialRepository.save(tweetOfficial);
+    }
+
+    @Override
+    public List<TweetOfficial> findLast3TweetOfficial() {
+        return tweetOfficialRepository.findLast3();
     }
 
 

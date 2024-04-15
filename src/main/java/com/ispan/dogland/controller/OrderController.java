@@ -34,6 +34,14 @@ public class OrderController {
         }
         return os.findOrdersByUserId(loggedInMember.getUserId());
     }
+    @PostMapping("/ecpayCheckout")
+    public String ecpayCheckout(@RequestParam String price, @RequestParam String url) {
+        System.out.println("OrderController");
+
+        String aioCheckOutALLForm = os.ecpayCheckout(price, url);
+
+        return aioCheckOutALLForm;
+        }
 
     @GetMapping("/{orderId}/orderDetails")
     public List<OrderDetail> getDetailsByOrderId(@PathVariable Integer orderId, HttpSession session){
@@ -55,3 +63,6 @@ public class OrderController {
         return ResponseEntity.ok("Product上架成功");
     }
 }
+
+
+

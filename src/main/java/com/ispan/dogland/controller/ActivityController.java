@@ -15,10 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/activity/api")
@@ -84,6 +81,10 @@ public class ActivityController {
     public ActivityData addNewActivity(@RequestBody ActivityData activityData){
         return activityService.addNewActivity(activityData);
     }
+    @PostMapping("/official/createActivity")
+    public ActivityCreateDto createNewActivity(@RequestBody ActivityCreateDto createDto ){
+        return activityService.offCreateNewActivity(createDto);
+    }
 
     @PostMapping("/official/addMainImg")
     public ActivityGallery addMainImg(@RequestParam Integer activityId,@RequestParam MultipartFile mainImg){
@@ -138,6 +139,7 @@ public class ActivityController {
                 applyData.setActivityTitle(dogJoined.getVenueActivity().getActivityTitle());
                 joinedMembers.add(applyData);
             }
+            activityService.sendJoinSuccessTemplateMail(userId,activityId);
             return joinedMembers;
         }
         throw new RuntimeException("超過狗數限制 !!");
@@ -206,14 +208,145 @@ public class ActivityController {
     }
 
     //===============官方管理頁面===============
-    @PostMapping("/official/activityManager/past")
-    public List<ActivityBrief> findPastActivityInThisPeriod(@RequestParam Date startDate,@RequestParam Date endDate){
+    @GetMapping("/official/activityManager/past")
+    public List<ActivityPastBrief> findPastActivityInThisPeriod(){
+        Date currentDate = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDate);
+
+        // 今天
+        Date endDate = calendar.getTime();
+        System.out.println("activityManager/past執行今天：" + endDate);
+
+        // 上個月的今日
+        calendar.add(Calendar.MONTH, -1);
+        Date startDate = calendar.getTime();
+        System.out.println("activityManager/past執行上個月開始：" + startDate);
         return activityService.officialActManagerByStatus(startDate,endDate);
     }
+    @PostMapping("/official/activityManager/past")
+    public List<ActivityPastBrief> findPastActivityInThisPeriod(@RequestParam Date startDate,@RequestParam Date endDate){
+        return activityService.officialActManagerByStatus(startDate,endDate);
+    }
+
+    @GetMapping("/official/activityManager/now")
+    public List<ActivityBrief> findNowActivityInThisPeriod(){
+        Date currentDate = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDate);
+
+        // 今天是第一天
+        Date startDate = calendar.getTime();
+        System.out.println("activityManager/now執行今天：" + startDate);
+
+        // 下個月的同一天
+        calendar.add(Calendar.MONTH, 1);
+        Date endDate = calendar.getTime();
+        System.out.println("activityManager/now執行下個月的同日：" + endDate);
+        return activityService.officialActManagerByStatusNot(startDate,endDate);
+    }
+
 
     @PostMapping("/official/activityManager/now")
     public List<ActivityBrief> findNowActivityInThisPeriod(@RequestParam Date startDate,@RequestParam Date endDate){
         return activityService.officialActManagerByStatusNot(startDate,endDate);
+    }
+
+    @GetMapping("/official/activityManager/{activityId}/attendeeList")
+    public List<ActOfficialAttendeeDto> findOnePastActAttendeeList (@PathVariable Integer activityId){
+        return activityService.findOneActAttendeeList(activityId,"已取消");
+    }
+
+    @GetMapping("/official/activityInfo/{activityId}")
+    public ActivityShowInfo getActivityInfo(@PathVariable Integer activityId){
+        return activityService.getActivityPageInfo(activityId);
+    }
+
+    @GetMapping("/usersLiked/{userId}")
+    public List<Integer> getUsersLikedActIds(@PathVariable Integer userId){
+        return activityService.usersLikedActsIdList(userId);
+    }
+    @PostMapping("/userDo/like")
+    public Boolean userLikeAct(@RequestParam Integer activityId,@RequestParam Integer userId){
+        return activityService.userLikeAnAct(activityId,userId);
+    }
+
+    @PostMapping("/userDo/dislike")
+    public Boolean userDislikeAct(@RequestParam Integer activityId,@RequestParam Integer userId){
+        return activityService.userDislikedAnAct(activityId,userId);
+    }
+
+    @GetMapping("/likedManager/{userId}")
+    public List<ActivityBrief> userFavoriteWall(@PathVariable Integer userId){
+        return activityService.userFavoriteWall(userId);
+    }
+
+    @PostMapping("/official/updateManager/mainPic")
+    public boolean OffUpdateMainImg(@RequestParam Integer activityId,
+                                    @RequestParam Integer galleryId,
+                                    @RequestParam MultipartFile mainImg){
+        return activityService.updateTitleImg(activityId,galleryId,mainImg);
+    }
+    @PostMapping("/official/updateManager/Info")
+    public Boolean updateMainInfo(@RequestParam Integer activityId,@RequestParam Integer venueId, @RequestParam String activityTitle,
+                                     @RequestParam Integer activityDogNumber,@RequestParam Date activityClosingDate,
+                                     @RequestParam Date activityDate,@RequestParam Date activityEnd, @RequestParam Date activityStart){
+        return activityService.updateMainInfo(activityId,venueId,activityTitle,activityDogNumber,activityClosingDate,activityDate,activityEnd,activityStart);
+    }
+
+    @PostMapping("/official/updateManager/desForm")
+    public Boolean updateMainInfo(@RequestParam Integer activityId,@RequestParam String activityProcess,@RequestParam String activityDescription,
+                                  @RequestParam String activityCostDescription,@RequestParam String activityNotice){
+        return activityService.updateDesForm(activityId,activityProcess,activityDescription,activityCostDescription,activityNotice);
+    }
+    @PostMapping("/official/updateManager/desCkeditor")
+    public Boolean updateDesEditor(Integer activityId,String activityDescription){
+        return activityService.updateDesEditor(activityId,activityDescription);
+    }
+
+    @PostMapping("/official/updateManager/sidePic/delete")
+    public Boolean deleteSidePic(Integer activityId,Integer[] delGalleryIdList){
+       return activityService.deleteSideImg(activityId,delGalleryIdList);
+    }
+
+    @PostMapping("/official/updateManager/sidePic/add")
+    public String addSidePic(Integer activityId,MultipartFile[] addSidePicList){
+        return activityService.addSidePicList(activityId,addSidePicList);
+    }
+
+    //得到哪些活動評論過
+    @GetMapping("/activityManager/get/{userId}/commentList")
+    public List<Integer> getMyCommentedList(@PathVariable Integer userId){
+        return activityService.userCommentActivityIdList(userId);
+    }
+    //使用者個別查看自己寫的內容
+    @GetMapping("/activityManager/get/{userId}/comment/{activityId}")
+    public CommentActivity getMyOneComment(@PathVariable Integer userId,@PathVariable Integer activityId){
+        return activityService.getMyOneComment(userId,activityId);
+    }
+
+    //上傳自己的評論
+    @PostMapping("/activityManager/doComment")
+    public CommentActivity writeActivityComment(@RequestParam Integer activityId,@RequestParam Integer userId,
+                                                @RequestParam String commentText,@RequestParam Integer score){
+        return activityService.writeOneActivityComment(activityId, userId, commentText, score);
+    }
+    //修改自己的評論
+    @PostMapping("/activityManager/doComment/update")
+    public CommentActivity updateActivityComment(@RequestParam Integer commentId,@RequestParam String commentText,
+                                                 @RequestParam Integer score){
+        return activityService.updateOneActivityComment(commentId, commentText, score);
+    }
+
+    //官方找出某活動使用者們的所有評論
+    @GetMapping("official/activityManager/past/commentList/{activityId}")
+    public List<ActCommentDto> getOneActAllComments(@PathVariable Integer activityId){
+        return activityService.getOneActAllComments(activityId);
+    }
+    //官方找出某使用者的所有評論
+    @GetMapping("official/activityManager/past/{userId}/allComment")
+    public List<ActCommentDto> findOneUserAllComment(@PathVariable Integer userId){
+        return activityService.findOneUserAllComment(userId);
     }
 
 }

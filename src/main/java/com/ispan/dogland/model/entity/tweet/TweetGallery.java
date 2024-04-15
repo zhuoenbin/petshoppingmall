@@ -20,6 +20,7 @@ public class TweetGallery {
     @JsonIgnore
     private Tweet tweet;
 
+
     public TweetGallery() {
     }
 

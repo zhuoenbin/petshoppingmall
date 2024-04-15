@@ -1,6 +1,7 @@
 package com.ispan.dogland.controller;
 
 import com.ispan.dogland.model.dto.Passport;
+import com.ispan.dogland.model.dto.RoomReservationDto;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.room.Room;
 import com.ispan.dogland.model.entity.room.RoomReservation;
@@ -60,16 +61,17 @@ public class RoomController {
         rService.scoreRoomReservation(roomReservation, roomReservationId);
     }
 
-    // 顯示出全部的房間
-    @GetMapping("")
-    public List<Room> room() {
-        return rService.findAllroom();
-    }
-
     // 顯示出使用者的訂房明細
     @GetMapping("/allRoomReservationByUser")
-    public List<RoomReservation> roomReservation(HttpSession session) {
+    public List<RoomReservationDto> roomReservation(HttpSession session) {
         Passport loginUser = (Passport) session.getAttribute("loginUser");
+
+//        for(RoomReservationDto roomReservationDto : rService.findRoomReservationByUserId(loginUser.getUserId())) {
+//
+//            System.out.println("controller" + roomReservationDto.getReservationId());
+//            System.out.println("controller" + roomReservationDto.getCancelTime());
+//        }
+
         return rService.findRoomReservationByUserId(loginUser.getUserId());
     }
 
@@ -88,8 +90,8 @@ public class RoomController {
 
     // 修改訂單時段(顯示需要修改的訂單明細)
     @GetMapping("/showUpdateRoom")
-    public RoomReservation updateRoom(@RequestParam Integer roomReservationId) {
-        return rService.findByRoomReservationId(roomReservationId);
+    public RoomReservationDto updateRoom(@RequestParam Integer roomReservationId) {
+        return rService.findDtoByRoomReservationId(roomReservationId);
     }
 
 }

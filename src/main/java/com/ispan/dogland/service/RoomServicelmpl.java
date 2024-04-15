@@ -3,6 +3,7 @@ package com.ispan.dogland.service;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.ispan.dogland.model.dao.*;
+import com.ispan.dogland.model.dto.RoomOrderDto;
 import com.ispan.dogland.model.dto.RoomReservationDto;
 import com.ispan.dogland.model.dto.ScoreDto;
 import com.ispan.dogland.model.entity.Users;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -102,7 +104,7 @@ public class RoomServicelmpl implements RoomService {
         reservation.setStar(roomReservation.getStar());
         reservation.setConments(roomReservation.getConments());
         reservation.setConmentsTime(roomReservation.getConmentsTime());
-
+        reservation.setConmentsClass(geminiCheckComment(roomReservation.getConments()));
         reservationRepository.save(reservation);
     }
 
@@ -149,8 +151,8 @@ public class RoomServicelmpl implements RoomService {
         List<List<String>> roomList = new ArrayList<>();
 
         for (RoomReservation roomReservations : reservationRepository.findAll()) {
-            // 已取消的訂單不需要傳
-            if(roomReservations.getCancelTime() == null) {
+            // 已取消的訂單 || 結束的訂單 不需要傳
+            if(roomReservations.getCancelTime() == null || roomReservations.getEndTime().before(new Date())) {
                 LocalDate receiveDate = roomReservations.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 LocalDate confirmDate = roomReservations.getEndTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
@@ -212,6 +214,40 @@ public class RoomServicelmpl implements RoomService {
         return roomReservationDtoList;
     }
 
+    // 登入者的未結束訂房明細
+    @Override
+    public List<RoomOrderDto> findOrderByUserId(Integer userId) {
+        List<RoomOrderDto> roomOrderDtoList = new ArrayList<>();
+
+        LocalDateTime currentDateTime = LocalDateTime.now();
+
+        for (RoomReservation roomReservation : reservationRepository.findByUser(usersRepository.findByUserId(userId))) {
+
+            LocalDateTime endTime = roomReservation.getEndTime().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
+
+            if(roomReservation.getCancelTime() == null &&
+               endTime.isAfter(currentDateTime)) {
+
+            RoomOrderDto roomOrderDto = new RoomOrderDto();
+
+            roomOrderDto.setReservationId(roomReservation.getReservationId());
+            roomOrderDto.setRoom(roomReservation.getRoom());
+            roomOrderDto.setUserId(userId);
+            roomOrderDto.setLastName(roomReservation.getUser().getLastName());
+            roomOrderDto.setDog(roomReservation.getDog());
+            roomOrderDto.setStartTime(roomReservation.getStartTime());
+            roomOrderDto.setEndTime(roomReservation.getEndTime());
+            roomOrderDto.setTotalPrice(roomReservation.getTotalPrice());
+            roomOrderDto.setReservationTime(roomReservation.getReservationTime());
+
+            roomOrderDtoList.add(roomOrderDto);
+             System.out.println(roomReservation.getEndTime());
+            }
+        }
+        return roomOrderDtoList;
+    }
 
     @Override
     public List<Room> findAllroom() { return roomRepository.findAll(); }

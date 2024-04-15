@@ -43,6 +43,12 @@ public class DogServiceImpl implements DogService {
     }
 
     @Override
+    public Dog deleteDog(Integer dogId) {
+        dogRepository.delete(dogRepository.findByDogId(dogId));
+        return dogRepository.findByDogId(dogId);
+    }
+
+    @Override
     public Dog addUserDog(Dog dog, Integer userId) {
         dog.setUser(userRepository.findByUserId(userId));
         return dogRepository.save(dog);

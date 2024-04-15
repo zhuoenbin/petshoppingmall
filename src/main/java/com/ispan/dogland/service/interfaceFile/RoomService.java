@@ -1,5 +1,6 @@
 package com.ispan.dogland.service.interfaceFile;
 
+import com.ispan.dogland.model.dto.RoomOrderDto;
 import com.ispan.dogland.model.dto.RoomReservationDto;
 import com.ispan.dogland.model.dto.ScoreDto;
 import com.ispan.dogland.model.entity.room.Room;
@@ -29,6 +30,8 @@ public interface RoomService {
 
     public List<RoomReservationDto> findRoomReservationByUserId(Integer userId);
 
+    public List<RoomOrderDto> findOrderByUserId(Integer userId);
+
     public List<Room> findAllroom();
 
     public List<RoomReservationDto> findAllRoomReservation();
@@ -40,5 +43,7 @@ public interface RoomService {
     public RoomReservation findByRoomReservationId(Integer roomReservationId);
 
     public RoomReservationDto findDtoByRoomReservationId(Integer roomReservationId);
+
+    public String geminiCheckComment(String content);
 
 }

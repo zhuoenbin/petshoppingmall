@@ -10,16 +10,15 @@ import com.ispan.dogland.model.entity.OrderDetail;
 import com.ispan.dogland.model.entity.Orders;
 import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductGallery;
+import ecpay.payment.integration.AllInOne;
+import ecpay.payment.integration.domain.AioCheckOutALL;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class OrderService {
@@ -69,15 +68,6 @@ public class OrderService {
         return ordersRepository.findOrdersByUserId(userId);
     }
 
-import org.springframework.stereotype.Service;
-
-import ecpay.payment.integration.AllInOne;
-import ecpay.payment.integration.domain.AioCheckOutALL;
-
-import java.util.UUID;
-
-@Service
-public class OrderService {
 
     public String ecpayCheckout(String price, String url) {
 
@@ -99,3 +89,4 @@ public class OrderService {
         return form;
     }
 }
+

@@ -12,7 +12,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +22,8 @@ public class OrderController {
 
     @Autowired
     private OrderService os;
+    @Autowired
+    OrderService orderService;
 
     @GetMapping("")
     public List<Orders> getOrdersByUserId(HttpSession session){
@@ -47,6 +48,15 @@ public class OrderController {
         return os.getProductsFromOrderDetails(productIds);
     }
 
+    @PostMapping("/ecpayCheckout")
+    public String ecpayCheckout(@RequestParam String price, @RequestParam String url) {
+        System.out.println("OrderController");
+
+        String aioCheckOutALLForm = orderService.ecpayCheckout(price, url);
+
+        return aioCheckOutALLForm;
+    }
+
 //    @PostMapping("/getProducts")
 //    public List<Product> getProductsFromOrderDetails(@RequestBody List<Integer> productIds ,HttpSession session){
 //        List<Product> plist = new ArrayList<>();
@@ -60,26 +70,4 @@ public class OrderController {
 //        System.out.println(plist);
 //        return plist;
 //    }
-}
-
-import com.ispan.dogland.service.OrderService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-public class OrderController {
-
-    @Autowired
-    OrderService orderService;
-
-    @PostMapping("/ecpayCheckout")
-    public String ecpayCheckout(@RequestParam String price, @RequestParam String url) {
-        System.out.println("OrderController");
-
-        String aioCheckOutALLForm = orderService.ecpayCheckout(price, url);
-
-        return aioCheckOutALLForm;
-    }
 }

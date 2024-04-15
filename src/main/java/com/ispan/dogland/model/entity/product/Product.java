@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import com.ispan.dogland.model.entity.Comment;
+import com.ispan.dogland.model.entity.Collection;
 import com.ispan.dogland.model.entity.Employee;
-import com.ispan.dogland.model.entity.OrderDetail;
 import com.ispan.dogland.model.entity.ShoppingCart;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -64,16 +65,23 @@ public class Product {
             fetch = FetchType.LAZY ,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE,
                     CascadeType.DETACH, CascadeType.REFRESH})
+    @JsonIgnore
     private List<ProductGallery> productGalleries;
-
-    @OneToMany(mappedBy = "product",
-            fetch = FetchType.LAZY ,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-                    CascadeType.DETACH, CascadeType.REFRESH})
-    private List<ProductGalleryCloud>productGalleryClouds;
 
     @OneToMany(mappedBy = "product")
     private List<ShoppingCart> shoppingCarts;
+    @OneToMany(mappedBy = "product")
+    private List<Collection> collections;
+
+    @OneToMany(mappedBy = "product")
+    private List<Comment> comments;
+
+    //    @OneToMany(mappedBy = "product",
+//            fetch = FetchType.LAZY ,
+//            cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+//                    CascadeType.DETACH, CascadeType.REFRESH})
+//    @JsonIgnore
+//    private List<ProductGalleryCloud>productGalleryClouds;
 
     //暫時不設關聯
 //    @OneToMany(mappedBy = "productId")
@@ -190,14 +198,6 @@ public class Product {
         this.productGalleries = productGalleries;
     }
 
-    public List<ProductGalleryCloud> getProductGalleryClouds() {
-        return productGalleryClouds;
-    }
-
-    public void setProductGalleryClouds(List<ProductGalleryCloud> productGalleryClouds) {
-        this.productGalleryClouds = productGalleryClouds;
-    }
-
     public String getProductDescription() {
         return productDescription;
     }
@@ -214,7 +214,31 @@ public class Product {
         this.shoppingCarts = shoppingCarts;
     }
 
-//    public List<OrderDetail> getOrderDetails() {
+    public List<Collection> getCollections() {
+        return collections;
+    }
+
+    public void setCollections(List<Collection> collections) {
+        this.collections = collections;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    //    public List<ProductGalleryCloud> getProductGalleryClouds() {
+//        return productGalleryClouds;
+//    }
+//
+//    public void setProductGalleryClouds(List<ProductGalleryCloud> productGalleryClouds) {
+//        this.productGalleryClouds = productGalleryClouds;
+//    }
+
+    //    public List<OrderDetail> getOrderDetails() {
 //        return orderDetails;
 //    }
 //
@@ -237,7 +261,7 @@ public class Product {
         sb.append(", modifiedDate=").append(modifiedDate);
         sb.append(", discountId=").append(discountId);
         sb.append(", productGalleries=").append(productGalleries);
-        sb.append(", productGalleryClouds=").append(productGalleryClouds);
+//        sb.append(", productGalleryClouds=").append(productGalleryClouds);
         sb.append(", shoppingCarts=").append(shoppingCarts);
 //        sb.append(", orderDetails=").append(orderDetails);
         sb.append('}');

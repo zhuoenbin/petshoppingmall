@@ -104,6 +104,8 @@ public interface TweetService {
 
     public String uploadOfficialImg(MultipartFile file);
 
+    public String uploadTweetImgToCloud(MultipartFile file);
+
     public TweetOfficial saveOfficialTweet(TweetOfficial tweetOfficial);
 
     public List<TweetOfficial> findAllOfficialTweet();
@@ -113,4 +115,6 @@ public interface TweetService {
     public TweetOfficial findOfficialTweetByTweetId(Integer tweetId);
 
     public TweetOfficial saveTweetOfficial(TweetOfficial tweetOfficial);
+
+    public List<TweetOfficial> findLast3TweetOfficial();
 }

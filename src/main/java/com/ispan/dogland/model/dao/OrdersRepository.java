@@ -1,9 +1,13 @@
 package com.ispan.dogland.model.dao;
 
+import com.ispan.dogland.model.entity.OrderDetail;
 import com.ispan.dogland.model.entity.Orders;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.ispan.dogland.model.entity.Users;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -24,4 +28,6 @@ public interface OrdersRepository extends JpaRepository<Orders,Integer> {
     // 根據用戶ID查詢訂單
     List<Orders> findByUsers_UserId(Integer userId);
 
+    @Query("SELECT o FROM Orders o JOIN o.users u ON u.userId = :userId")
+    List<Orders> findOrdersByUserId(Integer userId);
 }

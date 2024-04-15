@@ -34,11 +34,8 @@ public class TweetShareController {
     @Autowired
     private RoomService roomService;
 
-    @GetMapping("/postTweetForActivityShare")
-    public String postTweetForActivityShare(@RequestParam("activityId") Integer activityId, HttpSession session) {
-        Passport passport = (Passport)session.getAttribute("loginUser");
-        Integer userId = passport.getUserId();
-
+    @PostMapping("/postTweetForActivityShare")
+    public String postTweetForActivityShare(@RequestParam Integer activityId, @RequestParam Integer userId) {
 //        //user參加活動的狗
 //        List<Dog> dogs = activityService.findUserDogsAttendThisActivity(userId,activityId);
 

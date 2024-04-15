@@ -139,6 +139,7 @@ public class ActivityController {
                 applyData.setActivityTitle(dogJoined.getVenueActivity().getActivityTitle());
                 joinedMembers.add(applyData);
             }
+            activityService.sendJoinSuccessTemplateMail(userId,activityId);
             return joinedMembers;
         }
         throw new RuntimeException("超過狗數限制 !!");

@@ -5,6 +5,7 @@ import com.ispan.dogland.model.dto.UserDto;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Users;
 import com.ispan.dogland.model.entity.tweet.Tweet;
+import com.ispan.dogland.model.entity.tweet.TweetOfficial;
 import com.ispan.dogland.service.interfaceFile.AccountService;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +78,7 @@ public class TweetControllerOpen {
         UserDto userDto = new UserDto();
         userDto.setUserId(user.getUserId());
         userDto.setLastName(user.getLastName());
+        userDto.setUserImgPath(user.getUserImgPath());
         return userDto;
     }
 
@@ -116,5 +118,10 @@ public class TweetControllerOpen {
             userDtos.add(userDto);
         }
         return ResponseEntity.ok(userDtos);
+    }
+
+    @GetMapping("/getTweetOfficialTop3")
+    public ResponseEntity<List<TweetOfficial>> getTweetOfficialTop3() {
+        return ResponseEntity.ok(tweetService.findLast3TweetOfficial());
     }
 }

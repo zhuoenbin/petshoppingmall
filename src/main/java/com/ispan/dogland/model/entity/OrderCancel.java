@@ -14,11 +14,6 @@ public class OrderCancel {
     @JoinColumn(name="order_id")
     private Orders orders;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH},fetch = FetchType.EAGER)
-    @JoinColumn(name="employee_id")
-    private Employee employee;
-
     @Column(name="is_read")
     private Integer isRead;
 
@@ -36,14 +31,6 @@ public class OrderCancel {
 
     public void setOrders(Orders orders) {
         this.orders = orders;
-    }
-
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
     }
 
     public Integer getIsRead() {

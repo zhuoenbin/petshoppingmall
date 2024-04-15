@@ -18,7 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -70,21 +73,10 @@ public class OrderService {
     }
 
     public void addOrderCancelCase(Integer orderId){
-        Orders o = ordersRepository.findByOrderId(orderId);
-        o.setOrderCancelDate(new Date());
-        if(o.getPaymentStatus() == 1){
-            o.setPaymentStatus(6);
-        }
-        else{
-            o.setPaymentStatus(5);
-        }
-
-        Orders o2 = ordersRepository.save(o);
-
         OrderCancel oc = new OrderCancel();
         oc.setIsRead(0);
         OrderCancel oc2 = orderCancelRepository.save(oc);
-        oc2.setOrders(o2);
+        oc2.setOrders(ordersRepository.findByOrderId(orderId));
         orderCancelRepository.save(oc2);
     }
 

@@ -55,7 +55,8 @@ public class DoglandApplication {
 											   TweetReportRepository tweetReportRepository,
 											   RoomReservationRepository roomReservationRepository,
 											   RoomService roomService,
-											   TweetController tweetController) {
+											   TweetController tweetController,
+											   TweetOfficialRepository tweetOfficialRepository) {
 		return runner -> {
 
 		};

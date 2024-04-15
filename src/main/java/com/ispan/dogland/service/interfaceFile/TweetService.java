@@ -113,4 +113,6 @@ public interface TweetService {
     public TweetOfficial findOfficialTweetByTweetId(Integer tweetId);
 
     public TweetOfficial saveTweetOfficial(TweetOfficial tweetOfficial);
+
+    public List<TweetOfficial> findLast3TweetOfficial();
 }

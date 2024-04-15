@@ -566,5 +566,10 @@ public class TweetServiceImpl implements TweetService {
         return tweetOfficialRepository.save(tweetOfficial);
     }
 
+    @Override
+    public List<TweetOfficial> findLast3TweetOfficial() {
+        return tweetOfficialRepository.findLast3();
+    }
+
 
 }

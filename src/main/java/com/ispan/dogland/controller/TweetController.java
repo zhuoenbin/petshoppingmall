@@ -10,13 +10,11 @@ import com.ispan.dogland.model.dto.TweetLikesCheckResponse;
 import com.ispan.dogland.model.dto.UserDto;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Users;
-import com.ispan.dogland.model.entity.tweet.Tweet;
-import com.ispan.dogland.model.entity.tweet.TweetGallery;
-import com.ispan.dogland.model.entity.tweet.TweetNotification;
-import com.ispan.dogland.model.entity.tweet.TweetReport;
+import com.ispan.dogland.model.entity.tweet.*;
 import com.ispan.dogland.service.interfaceFile.AccountService;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -40,6 +38,9 @@ public class TweetController {
     private TweetService tweetService;
 
     private AccountService accountService;
+
+    @Value("${gemini_apiKey}")
+    private String apiKey;
 
     @Autowired
     public TweetController(TweetService tweetService, AccountService accountService) {
@@ -128,6 +129,57 @@ public class TweetController {
         return ResponseEntity.ok("Tweet posted successfully");
     }
 
+    //官方發文+本地圖片
+    @PostMapping("/postTweetWithPhotoByOfficial")
+    public ResponseEntity<String> postTweetWithPhotoByOfficial(@RequestParam Integer memberId,
+                                            @RequestParam String tweetContent,
+                                            @RequestParam("image") MultipartFile file,
+                                            @RequestParam String htmlLink) {
+        TweetOfficial tweetOfficial = new TweetOfficial();
+        tweetOfficial.setEmployeeId(memberId);
+        tweetOfficial.setPreNode(0);
+        tweetOfficial.setPostDate(new Date());
+        tweetOfficial.setTweetStatus(1);
+        tweetOfficial.setNumReport(0);
+        if (tweetContent != null) {
+            tweetOfficial.setTweetContent(tweetContent);
+        }
+        if(htmlLink != null){
+            tweetOfficial.setTweetLink(htmlLink);
+        }
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Image file is empty");
+        }
+        //把圖片存到雲端
+        String imgFileName = tweetService.uploadOfficialImg(file);
+        tweetOfficial.setImgPathCloud(imgFileName);
+        TweetOfficial tweetOfficial1 = tweetService.saveOfficialTweet(tweetOfficial);
+        System.out.println(tweetOfficial1.toString());
+        return ResponseEntity.ok("Tweet posted successfully");
+    }
+
+    //官方發文+本地圖片
+    @PostMapping("/postTweetWithOutPhotoByOfficial")
+    public ResponseEntity<String> postTweetOnlyTextByOfficial(@RequestParam Integer memberId,
+                                                              @RequestParam String tweetContent,
+                                                              @RequestParam String htmlLink) {
+        TweetOfficial tweetOfficial = new TweetOfficial();
+        tweetOfficial.setEmployeeId(memberId);
+        tweetOfficial.setPreNode(0);
+        tweetOfficial.setPostDate(new Date());
+        tweetOfficial.setTweetStatus(1);
+        tweetOfficial.setNumReport(0);
+        if (tweetContent != null) {
+            tweetOfficial.setTweetContent(tweetContent);
+        }
+        if(htmlLink != null){
+            tweetOfficial.setTweetLink(htmlLink);
+        }
+        TweetOfficial tweetOfficial1 = tweetService.saveOfficialTweet(tweetOfficial);
+        System.out.println(tweetOfficial1.toString());
+        return ResponseEntity.ok("Tweet posted successfully");
+    }
+
     //找到該則tweet的所有按讚數量
     @GetMapping("/getTweetLikesNum")
     public ResponseEntity<TweetLikesCheckResponse> getTweetLikesNum(@RequestParam Integer tweetId, @RequestParam Integer userId) {
@@ -145,6 +197,25 @@ public class TweetController {
             tweetLikesCheckResponse.setIsUserLiked(0);
         }
         return ResponseEntity.ok(tweetLikesCheckResponse);
+    }
+
+
+    @GetMapping("/getAllTweetOfficial")
+    public List<TweetOfficial> getAllTweetOfficial() {
+        return tweetService.findAllOfficialTweet();
+    }
+
+    @PostMapping("/updateOfficialTweetContent")
+    public String saveEditedOfficialTweet(@RequestBody Map<String, Object> request) {
+
+        String editTweetContentTmp = (String) request.get("editTweetContentTmp");
+        Integer tweetId = Integer.parseInt(String.valueOf(request.get("tweetId")));
+
+        TweetOfficial t1 = tweetService.updateOfficialTweetContent(tweetId, editTweetContentTmp);
+        if(t1 == null) {
+            return "fail";
+        }
+        return t1.getTweetContent();
     }
 
 
@@ -322,6 +393,14 @@ public class TweetController {
         return tweetService.saveTweet(t1);
     }
 
+    @PostMapping("/removeOfficialTweetContent")
+    public TweetOfficial removeOfficialTweetContent(@RequestBody Map<String, Object> request) {
+        Integer tweetId = Integer.parseInt(String.valueOf(request.get("tweetId")));
+        TweetOfficial t1 = tweetService.findOfficialTweetByTweetId(tweetId);
+        t1.setTweetStatus(0);
+        return tweetService.saveOfficialTweet(t1);
+    }
+
     @PostMapping("/reportTweet")
     public ResponseEntity<String> handlePostRequest(@RequestBody Map<String, Object> requestMap) {
         //被檢舉的tweetId
@@ -379,22 +458,21 @@ public class TweetController {
 
     public Map<String,String> evaluateTweetContentByAi(String content) {
         Map<String,String> map = new HashMap<>();
-        String apiKey = "AIzaSyD8L-U56UHVFpQm4eh5uPp04ySNkObpzFQ";
         String url = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=" + apiKey;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
+        String contentPrompt =content+"。以上句子若包含仇恨言論、騷擾、露骨的性行為、危險內容嗎?若有請回傳其中可能性最高的一個，若沒有請不要回傳任何值，請用道德高標";
         String requestBody = "{"
                 + "\"contents\": [{"
-                + "\"parts\": [{\"text\": \"" + content + "\"}]"
+                + "\"parts\": [{\"text\": \"" + contentPrompt + "\"}]"
                 + "}],"
-                + "\"safetySettings\": [{"
-                + "\"category\": \"HARM_CATEGORY_DANGEROUS_CONTENT\","
-                + "\"threshold\": \"BLOCK_NONE\""
-                + "}],"
+//                + "\"safetySettings\": [{"
+//                + "\"category\": \"HARM_CATEGORY_DANGEROUS_CONTENT\","
+//                + "\"threshold\": \"BLOCK_NONE\""
+//                + "}],"
                 + "\"generationConfig\": {"
-                + "\"temperature\": 1.0,"
+                + "\"temperature\": 0.1,"
                 + "\"maxOutputTokens\": 30,"
                 + "\"topP\": 0.8,"
                 + "\"topK\": 10"
@@ -408,7 +486,7 @@ public class TweetController {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode responseJson = mapper.readTree(responseEntity.getBody());
             for(int i =0;i<=3;i++){
-                JsonNode promptFeedbackNode = responseJson.path("promptFeedback").get("safetyRatings").get(i);
+                JsonNode promptFeedbackNode = responseJson.path("candidates").get(0).get("safetyRatings").get(i);
                 map.put(promptFeedbackNode.get("category").textValue(),promptFeedbackNode.get("probability").textValue());
             }
         }catch (Exception e){

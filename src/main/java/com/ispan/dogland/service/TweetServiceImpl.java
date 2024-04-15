@@ -1,5 +1,7 @@
 package com.ispan.dogland.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.UserRepository;
@@ -7,6 +9,7 @@ import com.ispan.dogland.model.dao.tweet.*;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
+import com.ispan.dogland.model.entity.mongodb.TweetData;
 import com.ispan.dogland.model.entity.tweet.*;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import org.apache.commons.io.FileUtils;
@@ -50,6 +53,9 @@ public class TweetServiceImpl implements TweetService {
     private TweetNotificationRepository tweetNotificationRepository;
     private TweetReportRepository tweetReportRepository;
     private EmployeeRepository employeeRepository;
+    private TweetDataRepository tweetDataRepository;
+    private Cloudinary cloudinary;
+    private TweetOfficialRepository tweetOfficialRepository;
 
     @Autowired
     public TweetServiceImpl(TweetRepository tweetRepository,
@@ -60,7 +66,10 @@ public class TweetServiceImpl implements TweetService {
                             DogRepository dogRepository,
                             TweetNotificationRepository tweetNotificationRepository,
                             TweetReportRepository tweetReportRepository,
-                            EmployeeRepository employeeRepository) {
+                            EmployeeRepository employeeRepository,
+                            TweetDataRepository tweetDataRepository,
+                            Cloudinary cloudinary,
+                            TweetOfficialRepository tweetOfficialRepository) {
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
         this.tweetGalleryRepository = tweetGalleryRepository;
@@ -70,6 +79,9 @@ public class TweetServiceImpl implements TweetService {
         this.tweetNotificationRepository = tweetNotificationRepository;
         this.tweetReportRepository = tweetReportRepository;
         this.employeeRepository = employeeRepository;
+        this.tweetDataRepository = tweetDataRepository;
+        this.cloudinary = cloudinary;
+        this.tweetOfficialRepository = tweetOfficialRepository;
     }
 
     @Override
@@ -379,6 +391,11 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
+    public List<Tweet> findAllTweetsOnly() {
+        return tweetRepository.findAllTweetsOnly();
+    }
+
+    @Override
     public TweetNotification findTweetNotificationByNotifiId(Integer id) {
         return tweetNotificationRepository.findByTweetNotiId(id);
     }
@@ -499,6 +516,54 @@ public class TweetServiceImpl implements TweetService {
         Tweet tweetInDb = tweetRepository.save(tweet);
         Tweet tweetForReturn = this.postNewTweet(tweetInDb, userId);
         return tweetForReturn;
+    }
+
+    @Override
+    public TweetData getLastTweetData() {
+        List<TweetData> tweetData = tweetDataRepository.findAllByOrderByTimestampDesc();
+        return tweetData.get(0);
+
+    }
+
+    @Override
+    public String uploadOfficialImg(MultipartFile file) {
+        try{
+            Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "tweetOfficialFolder"));
+            return (String) data.get("url");
+        }catch (IOException e){
+            throw new RuntimeException("Image uploading fail !!");
+        }
+    }
+
+    @Override
+    public TweetOfficial saveOfficialTweet(TweetOfficial tweetOfficial) {
+        return tweetOfficialRepository.save(tweetOfficial);
+    }
+
+    @Override
+    public List<TweetOfficial> findAllOfficialTweet() {
+        return tweetOfficialRepository.findAllOfficialTweetWhereStatusIs1();
+    }
+
+    @Override
+    public TweetOfficial updateOfficialTweetContent(Integer tweetId, String newContent) {
+
+        TweetOfficial t1 = tweetOfficialRepository.findByTweetId(tweetId);
+        if(t1 == null){
+            return null;
+        }
+        t1.setTweetContent(newContent);
+        return tweetOfficialRepository.save(t1);
+    }
+
+    @Override
+    public TweetOfficial findOfficialTweetByTweetId(Integer tweetId) {
+        return tweetOfficialRepository.findByTweetId(tweetId);
+    }
+
+    @Override
+    public TweetOfficial saveTweetOfficial(TweetOfficial tweetOfficial) {
+        return tweetOfficialRepository.save(tweetOfficial);
     }
 
 

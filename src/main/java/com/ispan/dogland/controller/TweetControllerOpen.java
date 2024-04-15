@@ -77,6 +77,7 @@ public class TweetControllerOpen {
         UserDto userDto = new UserDto();
         userDto.setUserId(user.getUserId());
         userDto.setLastName(user.getLastName());
+        userDto.setUserImgPath(user.getUserImgPath());
         return userDto;
     }
 

@@ -4,6 +4,8 @@ package com.ispan.dogland.model.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ispan.dogland.model.entity.room.RoomReservation;
 import com.ispan.dogland.model.entity.tweet.Tweet;
+import com.ispan.dogland.model.entity.tweet.TweetNotification;
+import com.ispan.dogland.model.entity.tweet.TweetOfficial;
 import com.ispan.dogland.model.entity.tweet.TweetReport;
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -63,6 +65,7 @@ public class Users {
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Tweet> tweets;
+
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE,
                                                     CascadeType.DETACH, CascadeType.REFRESH})

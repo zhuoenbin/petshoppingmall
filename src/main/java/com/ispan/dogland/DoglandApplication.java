@@ -1,5 +1,6 @@
 package com.ispan.dogland;
 
+import com.ispan.dogland.controller.TweetController;
 import com.ispan.dogland.model.dao.DogRepository;
 import com.ispan.dogland.model.dao.EmployeeRepository;
 import com.ispan.dogland.model.dao.RoomReservationRepository;
@@ -9,12 +10,14 @@ import com.ispan.dogland.model.dao.tweet.*;
 import com.ispan.dogland.model.entity.Dog;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.Users;
+//import com.ispan.dogland.model.entity.mongodb.TweetData;
 import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductGallery;
 import com.ispan.dogland.model.entity.room.Room;
 import com.ispan.dogland.model.entity.room.RoomReservation;
 import com.ispan.dogland.model.entity.tweet.*;
 import com.ispan.dogland.service.interfaceFile.AccountService;
+import com.ispan.dogland.service.interfaceFile.RoomService;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -50,8 +53,11 @@ public class DoglandApplication {
 											   TweetNotificationRepository tweetNotificationRepository,
 											   AccountService accountService,
 											   TweetReportRepository tweetReportRepository,
-											   RoomReservationRepository roomReservationRepository) {
+											   RoomReservationRepository roomReservationRepository,
+											   RoomService roomService,
+											   TweetController tweetController) {
 		return runner -> {
+
 		};
 
 

@@ -27,13 +27,14 @@ public class OrderController {
     OrderService orderService;
 
     @GetMapping("")
-    public List<Orders> getOrdersByUserId(HttpSession session){
+    public List<Orders> getOrdersByUserId(HttpSession session) {
         Passport loggedInMember = (Passport) session.getAttribute("loginUser");
-        if(loggedInMember == null){
+        if (loggedInMember == null) {
             throw new RuntimeException("未登入錯誤");
         }
         return os.findOrdersByUserId(loggedInMember.getUserId());
     }
+
     @PostMapping("/ecpayCheckout")
     public String ecpayCheckout(@RequestParam String price, @RequestParam String url) {
         System.out.println("OrderController");
@@ -44,16 +45,16 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}/orderDetails")
-    public List<OrderDetail> getDetailsByOrderId(@PathVariable Integer orderId, HttpSession session){
+    public List<OrderDetail> getDetailsByOrderId(@PathVariable Integer orderId, HttpSession session) {
         Passport loggedInMember = (Passport) session.getAttribute("loginUser");
-        if(loggedInMember == null){
+        if (loggedInMember == null) {
             throw new RuntimeException("未登入錯誤");
         }
         return os.findDetailByOrderId(orderId);
     }
 
     @PostMapping("/getProducts")
-    public List<ProductDto> getProductsFromOrderDetails(@RequestBody List<Integer> productIds , HttpSession session){
+    public List<ProductDto> getProductsFromOrderDetails(@RequestBody List<Integer> productIds, HttpSession session) {
         return os.getProductsFromOrderDetails(productIds);
     }
 

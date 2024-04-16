@@ -289,23 +289,15 @@ public class ShopService {
         }
     }
 
-    //實作找尋評論(商品內頁)沒有使用者名字
+    //實作找尋評論(商品內頁)
     public List<Object[]> findAllCommentByProductId(Integer productId) {
         return commentRepository.findCommentWithUserByProductId(productId);
     }
 
-    //這個沒有實作成功
-//        public CommentDto findAllCommentByProductId(Integer productId){
-//        CommentDto commentDto = new CommentDto();
-//        Product product = new Product(productId);
-//        Users user = new Users();
-//        commentDto.setFirstName(user.getFirstName());
-//        commentDto.setLastName(user.getLastName());
-//
-//         Comment comment = commentRepository.findByProduct(product);
-//         BeanUtils.copyProperties(comment, commentDto);
-//         return commentDto;
-//    }
+    //實作找尋評論(商品內頁)加star
+    public List<Object[]> findCommentWithUserByProductIdAndStar(Integer productId,Integer star) {
+        return commentRepository.findCommentWithUserByProductIdAndStar(productId,star);
+    }
 
     //------------------------LinePay------------------------
     //Hmac 簽章

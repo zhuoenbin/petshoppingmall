@@ -60,7 +60,7 @@ public class OrderController {
     @PostMapping("/doOrderCancel")
     public ResponseEntity<String> doOrderCancel(@RequestParam("orderId") Integer orderId){
         os.addOrderCancelCase(orderId);
-        return ResponseEntity.ok("Product上架成功");
+        return ResponseEntity.ok("已發送訂單取消審核");
     }
 }
 

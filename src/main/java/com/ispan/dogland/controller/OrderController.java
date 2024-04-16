@@ -6,7 +6,6 @@ import com.ispan.dogland.model.entity.OrderDetail;
 import com.ispan.dogland.model.entity.Orders;
 import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductGallery;
-import com.ispan.dogland.service.EmployeeService;
 import com.ispan.dogland.service.OrderService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +23,8 @@ public class OrderController {
 
     @Autowired
     private OrderService os;
+    @Autowired
+    OrderService orderService;
 
     @GetMapping("")
     public List<Orders> getOrdersByUserId(HttpSession session){
@@ -63,6 +63,3 @@ public class OrderController {
         return ResponseEntity.ok("已發送訂單取消審核");
     }
 }
-
-
-

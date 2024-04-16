@@ -12,11 +12,6 @@ public class OrderDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderDetailId;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name="order_id")
-    @JsonIgnore
-    private Orders orders;
-
     private Integer quantity;
 
 //    private Integer price;
@@ -24,6 +19,11 @@ public class OrderDetail {
     private Integer unitPrice;
 
     private Integer discount;
+
+    @ManyToOne
+    @JoinColumn(name="order_id")
+    @JsonIgnore  //後來加的
+    private Orders orders;
 
 //    @ManyToOne
 //    @JoinColumn(name = "product_id")

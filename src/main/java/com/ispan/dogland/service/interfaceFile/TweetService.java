@@ -104,6 +104,8 @@ public interface TweetService {
 
     public String uploadOfficialImg(MultipartFile file);
 
+    public String uploadTweetImgToCloud(MultipartFile file);
+
     public TweetOfficial saveOfficialTweet(TweetOfficial tweetOfficial);
 
     public List<TweetOfficial> findAllOfficialTweet();

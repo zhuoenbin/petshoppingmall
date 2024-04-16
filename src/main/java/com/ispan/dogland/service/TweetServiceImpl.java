@@ -536,6 +536,16 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
+    public String uploadTweetImgToCloud(MultipartFile file) {
+        try{
+            Map data = this.cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "tweetFolder"));
+            return (String) data.get("url");
+        }catch (IOException e){
+            throw new RuntimeException("Image uploading fail !!");
+        }
+    }
+
+    @Override
     public TweetOfficial saveOfficialTweet(TweetOfficial tweetOfficial) {
         return tweetOfficialRepository.save(tweetOfficial);
     }

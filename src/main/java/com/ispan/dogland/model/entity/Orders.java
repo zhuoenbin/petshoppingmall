@@ -1,7 +1,6 @@
 package com.ispan.dogland.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.util.ArrayList;
@@ -94,6 +93,8 @@ public class Orders {
 //    }
 
     public Orders() {
+        // 初始化日期欄位
+        this.orderDate = new Date(); // 設定訂單日期為當前日期和時間
     }
 
     public Integer getOrderId() {
@@ -309,4 +310,5 @@ public class Orders {
         sb.append('}');
         return sb.toString();
     }
+
 }

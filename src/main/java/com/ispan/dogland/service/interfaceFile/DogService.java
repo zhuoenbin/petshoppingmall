@@ -11,6 +11,8 @@ public interface DogService {
 
     public List<Dog> findDogsByUsersId(Integer userId);
 
+    public Dog deleteDog(Integer dogId);
+
     public Dog addUserDog(Dog dog, Integer userId);
 
     public String uploadImg(Integer dogId, MultipartFile dogImgPathCloud);

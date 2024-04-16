@@ -1,11 +1,13 @@
 package com.ispan.dogland.service;
 
+import com.ispan.dogland.model.dao.OrderCancelRepository;
 import com.ispan.dogland.model.dao.OrderDetailRepository;
 import com.ispan.dogland.model.dao.OrdersRepository;
 import com.ispan.dogland.model.dao.UserRepository;
 import com.ispan.dogland.model.dao.product.ProductGalleryRepository;
 import com.ispan.dogland.model.dao.product.ProductRepository;
 import com.ispan.dogland.model.dto.ProductDto;
+import com.ispan.dogland.model.entity.OrderCancel;
 import com.ispan.dogland.model.entity.OrderDetail;
 import com.ispan.dogland.model.entity.Orders;
 import com.ispan.dogland.model.entity.product.Product;
@@ -32,11 +34,12 @@ public class OrderService {
     private ProductRepository productRepository;
     @Autowired
     private ProductGalleryRepository productGalleryRepository;
+    @Autowired
+    private OrderCancelRepository orderCancelRepository;
 
     public List<OrderDetail> findDetailByOrderId(Integer orderId){
         return orderDetailRepository.findByOrderId(orderId);
     }
-
     public List<ProductDto> getProductsFromOrderDetails(List<Integer> productIds){
         List<Product> pList = new ArrayList<>();
         List<ProductDto> pDtoList = new ArrayList<>();
@@ -68,7 +71,13 @@ public class OrderService {
         return ordersRepository.findOrdersByUserId(userId);
     }
 
-
+    public void addOrderCancelCase(Integer orderId){
+        OrderCancel oc = new OrderCancel();
+        oc.setIsRead(0);
+        OrderCancel oc2 = orderCancelRepository.save(oc);
+        oc2.setOrders(ordersRepository.findByOrderId(orderId));
+        orderCancelRepository.save(oc2);
+    }
     public String ecpayCheckout(String price, String url) {
 
         String uuId = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 20);
@@ -88,5 +97,5 @@ public class OrderService {
 
         return form;
     }
-}
 
+}

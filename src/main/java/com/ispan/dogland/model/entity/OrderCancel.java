@@ -11,6 +11,7 @@ public class OrderCancel {
     private Integer caseId;
 
     @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @JoinColumn(name="order_id")
     private Orders orders;
 
     @Column(name="is_read")

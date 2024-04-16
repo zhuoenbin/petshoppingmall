@@ -1,40 +1,34 @@
 package com.ispan.dogland.controller;
 
+
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ispan.dogland.model.dto.Passport;
 import com.ispan.dogland.model.dto.RoomReservationDto;
 import com.ispan.dogland.model.dto.ScoreDto;
 import com.ispan.dogland.model.entity.Employee;
-//import com.ispan.dogland.model.entity.mongodb.TweetData;
 import com.ispan.dogland.model.entity.OrderCancel;
 import com.ispan.dogland.model.entity.mongodb.TweetData;
 import com.ispan.dogland.model.entity.product.ProductCategory;
 import com.ispan.dogland.model.entity.room.Room;
-import com.ispan.dogland.model.entity.room.RoomReservation;
 import com.ispan.dogland.model.entity.tweet.Tweet;
 import com.ispan.dogland.service.EmployeeService;
 import com.ispan.dogland.service.interfaceFile.RoomService;
 import com.ispan.dogland.service.interfaceFile.TweetService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +100,10 @@ public class EmployeeController {
     public Employee getEmpByReportId(@PathVariable Integer reportId) {
         return tweetService.findEmployeeByReportId(reportId);
     }
+    @GetMapping("/getCategory")
+    public List<ProductCategory> getCategory(){
+        return es.findCategories();
+    }
 
 
 
@@ -149,10 +147,7 @@ public class EmployeeController {
     public TweetData getTweetData() {
         return tweetService.getLastTweetData();
     }
-    @GetMapping("/getCategory")
-    public List<ProductCategory> getCategory(){
-        return es.findCategories();
-    }
+
 
 
     @PostMapping("/addProduct")
@@ -177,7 +172,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/showOrderCase")
-    public List<OrderCancel> getCase(){
+    public List<OrderCancel> getCase() {
         return es.findOrderCases();
     }
 }

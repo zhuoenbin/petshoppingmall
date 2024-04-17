@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 
 @RestController
-@CrossOrigin(allowCredentials = "true", origins = { "http://localhost:5173/", "http://127.0.0.1:5173" })
 public class AccountController {
 
     @Autowired

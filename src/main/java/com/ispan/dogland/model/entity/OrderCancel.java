@@ -1,7 +1,6 @@
 package com.ispan.dogland.model.entity;
 
 import jakarta.persistence.*;
-
 @Entity
 @Table(name="orders_cancel")
 public class OrderCancel {
@@ -11,7 +10,12 @@ public class OrderCancel {
     private Integer caseId;
 
     @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @JoinColumn(name="order_id")
     private Orders orders;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="employee_id")
+    private Employee employee;
 
     @Column(name="is_read")
     private Integer isRead;
@@ -30,6 +34,14 @@ public class OrderCancel {
 
     public void setOrders(Orders orders) {
         this.orders = orders;
+    }
+
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
     }
 
     public Integer getIsRead() {

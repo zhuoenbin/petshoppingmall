@@ -175,4 +175,10 @@ public class EmployeeController {
     public List<OrderCancel> getCase() {
         return es.findOrderCases();
     }
+
+    @PostMapping("/confirmOrderCancel")
+    public ResponseEntity<String> doCancel(@RequestParam("orderId") Integer orderId){
+        es.updateCancelOrder(orderId);
+        return ResponseEntity.ok("success");
+    }
 }

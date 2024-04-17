@@ -221,9 +221,9 @@ public class AccountController {
 
         Passport loginUser=(Passport)session.getAttribute("loginUser");
         Users user = accountService.findUsersByUserId(loginUser.getUserId());
-
         //google登入後是無密碼狀態
-        if(Objects.equals(user.getUserPassword(), "")){
+        if(Objects.equals(user.getUserPassword(), null)){
+
             accountService.resetPassword(user.getUserEmail(), newPassword);
             return ResponseEntity.ok("resetPassword success");
         }

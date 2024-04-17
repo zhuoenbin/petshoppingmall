@@ -30,6 +30,11 @@ public class DogController {
         return dogs;
     }
 
+    @DeleteMapping("/delete/Dogs/{dogId}")
+    public Dog deleteDogs(@PathVariable Integer dogId) {
+        return dogService.deleteDog(dogId);
+    }
+
     @PostMapping("/addUserDog")
     public Integer addUserDog(@RequestBody Dog dog, HttpSession session) {
         Passport loginUser = (Passport) session.getAttribute("loginUser");

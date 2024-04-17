@@ -6,6 +6,7 @@ import com.ispan.dogland.model.dao.product.ProductGalleryRepository;
 import com.ispan.dogland.model.dao.product.ProductRepository;
 import com.ispan.dogland.model.entity.Employee;
 import com.ispan.dogland.model.entity.OrderCancel;
+import com.ispan.dogland.model.entity.Orders;
 import com.ispan.dogland.model.entity.product.Product;
 import com.ispan.dogland.model.entity.product.ProductCategory;
 import com.ispan.dogland.model.entity.product.ProductGallery;
@@ -40,6 +41,8 @@ public class EmployeeService {
     @Autowired
     private ProductCategoryRepository productCategoryRepository;
     @Autowired
+    private OrdersRepository ordersRepository;
+    @Autowired
     private OrderCancelRepository orderCancelRepository;
 
     public void addNewProduct(String productName, Integer categoryId, Integer unitPrice, String productDescription, Integer stock , String imgUrl){
@@ -71,5 +74,15 @@ public class EmployeeService {
 
     public List<OrderCancel> findOrderCases(){
         return orderCancelRepository.findAll();
+    }
+
+    public void updateCancelOrder(Integer orderId){
+        Orders o = ordersRepository.findByOrderId(orderId);
+        if(o.getPaymentStatus()==6) {
+            o.setPaymentStatus(4);
+        }else {
+            o.setPaymentStatus(3);
+        }
+        ordersRepository.save(o);
     }
 }

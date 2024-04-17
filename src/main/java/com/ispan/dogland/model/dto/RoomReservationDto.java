@@ -35,6 +35,9 @@ public class RoomReservationDto {
 
     private Date conmentsTime;
 
+    public RoomReservationDto() {
+    }
+
     public Integer getReservationId() {
         return reservationId;
     }
@@ -145,9 +148,6 @@ public class RoomReservationDto {
 
     public void setConmentsTime(Date conmentsTime) {
         this.conmentsTime = conmentsTime;
-    }
-
-    public RoomReservationDto() {
     }
 
     @Override

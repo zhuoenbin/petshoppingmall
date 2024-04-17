@@ -64,7 +64,10 @@ public class TweetController {
             return ResponseEntity.badRequest().body("Image file is empty");
         }
         //把圖片存到本地
-        String imgFileName = tweetService.saveTweetImgToLocal(file);
+//        String imgFileName = tweetService.saveTweetImgToLocal(file);
+
+        //把圖片存到雲端
+        String imgFileName = tweetService.uploadTweetImgToCloud(file);
 
         TweetGallery tweetGallery = new TweetGallery();
         tweetGallery.setImgPath(imgFileName);

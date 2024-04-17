@@ -31,7 +31,5 @@ public interface OrdersRepository extends JpaRepository<Orders,Integer> {
     @Query("SELECT o FROM Orders o JOIN o.users u ON u.userId = :userId")
     List<Orders> findOrdersByUserId(Integer userId);
 
-    //建誠
     Orders findByOrderId(Integer orderId);
-
 }

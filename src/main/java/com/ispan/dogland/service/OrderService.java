@@ -72,6 +72,23 @@ public class OrderService {
         return ordersRepository.findOrdersByUserId(userId);
     }
 
+    public void addOrderCancelCase(Integer orderId){
+        Orders o = ordersRepository.findByOrderId(orderId);
+        if(o.getPaymentStatus()==1){
+            o.setPaymentStatus(6);
+        }else{
+            o.setPaymentStatus(5);
+        }
+        o.setOrderCancelDate(new Date());
+        ordersRepository.save(o);
+
+        OrderCancel oc = new OrderCancel();
+        oc.setIsRead(0);
+
+        OrderCancel oc2 = orderCancelRepository.save(oc);
+        oc2.setOrders(o);
+        orderCancelRepository.save(oc2);
+    }
 
     public String ecpayCheckout(String price, String url) {
 
@@ -92,24 +109,5 @@ public class OrderService {
 
         return form;
     }
-
-    public void addOrderCancelCase(Integer orderId){
-        Orders o = ordersRepository.findByOrderId(orderId);
-        if(o.getPaymentStatus()==1){
-            o.setPaymentStatus(6);
-        }else{
-            o.setPaymentStatus(5);
-        }
-        o.setOrderCancelDate(new Date());
-        ordersRepository.save(o);
-
-        OrderCancel oc = new OrderCancel();
-        oc.setIsRead(0);
-
-        OrderCancel oc2 = orderCancelRepository.save(oc);
-        oc2.setOrders(o);
-        orderCancelRepository.save(oc2);
-    }
-
 }
 

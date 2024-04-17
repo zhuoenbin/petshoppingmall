@@ -39,6 +39,8 @@ public class ActivityPastBrief {
     private Integer currentDogNumber;
     private Integer currentUserNumber;
 
+    private Integer activityCost;
+    private String activityCostDescription;
     public Integer getActivityId() {
         return activityId;
     }
@@ -165,5 +167,21 @@ public class ActivityPastBrief {
 
     public void setCurrentUserNumber(Integer currentUserNumber) {
         this.currentUserNumber = currentUserNumber;
+    }
+
+    public Integer getActivityCost() {
+        return activityCost;
+    }
+
+    public void setActivityCost(Integer activityCost) {
+        this.activityCost = activityCost;
+    }
+
+    public String getActivityCostDescription() {
+        return activityCostDescription;
+    }
+
+    public void setActivityCostDescription(String activityCostDescription) {
+        this.activityCostDescription = activityCostDescription;
     }
 }

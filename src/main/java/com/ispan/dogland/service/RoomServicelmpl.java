@@ -243,7 +243,6 @@ public class RoomServicelmpl implements RoomService {
             roomOrderDto.setReservationTime(roomReservation.getReservationTime());
 
             roomOrderDtoList.add(roomOrderDto);
-             System.out.println(roomReservation.getEndTime());
             }
         }
         return roomOrderDtoList;
